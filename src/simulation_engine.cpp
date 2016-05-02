@@ -19,6 +19,29 @@
 
 #include "simulation_engine.hpp"
 
+namespace
+{
+    double distance(const Object& o1, const Object& o2)
+    {
+        const XY& p1 = o1.pos();
+        const XY& p2 = o2.pos();
+        const double dist = sqrt( (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) );
+
+        return dist;
+    }
+
+    XY unit_vector(const Object& o1, const Object& o2)
+    {
+        XY v( o1.pos() - o2.pos() );
+        const double dist = distance(o1, o2);
+
+        v.x /= dist;
+        v.y /= dist;
+
+        return v;
+    }
+}
+
 
 SimulationEngine::SimulationEngine()
 {
@@ -31,3 +54,41 @@ SimulationEngine::~SimulationEngine()
 
 }
 
+
+void SimulationEngine::addObject(const Object& obj)
+{
+    m_objects.push_back(obj);
+}
+
+
+void SimulationEngine::stepBy(double dt)
+{
+    const double G = 6.6732e-11;
+
+    for(int i = 0; i < m_objects.size() - 1; i++)
+        for(int j = i + 1; j < m_objects.size(); j++)
+        {
+            Object& o1 = m_objects[i];
+            Object& o2 = m_objects[j];
+
+            const double dist = distance(o1, o2);
+            const double dist2 = dist * dist;
+            const double masses = o1.mass() * o2.mass();
+            const double Fg = G * masses / dist2;
+
+            XY force_vector = unit_vector(o2, o1);
+            force_vector *= Fg;
+
+            o1.addForce(force_vector);
+            o2.addForce(-force_vector);
+        }
+
+    for(int i = 0; i < m_objects.size(); i++)
+        m_objects[i].applyForce(60);
+}
+
+
+const std::vector< Object >& SimulationEngine::objects() const
+{
+    return m_objects;
+}
