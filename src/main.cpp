@@ -59,8 +59,8 @@ int main(int argc, char** argv)
 {
     const double G = 6.6732e-11;
 
-    objs.push_back( Object(0, 0, 5.9736e27) );
-    objs.push_back( Object(6500e3, 0, 1e3) );
+    objs.push_back( Object(0, 0, 5.9736e24) );
+    objs.push_back( Object(6373e3, 0, 1) );
 
     while(true)
     {
