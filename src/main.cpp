@@ -127,11 +127,10 @@ XY unit_vector(const Object& o1, const Object& o2)
 }
 
 
-std::vector<Object> objs;
-
-
 int main(int argc, char** argv)
 {
+    std::vector<Object> objs;
+
     const double G = 6.6732e-11;
 
     objs.push_back( Object(0, 0, 5.9736e24) );
