@@ -12,8 +12,55 @@ struct XY
     XY(double _x, double _y): x(_x), y(_y) {}
     XY(): x(0.0), y(0.0) {}
 
+    XY operator-(const XY& other) const
+    {
+        XY result = *this;
+        result.x -= other.x;
+        result.y -= other.y;
 
+        return result;
+    }
+
+    XY& operator*=(double v)
+    {
+        x *= v;
+        y *= v;
+
+        return *this;
+    }
+
+    XY operator*(double v) const
+    {
+        XY result(x, y);
+        result *= v;
+
+        return result;
+    }
+
+    XY& operator+=(const XY& other)
+    {
+        x += other.x;
+        y += other.y;
+
+        return *this;
+    }
+
+    XY operator-() const
+    {
+        XY result(-x, -y);
+
+        return result;
+    }
+
+    XY& operator/(double v)
+    {
+        x /= v;
+        y /= v;
+
+        return *this;
+    }
 };
+
 
 class Object
 {
@@ -36,8 +83,24 @@ class Object
             return m_pos;
         }
 
-        void addForce(const XY &)
+        void addForce(const XY& f)
         {
+            dF += f;
+        }
+
+        void applyForce(double dt)
+        {
+            // F=am ⇒ a = F/m
+            const XY a = dF/m_mass;
+
+            // ΔV = aΔt
+            const XY dv = a * dt;
+
+            m_v += dv;
+            m_pos += m_v * dt;
+
+            dF.x = 0.0;
+            dF.y = 0.0;
         }
 };
 
@@ -52,6 +115,18 @@ double distance(const Object& o1, const Object& o2)
 }
 
 
+XY unit_vector(const Object& o1, const Object& o2)
+{
+    XY v( o1.pos() - o2.pos() );
+    const double dist = distance(o1, o2);
+
+    v.x /= dist;
+    v.y /= dist;
+
+    return v;
+}
+
+
 std::vector<Object> objs;
 
 
@@ -60,20 +135,30 @@ int main(int argc, char** argv)
     const double G = 6.6732e-11;
 
     objs.push_back( Object(0, 0, 5.9736e24) );
-    objs.push_back( Object(6373e3, 0, 1) );
+    objs.push_back( Object(6373e3, 0, 1e0) );
 
     while(true)
     {
         for(int i = 0; i < objs.size() - 1; i++)
             for(int j = i + 1; j < objs.size(); j++)
             {
-                const double dist = distance(objs[i], objs[j]);
+                Object& o1 = objs[i];
+                Object& o2 = objs[j];
+
+                const double dist = distance(o1, o2);
                 const double dist2 = dist * dist;
-                const double masses = objs[i].mass() * objs[j].mass();
+                const double masses = o1.mass() * o2.mass();
                 const double Fg = G * masses / dist2;
 
-                std::cout << Fg << std::endl;
+                XY force_vector = unit_vector(o2, o1);
+                force_vector *= Fg;
+
+                o1.addForce(force_vector);
+                o2.addForce(-force_vector);
             }
+
+        for(int i = 0; i < objs.size(); i++)
+            objs[i].applyForce(1);
     };
 
     return 0;
