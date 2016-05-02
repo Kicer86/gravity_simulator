@@ -71,7 +71,7 @@ class Object
     XY dF;
 
     public:
-        Object(double x, double y, double m): m_pos(x, y), m_v(), m_mass(m) {}
+        Object(double x, double y, double m, double v_x = 0.0, double v_y = 0.0): m_pos(x, y), m_v(v_x, v_y), m_mass(m) {}
 
         double mass() const
         {
@@ -81,6 +81,11 @@ class Object
         const XY& pos() const
         {
             return m_pos;
+        }
+
+        const XY& velocity() const
+        {
+            return m_v;
         }
 
         void addForce(const XY& f)
@@ -134,9 +139,11 @@ int main(int argc, char** argv)
     const double G = 6.6732e-11;
 
     objs.push_back( Object(0, 0, 5.9736e24) );
-    objs.push_back( Object(6373e3, 0, 1e0) );
+    objs.push_back( Object(6373e3, 0, 1e0, 0.0, 19000) );
 
-    while(true)
+    bool done = false;
+
+    for(int l = 0; l < 1000; l++)
     {
         for(int i = 0; i < objs.size() - 1; i++)
             for(int j = i + 1; j < objs.size(); j++)
@@ -157,7 +164,14 @@ int main(int argc, char** argv)
             }
 
         for(int i = 0; i < objs.size(); i++)
-            objs[i].applyForce(1);
+            objs[i].applyForce(60);
+
+        for(int i = 1; i < objs.size(); i++)
+        {
+            const Object& o = objs[i];
+
+            std::cout << l << "; " << o.pos().x << "; " << o.pos().y << "; " << o.velocity().x << "; " << o.velocity().y << std::endl;
+        }
     };
 
     return 0;
