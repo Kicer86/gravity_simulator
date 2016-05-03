@@ -45,9 +45,11 @@ void SimulationController::beginSimulation()
 {
     int id1 = m_engine.addObject( Object(0, 0, 5.9736e24) );
     int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22, 0.0, 1.022e3) );
+    int id3 = m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 0.0, -1.022e3) );
 
     m_scene->addObject(id1, QPointF(0, 0));
     m_scene->addObject(id2, QPointF(384400e3, 0));
+    m_scene->addObject(id3, QPointF(-384400e3, 0));
 
     m_timer.start(100);
 }
