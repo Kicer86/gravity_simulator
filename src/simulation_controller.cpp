@@ -20,8 +20,10 @@
 
 #include "simulation_controller.hpp"
 
+#include "objects_scene.hpp"
 
-SimulationController::SimulationController()
+
+SimulationController::SimulationController(): m_scene(nullptr)
 {
 
 }
@@ -30,4 +32,10 @@ SimulationController::SimulationController()
 SimulationController::~SimulationController()
 {
 
+}
+
+
+void SimulationController::setScene(ObjectsScene* scene)
+{
+    m_scene = scene;
 }

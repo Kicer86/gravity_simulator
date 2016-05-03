@@ -20,6 +20,8 @@
 #ifndef SIMULATIONCONTROLLER_HPP
 #define SIMULATIONCONTROLLER_HPP
 
+class ObjectsScene;
+
 class SimulationController
 {
     public:
@@ -27,6 +29,11 @@ class SimulationController
         SimulationController(const SimulationController &) = delete;
         ~SimulationController();
         SimulationController& operator=(const SimulationController &) = delete;
+
+        void setScene(ObjectsScene *);
+
+    private:
+        ObjectsScene* m_scene;
 };
 
 #endif // SIMULATIONCONTROLLER_HPP
