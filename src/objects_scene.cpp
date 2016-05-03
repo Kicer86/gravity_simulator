@@ -19,6 +19,8 @@
 
 #include "objects_scene.hpp"
 
+#include <cassert>
+
 #include <QGraphicsItem>
 
 ObjectsScene::ObjectsScene()
@@ -38,12 +40,16 @@ void ObjectsScene::addObject(int id, const QPointF& p)
     const QSizeF size(1e6, 1e6);
     const QRectF rect(p, size);
 
-    QGraphicsItem* item = addEllipse(rect);
+    QGraphicsItem* item = addEllipse(rect, QPen(), QBrush(Qt::SolidPattern));
     m_objects.insert( std::make_pair(id, item) );
+    item->setVisible(true);
 }
 
 
-void ObjectsScene::updatePosition(int id, const QPointF &)
+void ObjectsScene::updatePosition(int id, const QPointF& pos)
 {
+    auto obj = m_objects.find(id);
+    assert(obj != m_objects.end());
 
+    obj->second->setPos(pos);
 }
