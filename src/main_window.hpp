@@ -24,6 +24,9 @@
 
 #include <QMainWindow>
 
+#include "objects_scene.hpp"
+#include "simulation_controller.hpp"
+
 namespace Ui
 {
     class MainWindow;
@@ -41,6 +44,9 @@ class MainWindow: public QMainWindow
 
     private:
         std::unique_ptr<Ui::MainWindow> ui;
+
+        ObjectsScene m_scene;
+        SimulationController m_controller;
 };
 
 #endif // MAINWINDOW_HPP
