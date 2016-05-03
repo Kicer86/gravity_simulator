@@ -20,11 +20,13 @@
 #ifndef SIMULATIONCONTROLLER_HPP
 #define SIMULATIONCONTROLLER_HPP
 
+#include <QTimer>
+
 #include "simulation_engine.hpp"
 
 class ObjectsScene;
 
-class SimulationController
+class SimulationController: public QObject
 {
     public:
         SimulationController();
@@ -38,7 +40,10 @@ class SimulationController
 
     private:
         SimulationEngine m_engine;
+        QTimer m_timer;
         ObjectsScene* m_scene;
+
+        void tick();
 };
 
 #endif // SIMULATIONCONTROLLER_HPP

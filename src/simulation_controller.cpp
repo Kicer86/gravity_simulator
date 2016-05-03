@@ -23,9 +23,9 @@
 #include "objects_scene.hpp"
 
 
-SimulationController::SimulationController(): m_engine(), m_scene(nullptr)
+SimulationController::SimulationController(): m_engine(), m_timer(), m_scene(nullptr)
 {
-
+    connect(&m_timer, &QTimer::timeout, this, &SimulationController::tick);
 }
 
 
@@ -44,8 +44,23 @@ void SimulationController::setScene(ObjectsScene* scene)
 void SimulationController::beginSimulation()
 {
     int id1 = m_engine.addObject( Object(0, 0, 5.9736e24) );
-    int id2 = m_engine.addObject( Object(6373e3, 0, 1e0, 0.0, 19000) );
+    int id2 = m_engine.addObject( Object(6373e3, 0, 1e20, 0.0, 10000) );
+    int id3 = m_engine.addObject( Object(0, 6373e3, 1e0, 5000, 0.0) );
 
     m_scene->addObject(id1, QPointF(0, 0));
     m_scene->addObject(id2, QPointF(6373e3, 0));
+    m_scene->addObject(id3, QPointF(0, 6373e3));
+
+    m_timer.start(100);
+}
+
+
+void SimulationController::tick()
+{
+    m_engine.stepBy(60);
+
+    const std::vector<Object>& objs = m_engine.objects();
+
+    for(int i = 0; i < objs.size(); i++)
+        m_scene->updatePosition(i, QPointF(objs[i].pos().x, objs[i].pos().y));
 }
