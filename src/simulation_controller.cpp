@@ -23,7 +23,7 @@
 #include "objects_scene.hpp"
 
 
-SimulationController::SimulationController(): m_scene(nullptr)
+SimulationController::SimulationController(): m_engine(), m_scene(nullptr)
 {
 
 }
@@ -38,4 +38,14 @@ SimulationController::~SimulationController()
 void SimulationController::setScene(ObjectsScene* scene)
 {
     m_scene = scene;
+}
+
+
+void SimulationController::beginSimulation()
+{
+    int id1 = m_engine.addObject( Object(0, 0, 5.9736e24) );
+    int id2 = m_engine.addObject( Object(6373e3, 0, 1e0, 0.0, 19000) );
+
+    m_scene->addObject(id1, QPointF(0, 0));
+    m_scene->addObject(id2, QPointF(6373e3, 0));
 }

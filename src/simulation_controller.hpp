@@ -20,6 +20,8 @@
 #ifndef SIMULATIONCONTROLLER_HPP
 #define SIMULATIONCONTROLLER_HPP
 
+#include "simulation_engine.hpp"
+
 class ObjectsScene;
 
 class SimulationController
@@ -32,7 +34,10 @@ class SimulationController
 
         void setScene(ObjectsScene *);
 
+        void beginSimulation();
+
     private:
+        SimulationEngine m_engine;
         ObjectsScene* m_scene;
 };
 
