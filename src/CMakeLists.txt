@@ -18,6 +18,8 @@ add_executable(gravity_simulator
                main_window.hpp
                objects_scene.cpp
                objects_scene.hpp
+               simulation_controller.cpp
+               simulation_controller.hpp
                simulation_engine.cpp
                simulation_engine.hpp
                ${moc_wrapped}
