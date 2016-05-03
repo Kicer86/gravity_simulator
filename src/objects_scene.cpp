@@ -25,7 +25,12 @@
 
 ObjectsScene::ObjectsScene()
 {
+    const double grid = 400e6;
+    QPen pen;
+    pen.setWidth(10e6);
 
+    addLine(-grid, 0, grid, 0, pen);
+    addLine(0, -grid, 0, grid, pen);
 }
 
 
@@ -37,12 +42,15 @@ ObjectsScene::~ObjectsScene()
 
 void ObjectsScene::addObject(int id, const QPointF& p)
 {
-    const QSizeF size(1e6, 1e6);
-    const QRectF rect(p, size);
+    const QSizeF size(100e6, 100e6);
+    const QRectF rect(QPointF(-50e6, -50e6), size);
+    QPen pen(QColor(Qt::red));
+    pen.setWidthF(10e6);
 
-    QGraphicsItem* item = addEllipse(rect, QPen(), QBrush(Qt::SolidPattern));
+    QGraphicsItem* item = addEllipse(rect, pen, QBrush(Qt::SolidPattern));
+    item->setPos(p);
+
     m_objects.insert( std::make_pair(id, item) );
-    item->setVisible(true);
 }
 
 
