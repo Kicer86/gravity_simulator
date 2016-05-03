@@ -20,6 +20,8 @@
 #ifndef OBJECTSSCENE_HPP
 #define OBJECTSSCENE_HPP
 
+#include <unordered_map>
+
 #include <QGraphicsScene>
 
 class ObjectsScene: public QGraphicsScene
@@ -29,6 +31,12 @@ class ObjectsScene: public QGraphicsScene
         ObjectsScene(const ObjectsScene &) = delete;
         ~ObjectsScene();
         ObjectsScene& operator=(const ObjectsScene &) = delete;
+
+        void addObject(int id);
+        void updatePosition(int id, const QPointF &);
+
+    private:
+        std::unordered_map<int, QGraphicsItem *> m_objects;
 };
 
 #endif // OBJECTSSCENE_HPP
