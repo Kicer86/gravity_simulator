@@ -87,7 +87,7 @@ void SimulationEngine::stepBy(double dt)
         }
 
     for(int i = 0; i < m_objects.size(); i++)
-        m_objects[i].applyForce(60);
+        m_objects[i].applyForce(dt);
 }
 
 
