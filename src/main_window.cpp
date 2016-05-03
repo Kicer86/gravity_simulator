@@ -29,6 +29,11 @@ MainWindow::MainWindow(): m_scene(), m_controller()
 
     ui->graphicsView->setScene(&m_scene);
     m_controller.setScene(&m_scene);
+
+    m_controller.beginSimulation();
+
+    auto rect = m_scene.sceneRect();
+    ui->graphicsView->fitInView(rect);
 }
 
 
