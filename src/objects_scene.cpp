@@ -33,16 +33,17 @@ ObjectsScene::~ObjectsScene()
 }
 
 
-void ObjectsScene::addObject(int id)
+void ObjectsScene::addObject(int id, const QPointF& p)
 {
-    QRectF rect(0, 0, 1e6, 1e6);
+    const QSizeF size(1e6, 1e6);
+    const QRectF rect(p, size);
 
     QGraphicsItem* item = addEllipse(rect);
     m_objects.insert( std::make_pair(id, item) );
 }
 
 
-void ObjectsScene::updatePosition(int id, const QPointF&)
+void ObjectsScene::updatePosition(int id, const QPointF &)
 {
 
 }
