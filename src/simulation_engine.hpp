@@ -142,7 +142,7 @@ class SimulationEngine
 
         SimulationEngine& operator=(const SimulationEngine &) = delete;
 
-        void addObject(const Object &);
+        int addObject(const Object &);
         void stepBy(double);
 
         const std::vector<Object>& objects() const;

@@ -55,9 +55,12 @@ SimulationEngine::~SimulationEngine()
 }
 
 
-void SimulationEngine::addObject(const Object& obj)
+int SimulationEngine::addObject(const Object& obj)
 {
+    const int id = m_objects.size();
     m_objects.push_back(obj);
+
+    return id;
 }
 
 
