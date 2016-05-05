@@ -78,36 +78,8 @@ int SimulationEngine::addObject(const Object& obj)
 
 void SimulationEngine::stepBy(double dt)
 {
-    const double G = 6.6732e-11;
-
-    for(int i = 0; i < m_objects.size() - 1; i++)
-        for(int j = i + 1; j < m_objects.size(); j++)
-        {
-            Object& o1 = m_objects[i];
-            Object& o2 = m_objects[j];
-
-            const double dist = distance(o1, o2);
-            const double r1 = o1.radius();
-            const double r2 = o2.radius();
-
-            if (r1 + r2 > dist)
-                collide(i, j);
-            else
-            {
-                const double dist2 = dist * dist;
-                const double masses = o1.mass() * o2.mass();
-                const double Fg = G * masses / dist2;
-
-                XY force_vector = unit_vector(o2, o1);
-                force_vector *= Fg;
-
-                o1.addForce(force_vector);
-                o2.addForce(-force_vector);
-            }
-        }
-
-    for(int i = 0; i < m_objects.size(); i++)
-        m_objects[i].applyForce(dt);
+    while (dt > 0.0)
+        dt -= step();
 }
 
 
@@ -120,9 +92,10 @@ double SimulationEngine::step()
     std::vector<XY> v(objs);
     std::vector<XY> pos(objs);
 
+    const std::vector<XY> forces = calculateForces();
+
     do
     {
-        const std::vector<XY> forces = calculateForces();
         const std::vector<XY> speeds = calculateVelocities(forces, m_dt);
 
         double max_travel = 0.0;
@@ -141,10 +114,10 @@ double SimulationEngine::step()
                 max_travel = travel;
         }
 
-        if (max_travel > 1e3)
+        if (max_travel > 100e3)
+            m_dt = m_dt * 100e3 / max_travel;
+        else if (max_travel < 1e3)
             m_dt = m_dt * 1e3 / max_travel;
-        else if (max_travel < 100)
-            m_dt = m_dt * 100 / max_travel;
         else
             optimal = true;
     }
@@ -156,6 +129,20 @@ double SimulationEngine::step()
         o.setPos(pos[i]);
         o.setVelocity(v[i]);
     }
+
+    for(int i = 0; i < objs - 1; i++)
+        for(int j = i + 1; j < objs; j++)
+        {
+            const Object& o1 = m_objects[i];
+            const Object& o2 = m_objects[j];
+
+            const double dist = distance(o1, o2);
+
+            if ( (o1.radius() + o2.radius()) > dist )
+                collide(i, j);
+        }
+
+    return m_dt;
 }
 
 
@@ -176,7 +163,7 @@ void SimulationEngine::collide(int i, int j)
     Object& h = m_objects[heavier];
     Object& l = m_objects[lighter];
 
-    const double newRadius = ( h.radius() * h.mass() + l.radius() * l.mass() ) / ( h.mass() + l.mass() );
+    const double newRadius = std::cbrt( std::pow( h.radius(), 3 ) + std::pow( l.radius(), 3 ) );
 
     h.setMass( h.mass() + l.mass() );
     h.setRadius( newRadius );
