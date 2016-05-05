@@ -90,15 +90,28 @@ class Object
         XY m_pos;
         XY m_v;
         double m_mass;
+        double m_radius;
 
         XY dF;
 
     public:
-        Object(double x, double y, double m, double v_x = 0.0, double v_y = 0.0): m_pos(x, y), m_v(v_x, v_y), m_mass(m) {}
+        Object(double x, double y, double m, double r, double v_x = 0.0, double v_y = 0.0):
+            m_pos(x, y),
+            m_v(v_x, v_y),
+            m_mass(m),
+            m_radius(r)
+        {
+
+        }
 
         double mass() const
         {
             return m_mass;
+        }
+
+        double radius() const
+        {
+            return m_radius;
         }
 
         const XY& pos() const

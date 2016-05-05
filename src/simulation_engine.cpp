@@ -75,15 +75,25 @@ void SimulationEngine::stepBy(double dt)
             Object& o2 = m_objects[j];
 
             const double dist = distance(o1, o2);
-            const double dist2 = dist * dist;
-            const double masses = o1.mass() * o2.mass();
-            const double Fg = G * masses / dist2;
+            const double r1 = o1.radius();
+            const double r2 = o2.radius();
 
-            XY force_vector = unit_vector(o2, o1);
-            force_vector *= Fg;
+            if (r1 + r2 > dist)
+            {
+                // collision
+            }
+            else
+            {
+                const double dist2 = dist * dist;
+                const double masses = o1.mass() * o2.mass();
+                const double Fg = G * masses / dist2;
 
-            o1.addForce(force_vector);
-            o2.addForce(-force_vector);
+                XY force_vector = unit_vector(o2, o1);
+                force_vector *= Fg;
+
+                o1.addForce(force_vector);
+                o2.addForce(-force_vector);
+            }
         }
 
     for(int i = 0; i < m_objects.size(); i++)
