@@ -101,7 +101,6 @@ class Object
         double m_mass;
         double m_radius;
 
-        XY dF [[deprecated]];
         int m_id;
 
     public:
@@ -133,26 +132,6 @@ class Object
         const XY& velocity() const
         {
             return m_v;
-        }
-
-        void addForce(const XY& f)
-        {
-            dF += f;
-        }
-
-        void applyForce(double dt)
-        {
-            // F=am ⇒ a = F/m
-            const XY a = dF/m_mass;
-
-            // ΔV = aΔt
-            const XY dv = a * dt;
-
-            m_v += dv;
-            m_pos += m_v * dt;
-
-            dF.x = 0.0;
-            dF.y = 0.0;
         }
 
         void setId(int id)
