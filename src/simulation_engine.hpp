@@ -68,6 +68,14 @@ struct XY
         return *this;
     }
 
+    XY operator+(const XY& other) const
+    {
+        XY result(x, y);
+        result += other;
+
+        return result;
+    }
+
     XY operator-() const
     {
         XY result(-x, -y);
@@ -196,7 +204,7 @@ class SimulationEngine
         void collide(int, int);
 
         std::vector<XY> calculateForces() const;
-        std::vector<XY> calculateSpeed(const std::vector<XY> &, double) const;
+        std::vector<XY> calculateVelocities(const std::vector<XY> &, double) const;
 };
 
 #endif // SIMULATIONENGINE_HPP

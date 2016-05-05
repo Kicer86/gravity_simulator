@@ -105,7 +105,22 @@ void SimulationEngine::stepBy(double dt)
 
 double SimulationEngine::step()
 {
+    double dt = 3600;
 
+    const std::vector<XY> forces = calculateForces();
+    const std::vector<XY> speeds = calculateVelocities(forces, dt);
+
+    for(std::size_t i = 0; i < m_objects.size(); i++)
+    {
+        Object& o = m_objects[i];
+
+        const XY& dV = speeds[i];
+        const XY v = dV + o.velocity();
+        const XY pos = o.pos() + v * dt;
+
+        o.setPos(pos);
+        o.setVelocity(v);
+    }
 }
 
 
@@ -145,7 +160,7 @@ std::vector<XY> SimulationEngine::calculateForces() const
     const std::size_t objs = m_objects.size();
     const double G = 6.6732e-11;
 
-    std::vector<XY> forces(objs, XY());
+    std::vector<XY> forces(objs);
 
     for(int i = 0; i < objs - 1; i++)
         for(int j = i + 1; j < objs; j++)
@@ -169,9 +184,10 @@ std::vector<XY> SimulationEngine::calculateForces() const
 }
 
 
-std::vector<XY> SimulationEngine::calculateSpeed(const std::vector<XY>& forces, double dt) const
+std::vector<XY> SimulationEngine::calculateVelocities(const std::vector<XY>& forces, double dt) const
 {
-    std::vector<XY> result(m_objects.size(), XY());
+    std::vector<XY> result;
+    result.reserve(m_objects.size());
 
     for(int i = 0; i < m_objects.size(); i++)
     {
