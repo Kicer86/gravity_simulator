@@ -43,7 +43,7 @@ void SimulationController::setScene(ObjectsScene* scene)
 
 void SimulationController::beginSimulation()
 {
-    int id1 = m_engine.addObject( Object(0, 0, 5.9736e24, 6.371e3) );
+    int id1 = m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
     int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 0, 0) );
     //int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
     //int id3 = m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
