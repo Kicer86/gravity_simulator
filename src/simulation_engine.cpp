@@ -168,7 +168,6 @@ void SimulationEngine::collide(int i, int j)
     h.setMass( h.mass() + l.mass() );
     h.setRadius( newRadius );
 
-
     // remove lighter by overriding it with last one
     if (lighter < m_objects.size() - 1)
         m_objects[lighter] = m_objects.back();
