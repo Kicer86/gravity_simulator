@@ -21,11 +21,18 @@
 
 namespace
 {
+    double distance(const XY& p1, const XY& p2)
+    {
+        const double dist = sqrt( (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) );
+
+        return dist;
+    }
+
     double distance(const Object& o1, const Object& o2)
     {
         const XY& p1 = o1.pos();
         const XY& p2 = o2.pos();
-        const double dist = sqrt( (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) );
+        const double dist = distance(p1, p2);
 
         return dist;
     }
@@ -45,6 +52,7 @@ namespace
 
 SimulationEngine::SimulationEngine():
     m_objects(),
+    m_dt(60),
     m_nextId(0)
 {
 
@@ -105,21 +113,48 @@ void SimulationEngine::stepBy(double dt)
 
 double SimulationEngine::step()
 {
-    double dt = 3600;
+    bool optimal = false;
 
-    const std::vector<XY> forces = calculateForces();
-    const std::vector<XY> speeds = calculateVelocities(forces, dt);
+    const std::size_t objs = m_objects.size();
 
-    for(std::size_t i = 0; i < m_objects.size(); i++)
+    std::vector<XY> v(objs);
+    std::vector<XY> pos(objs);
+
+    do
+    {
+        const std::vector<XY> forces = calculateForces();
+        const std::vector<XY> speeds = calculateVelocities(forces, m_dt);
+
+        double max_travel = 0.0;
+
+        for(std::size_t i = 0; i < objs; i++)
+        {
+            const Object& o = m_objects[i];
+
+            const XY& dV = speeds[i];
+            v[i] = dV + o.velocity();
+            pos[i] = o.pos() + v[i] * m_dt;
+
+            const double travel = distance(pos[i], o.pos());
+
+            if (travel > max_travel)
+                max_travel = travel;
+        }
+
+        if (max_travel > 1e3)
+            m_dt = m_dt * 1e3 / max_travel;
+        else if (max_travel < 100)
+            m_dt = m_dt * 100 / max_travel;
+        else
+            optimal = true;
+    }
+    while(optimal == false);
+
+    for(std::size_t i = 0; i < objs; i++)
     {
         Object& o = m_objects[i];
-
-        const XY& dV = speeds[i];
-        const XY v = dV + o.velocity();
-        const XY pos = o.pos() + v * dt;
-
-        o.setPos(pos);
-        o.setVelocity(v);
+        o.setPos(pos[i]);
+        o.setVelocity(v[i]);
     }
 }
 

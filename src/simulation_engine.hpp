@@ -199,6 +199,7 @@ class SimulationEngine
 
     private:
         std::vector<Object> m_objects;
+        double m_dt;
         int m_nextId;
 
         void collide(int, int);
