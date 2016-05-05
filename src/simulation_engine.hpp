@@ -150,6 +150,16 @@ class Object
         {
             m_id = id;
         }
+
+        void setMass(double m)
+        {
+            m_mass = m;
+        }
+
+        void setRadius(double r)
+        {
+            m_radius = r;
+        }
 };
 
 
@@ -170,6 +180,8 @@ class SimulationEngine
     private:
         std::vector<Object> m_objects;
         int m_nextId;
+
+        void collide(int, int);
 };
 
 #endif // SIMULATIONENGINE_HPP

@@ -83,9 +83,7 @@ void SimulationEngine::stepBy(double dt)
             const double r2 = o2.radius();
 
             if (r1 + r2 > dist)
-            {
-                // collision
-            }
+                collide(i, j);
             else
             {
                 const double dist2 = dist * dist;
@@ -108,4 +106,29 @@ void SimulationEngine::stepBy(double dt)
 const std::vector< Object >& SimulationEngine::objects() const
 {
     return m_objects;
+}
+
+
+void SimulationEngine::collide(int i, int j)
+{
+    Object& o1 = m_objects[i];
+    Object& o2 = m_objects[j];
+
+    const int heavier = o1.mass() > o2.mass()? i: j;
+    const int lighter = heavier == i? j : i;
+
+    Object& h = m_objects[heavier];
+    Object& l = m_objects[lighter];
+
+    const double newRadius = ( h.radius() * h.mass() + l.radius() * l.mass() ) / ( h.mass() + l.mass() );
+
+    h.setMass( h.mass() + l.mass() );
+    h.setRadius( newRadius );
+
+
+    // remove lighter by overriding it with last one
+    if (lighter < m_objects.size() - 1)
+        m_objects[lighter] = m_objects.back();
+
+    m_objects.pop_back();
 }
