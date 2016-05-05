@@ -43,7 +43,9 @@ namespace
 }
 
 
-SimulationEngine::SimulationEngine()
+SimulationEngine::SimulationEngine():
+    m_objects(),
+    m_nextId(0)
 {
 
 }
@@ -57,10 +59,12 @@ SimulationEngine::~SimulationEngine()
 
 int SimulationEngine::addObject(const Object& obj)
 {
-    const int id = m_objects.size();
     m_objects.push_back(obj);
+    Object& addedObj = m_objects.back();
 
-    return id;
+    addedObj.setId(m_nextId);
+
+    return m_nextId++;
 }
 
 

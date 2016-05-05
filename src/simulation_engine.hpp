@@ -93,13 +93,15 @@ class Object
         double m_radius;
 
         XY dF;
+        int m_id;
 
     public:
         Object(double x, double y, double m, double r, double v_x = 0.0, double v_y = 0.0):
             m_pos(x, y),
             m_v(v_x, v_y),
             m_mass(m),
-            m_radius(r)
+            m_radius(r),
+            m_id(0)
         {
 
         }
@@ -143,6 +145,11 @@ class Object
             dF.x = 0.0;
             dF.y = 0.0;
         }
+
+        void setId(int id)
+        {
+            m_id = id;
+        }
 };
 
 
@@ -162,6 +169,7 @@ class SimulationEngine
 
     private:
         std::vector<Object> m_objects;
+        int m_nextId;
 };
 
 #endif // SIMULATIONENGINE_HPP
