@@ -103,6 +103,12 @@ void SimulationEngine::stepBy(double dt)
 }
 
 
+double SimulationEngine::step()
+{
+
+}
+
+
 const std::vector< Object >& SimulationEngine::objects() const
 {
     return m_objects;
@@ -131,4 +137,55 @@ void SimulationEngine::collide(int i, int j)
         m_objects[lighter] = m_objects.back();
 
     m_objects.pop_back();
+}
+
+
+std::vector<XY> SimulationEngine::calculateForces() const
+{
+    const std::size_t objs = m_objects.size();
+    const double G = 6.6732e-11;
+
+    std::vector<XY> forces(objs, XY());
+
+    for(int i = 0; i < objs - 1; i++)
+        for(int j = i + 1; j < objs; j++)
+        {
+            const Object& o1 = m_objects[i];
+            const Object& o2 = m_objects[j];
+
+            const double dist = distance(o1, o2);
+            const double dist2 = dist * dist;
+            const double masses = o1.mass() * o2.mass();
+            const double Fg = G * masses / dist2;
+
+            XY force_vector = unit_vector(o2, o1);
+            force_vector *= Fg;
+
+            forces[i] += force_vector;
+            forces[j] += -force_vector;
+        }
+
+    return forces;
+}
+
+
+std::vector<XY> SimulationEngine::calculateSpeed(const std::vector<XY>& forces, double dt) const
+{
+    std::vector<XY> result(m_objects.size(), XY());
+
+    for(int i = 0; i < m_objects.size(); i++)
+    {
+        const XY& dF = forces[i];
+        const Object& o = m_objects[i];
+
+        // F=am ⇒ a = F/m
+        const XY a = dF / o.mass();
+
+        // ΔV = aΔt
+        const XY dv = a * dt;
+
+        result.push_back(dv);
+    }
+
+    return result;
 }

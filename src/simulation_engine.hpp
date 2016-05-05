@@ -75,12 +75,13 @@ struct XY
         return result;
     }
 
-    XY& operator/(double v)
+    XY operator/(double v) const
     {
-        x /= v;
-        y /= v;
+        XY result = *this;
+        result.x /= v;
+        result.y /= v;
 
-        return *this;
+        return result;
     }
 };
 
@@ -92,7 +93,7 @@ class Object
         double m_mass;
         double m_radius;
 
-        XY dF;
+        XY dF [[deprecated]];
         int m_id;
 
     public:
@@ -160,6 +161,16 @@ class Object
         {
             m_radius = r;
         }
+
+        void setVelocity(const XY& v)
+        {
+            m_v = v;
+        }
+
+        void setPos(const XY& p)
+        {
+            m_pos = p;
+        }
 };
 
 
@@ -174,6 +185,7 @@ class SimulationEngine
 
         int addObject(const Object &);
         void stepBy(double);
+        double step();
 
         const std::vector<Object>& objects() const;
 
@@ -182,6 +194,9 @@ class SimulationEngine
         int m_nextId;
 
         void collide(int, int);
+
+        std::vector<XY> calculateForces() const;
+        std::vector<XY> calculateSpeed(const std::vector<XY> &, double) const;
 };
 
 #endif // SIMULATIONENGINE_HPP
