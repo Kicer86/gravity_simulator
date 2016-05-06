@@ -197,7 +197,8 @@ class SimulationEngine
         double m_dt;
         int m_nextId;
 
-        void collide(int, int);
+        int collide(int, int);
+        std::vector<int> checkForCollisions();
 
         std::vector<XY> calculateForces() const;
         std::vector<XY> calculateVelocities(const std::vector<XY> &, double) const;

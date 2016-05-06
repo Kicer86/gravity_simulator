@@ -19,6 +19,8 @@
 
 #include "simulation_engine.hpp"
 
+#include <algorithm>
+
 namespace
 {
     double distance(const XY& p1, const XY& p2)
@@ -164,32 +166,17 @@ double SimulationEngine::step()
         o.setVelocity(v[i]);
     }
 
-    bool collisions = false;
+    std::vector<int> toRemove = checkForCollisions();
+    std::sort(toRemove.rbegin(), toRemove.rend());
 
-    do
+    for(int i: toRemove)
     {
-        collisions = false;
+        // remove object 'i' by overriding it with last one
+        if (i < m_objects.size() - 1)
+            m_objects[i] = m_objects.back();
 
-        const std::size_t objs = m_objects.size();
-        for(int i = 0; i < objs - 1; i++)
-            for(int j = i + 1; j < objs; j++)
-            {
-                const Object& o1 = m_objects[i];
-                const Object& o2 = m_objects[j];
-
-                const double dist = distance(o1, o2);
-
-                if ( (o1.radius() + o2.radius()) > dist )
-                {
-                    collide(i, j);
-                    collisions = true;
-                    goto quit;
-                }
-            }
-
-        quit: ;
+        m_objects.pop_back();
     }
-    while (collisions);
 
     return m_dt;
 }
@@ -201,7 +188,7 @@ const std::vector< Object >& SimulationEngine::objects() const
 }
 
 
-void SimulationEngine::collide(int i, int j)
+int SimulationEngine::collide(int i, int j)
 {
     Object& o1 = m_objects[i];
     Object& o2 = m_objects[j];
@@ -230,14 +217,34 @@ void SimulationEngine::collide(int i, int j)
 
     h.setVelocity(h.velocity() + h_velocity_vector);
 
-    // remove lighter by overriding it with last one
-    if (lighter < m_objects.size() - 1)
-        m_objects[lighter] = m_objects.back();
-
-    m_objects.pop_back();
-
     for(ISimulationEvents* events: m_eventObservers)
         events->objectsColided(h_id, l_id);
+
+    return lighter;
+}
+
+
+std::vector<int> SimulationEngine::checkForCollisions()
+{
+    std::vector<int> toRemove;
+
+    const std::size_t objs = m_objects.size();
+    for(int i = 0; i < objs - 1; i++)
+        for(int j = i + 1; j < objs; j++)
+        {
+            const Object& o1 = m_objects[i];
+            const Object& o2 = m_objects[j];
+
+            const double dist = distance(o1, o2);
+
+            if ( (o1.radius() + o2.radius()) > dist )
+            {
+                const int destroyed = collide(i, j);
+                toRemove.push_back(destroyed);
+            }
+        }
+
+    return toRemove;
 }
 
 
