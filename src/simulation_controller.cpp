@@ -26,6 +26,8 @@
 SimulationController::SimulationController(): m_engine(), m_timer(), m_scene(nullptr)
 {
     connect(&m_timer, &QTimer::timeout, this, &SimulationController::tick);
+
+    m_engine.addEventsObserver(this);
 }
 
 
