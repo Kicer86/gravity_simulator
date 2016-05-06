@@ -47,6 +47,33 @@ namespace
 
         return v;
     }
+
+    XY unit_vector(const XY& p1, const XY& p2)
+    {
+        XY v( p1 - p2 );
+        const double dist = distance(p1, p2);
+
+        v.x /= dist;
+        v.y /= dist;
+
+        return v;
+    }
+
+    XY unit_vector(const XY& p)
+    {
+        XY v = p;
+        const double dist = distance(p, XY());
+
+        v.x /= dist;
+        v.y /= dist;
+
+        return v;
+    }
+
+    double vector_length(const XY& p)
+    {
+        return distance(p, XY());
+    }
 }
 
 
@@ -173,10 +200,20 @@ void SimulationEngine::collide(int i, int j)
     const int h_id = h.id();
     const int l_id = l.id();
 
+    // increase mass and radius
     const double newRadius = std::cbrt( std::pow( h.radius(), 3 ) + std::pow( l.radius(), 3 ) );
 
     h.setMass( h.mass() + l.mass() );
     h.setRadius( newRadius );
+
+    // correct velocity
+    const double l_velocity = vector_length(l.velocity());
+    const double l_E = l.mass() + l_velocity * l_velocity / 2;   // kinetic energy of lighter object
+
+    const double h_velocity = sqrt(2 * l_E / h.mass());
+    const XY h_velocity_vector = unit_vector(l.velocity()) * h_velocity;
+
+    h.setVelocity(h.velocity() + h_velocity_vector);
 
     // remove lighter by overriding it with last one
     if (lighter < m_objects.size() - 1)
