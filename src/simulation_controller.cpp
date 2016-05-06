@@ -67,3 +67,9 @@ void SimulationController::tick()
     for(int i = 0; i < objs.size(); i++)
         m_scene->updatePosition(i, QPointF(objs[i].pos().x, objs[i].pos().y));
 }
+
+
+void SimulationController::objectsColided(int, int id2)
+{
+    m_scene->removeObject(id2);
+}

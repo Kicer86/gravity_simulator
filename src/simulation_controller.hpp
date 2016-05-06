@@ -26,7 +26,7 @@
 
 class ObjectsScene;
 
-class SimulationController: public QObject
+class SimulationController: public QObject, ISimulationEvents
 {
     public:
         SimulationController();
@@ -44,6 +44,9 @@ class SimulationController: public QObject
         ObjectsScene* m_scene;
 
         void tick();
+
+        // ISimulationEvents:
+        virtual void objectsColided(int id1, int id2) override;
 };
 
 #endif // SIMULATIONCONTROLLER_HPP

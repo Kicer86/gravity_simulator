@@ -61,3 +61,14 @@ void ObjectsScene::updatePosition(int id, const QPointF& pos)
 
     obj->second->setPos(pos);
 }
+
+
+void ObjectsScene::removeObject(int id)
+{
+    auto obj = m_objects.find(id);
+    assert(obj != m_objects.end());
+
+    removeItem(obj->second);
+
+    m_objects.erase(obj);
+}
