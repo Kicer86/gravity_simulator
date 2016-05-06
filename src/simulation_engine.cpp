@@ -202,20 +202,20 @@ int SimulationEngine::collide(int i, int j)
     const int h_id = h.id();
     const int l_id = l.id();
 
-    // increase mass and radius
-    const double newRadius = std::cbrt( std::pow( h.radius(), 3 ) + std::pow( l.radius(), 3 ) );
-
-    h.setMass( h.mass() + l.mass() );
-    h.setRadius( newRadius );
-
     // correct velocity
     const double l_velocity = vector_length(l.velocity());
-    const double l_E = l.mass() + l_velocity * l_velocity / 2;   // kinetic energy of lighter object
+    const double l_E = l.mass() * l_velocity * l_velocity / 2;   // kinetic energy of lighter object
 
     const double h_velocity = sqrt(2 * l_E / h.mass());
     const XY h_velocity_vector = unit_vector(l.velocity()) * h_velocity;
 
     h.setVelocity(h.velocity() + h_velocity_vector);
+
+    // increase mass and radius
+    const double newRadius = std::cbrt( std::pow( h.radius(), 3 ) + std::pow( l.radius(), 3 ) );
+
+    h.setMass( h.mass() + l.mass() );
+    h.setRadius( newRadius );
 
     for(ISimulationEvents* events: m_eventObservers)
         events->objectsColided(h_id, l_id);
