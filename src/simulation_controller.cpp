@@ -22,6 +22,12 @@
 
 #include "objects_scene.hpp"
 
+double fRand(double fMin, double fMax)
+{
+    double f = (double)rand() / RAND_MAX;
+    return fMin + f * (fMax - fMin);
+}
+
 
 SimulationController::SimulationController(): m_engine(), m_timer(), m_scene(nullptr)
 {
@@ -45,16 +51,16 @@ void SimulationController::setScene(ObjectsScene* scene)
 
 void SimulationController::beginSimulation()
 {
-    int id1 = m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
-    int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 0, 0) );
-    //int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
-    //int id3 = m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
-    //int id4 = m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
+    int id1 = m_engine.addObject( Object(0, 0, 7.347673e22, 1737.1e3) );
+    int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
+    int id3 = m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
+    int id4 = m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
 
     m_scene->addObject(id1, QPointF(0, 0));
     m_scene->addObject(id2, QPointF(0, 0));
-    //m_scene->addObject(id3, QPointF(0, 0));
-    //m_scene->addObject(id4, QPointF(0, 0));
+    m_scene->addObject(id3, QPointF(0, 0));
+    m_scene->addObject(id4, QPointF(0, 0));
+
 
     m_timer.start(20);
 }
@@ -62,7 +68,7 @@ void SimulationController::beginSimulation()
 
 void SimulationController::tick()
 {
-    m_engine.stepBy(3600);
+    m_engine.stepBy(1800);
 
     const std::vector<Object>& objs = m_engine.objects();
 
