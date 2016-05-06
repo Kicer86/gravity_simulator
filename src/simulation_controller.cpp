@@ -22,10 +22,18 @@
 
 #include "objects_scene.hpp"
 
+double fRand(double fMin, double fMax)
+{
+    double f = (double)rand() / RAND_MAX;
+    return fMin + f * (fMax - fMin);
+}
+
 
 SimulationController::SimulationController(): m_engine(), m_timer(), m_scene(nullptr)
 {
     connect(&m_timer, &QTimer::timeout, this, &SimulationController::tick);
+
+    m_engine.addEventsObserver(this);
 }
 
 
@@ -43,24 +51,39 @@ void SimulationController::setScene(ObjectsScene* scene)
 
 void SimulationController::beginSimulation()
 {
-    int id1 = m_engine.addObject( Object(0, 0, 5.9736e24) );
-    int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22, 0.0, 1.022e3) );
-    int id3 = m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 0.0, -1.022e3) );
+    srand(0);
 
-    m_scene->addObject(id1, QPointF(0, 0));
-    m_scene->addObject(id2, QPointF(384400e3, 0));
-    m_scene->addObject(id3, QPointF(-384400e3, 0));
+    for (int i = 0; i < 30; i++)
+    {
+        const double x = fRand(-1000e6, 1000e6);
+        const double y = fRand(-1000e6, 1000e6);
 
-    m_timer.start(100);
+        int id = m_engine.addObject( Object(x, y, 7.347673e22, 1737.1e3) );
+        //int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
+        //int id3 = m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
+        //int id4 = m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
+
+        m_scene->addObject(id, QPointF(x, y));
+        //m_scene->addObject(id3, QPointF(0, 0));
+        //m_scene->addObject(id4, QPointF(0, 0));
+    }
+
+    m_timer.start(20);
 }
 
 
 void SimulationController::tick()
 {
-    m_engine.stepBy(3600*10);
+    m_engine.stepBy(1800);
 
     const std::vector<Object>& objs = m_engine.objects();
 
     for(int i = 0; i < objs.size(); i++)
-        m_scene->updatePosition(i, QPointF(objs[i].pos().x, objs[i].pos().y));
+        m_scene->updatePosition(objs[i].id(), QPointF(objs[i].pos().x, objs[i].pos().y));
+}
+
+
+void SimulationController::objectsColided(int, int id2)
+{
+    m_scene->removeObject(id2);
 }

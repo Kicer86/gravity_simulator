@@ -34,6 +34,7 @@ class ObjectsScene: public QGraphicsScene
 
         void addObject(int id, const QPointF &);
         void updatePosition(int id, const QPointF &);
+        void removeObject(int id);
 
     private:
         std::unordered_map<int, QGraphicsItem *> m_objects;

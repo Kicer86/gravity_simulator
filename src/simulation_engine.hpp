@@ -68,6 +68,14 @@ struct XY
         return *this;
     }
 
+    XY operator+(const XY& other) const
+    {
+        XY result(x, y);
+        result += other;
+
+        return result;
+    }
+
     XY operator-() const
     {
         XY result(-x, -y);
@@ -75,12 +83,13 @@ struct XY
         return result;
     }
 
-    XY& operator/(double v)
+    XY operator/(double v) const
     {
-        x /= v;
-        y /= v;
+        XY result = *this;
+        result.x /= v;
+        result.y /= v;
 
-        return *this;
+        return result;
     }
 };
 
@@ -90,15 +99,29 @@ class Object
         XY m_pos;
         XY m_v;
         double m_mass;
+        double m_radius;
 
-        XY dF;
+        int m_id;
 
     public:
-        Object(double x, double y, double m, double v_x = 0.0, double v_y = 0.0): m_pos(x, y), m_v(v_x, v_y), m_mass(m) {}
+        Object(double x, double y, double m, double r, double v_x = 0.0, double v_y = 0.0):
+            m_pos(x, y),
+            m_v(v_x, v_y),
+            m_mass(m),
+            m_radius(r),
+            m_id(0)
+        {
+
+        }
 
         double mass() const
         {
             return m_mass;
+        }
+
+        double radius() const
+        {
+            return m_radius;
         }
 
         const XY& pos() const
@@ -111,25 +134,43 @@ class Object
             return m_v;
         }
 
-        void addForce(const XY& f)
+        int id() const
         {
-            dF += f;
+            return m_id;
         }
 
-        void applyForce(double dt)
+        void setId(int id)
         {
-            // F=am ⇒ a = F/m
-            const XY a = dF/m_mass;
-
-            // ΔV = aΔt
-            const XY dv = a * dt;
-
-            m_v += dv;
-            m_pos += m_v * dt;
-
-            dF.x = 0.0;
-            dF.y = 0.0;
+            m_id = id;
         }
+
+        void setMass(double m)
+        {
+            m_mass = m;
+        }
+
+        void setRadius(double r)
+        {
+            m_radius = r;
+        }
+
+        void setVelocity(const XY& v)
+        {
+            m_v = v;
+        }
+
+        void setPos(const XY& p)
+        {
+            m_pos = p;
+        }
+};
+
+
+struct ISimulationEvents
+{
+    virtual ~ISimulationEvents() {}
+
+    virtual void objectsColided(int id1, int id2) = 0;        // first id is for object which became bigger, second id is for object that was anihiliated
 };
 
 
@@ -142,13 +183,25 @@ class SimulationEngine
 
         SimulationEngine& operator=(const SimulationEngine &) = delete;
 
+        void addEventsObserver(ISimulationEvents *);
+
         int addObject(const Object &);
         void stepBy(double);
+        double step();
 
         const std::vector<Object>& objects() const;
 
     private:
         std::vector<Object> m_objects;
+        std::vector<ISimulationEvents *> m_eventObservers;
+        double m_dt;
+        int m_nextId;
+
+        int collide(int, int);
+        std::vector<int> checkForCollisions();
+
+        std::vector<XY> calculateForces() const;
+        std::vector<XY> calculateVelocities(const std::vector<XY> &, double) const;
 };
 
 #endif // SIMULATIONENGINE_HPP
