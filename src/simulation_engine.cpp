@@ -164,17 +164,32 @@ double SimulationEngine::step()
         o.setVelocity(v[i]);
     }
 
-    for(int i = 0; i < objs - 1; i++)
-        for(int j = i + 1; j < objs; j++)
-        {
-            const Object& o1 = m_objects[i];
-            const Object& o2 = m_objects[j];
+    bool collisions = false;
 
-            const double dist = distance(o1, o2);
+    do
+    {
+        collisions = false;
 
-            if ( (o1.radius() + o2.radius()) > dist )
-                collide(i, j);
-        }
+        const std::size_t objs = m_objects.size();
+        for(int i = 0; i < objs - 1; i++)
+            for(int j = i + 1; j < objs; j++)
+            {
+                const Object& o1 = m_objects[i];
+                const Object& o2 = m_objects[j];
+
+                const double dist = distance(o1, o2);
+
+                if ( (o1.radius() + o2.radius()) > dist )
+                {
+                    collide(i, j);
+                    collisions = true;
+                    goto quit;
+                }
+            }
+
+        quit: ;
+    }
+    while (collisions);
 
     return m_dt;
 }
