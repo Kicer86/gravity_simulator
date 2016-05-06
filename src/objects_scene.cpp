@@ -47,7 +47,7 @@ void ObjectsScene::addObject(int id, const QPointF& p)
 {
     const QSizeF size(100e6, 100e6);
     const QRectF rect(QPointF(-50e6, -50e6), size);
-    QPen pen(QColor(Qt::red));
+    QPen pen(Qt::red);
     pen.setWidthF(10e6);
 
     QGraphicsItem* item = addEllipse(rect, pen, QBrush(Qt::SolidPattern));
