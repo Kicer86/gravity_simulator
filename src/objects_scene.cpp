@@ -21,7 +21,10 @@
 
 #include <cassert>
 
+#include <QColor>
 #include <QGraphicsItem>
+#include <QPen>
+
 
 ObjectsScene::ObjectsScene()
 {
