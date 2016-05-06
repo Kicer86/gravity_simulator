@@ -134,6 +134,11 @@ class Object
             return m_v;
         }
 
+        int id() const
+        {
+            return m_id;
+        }
+
         void setId(int id)
         {
             m_id = id;
@@ -161,6 +166,14 @@ class Object
 };
 
 
+struct ISimulationEvents
+{
+    virtual ~ISimulationEvents() {}
+
+    virtual void objectsColided(int id1, int id2) = 0;        // first id is for object which became bigger, second id is for object that was anihiliated
+};
+
+
 class SimulationEngine
 {
     public:
@@ -170,6 +183,8 @@ class SimulationEngine
 
         SimulationEngine& operator=(const SimulationEngine &) = delete;
 
+        void addEventsObserver(ISimulationEvents *);
+
         int addObject(const Object &);
         void stepBy(double);
         double step();
@@ -178,6 +193,7 @@ class SimulationEngine
 
     private:
         std::vector<Object> m_objects;
+        std::vector<ISimulationEvents *> m_eventObservers;
         double m_dt;
         int m_nextId;
 

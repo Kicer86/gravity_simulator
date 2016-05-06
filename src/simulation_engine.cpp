@@ -52,6 +52,7 @@ namespace
 
 SimulationEngine::SimulationEngine():
     m_objects(),
+    m_eventObservers(),
     m_dt(60),
     m_nextId(0)
 {
@@ -62,6 +63,12 @@ SimulationEngine::SimulationEngine():
 SimulationEngine::~SimulationEngine()
 {
 
+}
+
+
+void SimulationEngine::addEventsObserver(ISimulationEvents* observer)
+{
+    m_eventObservers.push_back(observer);
 }
 
 
@@ -163,6 +170,9 @@ void SimulationEngine::collide(int i, int j)
     Object& h = m_objects[heavier];
     Object& l = m_objects[lighter];
 
+    const int h_id = h.id();
+    const int l_id = l.id();
+
     const double newRadius = std::cbrt( std::pow( h.radius(), 3 ) + std::pow( l.radius(), 3 ) );
 
     h.setMass( h.mass() + l.mass() );
@@ -173,6 +183,9 @@ void SimulationEngine::collide(int i, int j)
         m_objects[lighter] = m_objects.back();
 
     m_objects.pop_back();
+
+    for(ISimulationEvents* events: m_eventObservers)
+        events->objectsColided(h_id, l_id);
 }
 
 
