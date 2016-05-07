@@ -39,17 +39,6 @@ namespace
         return dist;
     }
 
-    XY unit_vector(const Object& o1, const Object& o2)
-    {
-        XY v( o1.pos() - o2.pos() );
-        const double dist = distance(o1, o2);
-
-        v.x /= dist;
-        v.y /= dist;
-
-        return v;
-    }
-
     XY unit_vector(const XY& p1, const XY& p2)
     {
         XY v( p1 - p2 );
@@ -57,6 +46,13 @@ namespace
 
         v.x /= dist;
         v.y /= dist;
+
+        return v;
+    }
+
+    XY unit_vector(const Object& o1, const Object& o2)
+    {
+        const XY v = unit_vector(o1.pos(), o2.pos());
 
         return v;
     }
@@ -166,10 +162,10 @@ double SimulationEngine::step()
         o.setVelocity(v[i]);
     }
 
-    std::vector<int> toRemove = checkForCollisions();
+    std::vector<std::size_t> toRemove = checkForCollisions();
     std::sort(toRemove.rbegin(), toRemove.rend());
 
-    for(int i: toRemove)
+    for(std::size_t i: toRemove)
     {
         // remove object 'i' by overriding it with last one
         if (i < m_objects.size() - 1)
@@ -188,13 +184,13 @@ const std::vector< Object >& SimulationEngine::objects() const
 }
 
 
-int SimulationEngine::collide(int i, int j)
+std::size_t SimulationEngine::collide(std::size_t i, std::size_t j)
 {
     Object& o1 = m_objects[i];
     Object& o2 = m_objects[j];
 
-    const int heavier = o1.mass() > o2.mass()? i: j;
-    const int lighter = heavier == i? j : i;
+    const std::size_t heavier = o1.mass() > o2.mass()? i: j;
+    const std::size_t lighter = heavier == i? j : i;
 
     Object& h = m_objects[heavier];
     Object& l = m_objects[lighter];
@@ -224,13 +220,13 @@ int SimulationEngine::collide(int i, int j)
 }
 
 
-std::vector<int> SimulationEngine::checkForCollisions()
+std::vector<std::size_t> SimulationEngine::checkForCollisions()
 {
-    std::vector<int> toRemove;
+    std::vector<std::size_t> toRemove;
 
     const std::size_t objs = m_objects.size();
-    for(int i = 0; i < objs - 1; i++)
-        for(int j = i + 1; j < objs; j++)
+    for(std::size_t i = 0; i < objs - 1; i++)
+        for(std::size_t j = i + 1; j < objs; j++)
         {
             const Object& o1 = m_objects[i];
             const Object& o2 = m_objects[j];
@@ -255,8 +251,8 @@ std::vector<XY> SimulationEngine::calculateForces() const
 
     std::vector<XY> forces(objs);
 
-    for(int i = 0; i < objs - 1; i++)
-        for(int j = i + 1; j < objs; j++)
+    for(std::size_t i = 0; i < objs - 1; i++)
+        for(std::size_t j = i + 1; j < objs; j++)
         {
             const Object& o1 = m_objects[i];
             const Object& o2 = m_objects[j];
@@ -282,7 +278,7 @@ std::vector<XY> SimulationEngine::calculateVelocities(const std::vector<XY>& for
     std::vector<XY> result;
     result.reserve(m_objects.size());
 
-    for(int i = 0; i < m_objects.size(); i++)
+    for(std::size_t i = 0; i < m_objects.size(); i++)
     {
         const XY& dF = forces[i];
         const Object& o = m_objects[i];
