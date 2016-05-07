@@ -19,7 +19,7 @@
 
 #include "simulation_engine.hpp"
 
-#include <algorithm>
+#include <set>
 
 namespace
 {
@@ -162,17 +162,7 @@ double SimulationEngine::step()
         o.setVelocity(v[i]);
     }
 
-    std::vector<std::size_t> toRemove = checkForCollisions();
-    std::sort(toRemove.rbegin(), toRemove.rend());
-
-    for(std::size_t i: toRemove)
-    {
-        // remove object 'i' by overriding it with last one
-        if (i < m_objects.size() - 1)
-            m_objects[i] = m_objects.back();
-
-        m_objects.pop_back();
-    }
+    checkForCollisions();
 
     return m_dt;
 }
@@ -220,9 +210,9 @@ std::size_t SimulationEngine::collide(std::size_t i, std::size_t j)
 }
 
 
-std::vector<std::size_t> SimulationEngine::checkForCollisions()
+void SimulationEngine::checkForCollisions()
 {
-    std::vector<std::size_t> toRemove;
+    std::set<std::size_t, std::greater<std::size_t>> toRemove;
 
     const std::size_t objs = m_objects.size();
     for(std::size_t i = 0; i < objs - 1; i++)
@@ -233,14 +223,25 @@ std::vector<std::size_t> SimulationEngine::checkForCollisions()
 
             const double dist = distance(o1, o2);
 
-            if ( (o1.radius() + o2.radius()) > dist )
+            if (
+                (o1.radius() + o2.radius()) > dist &&
+                toRemove.find(i) == toRemove.end() &&
+                toRemove.find(j) == toRemove.end()
+               )
             {
                 const int destroyed = collide(i, j);
-                toRemove.push_back(destroyed);
+                toRemove.insert(destroyed);
             }
         }
 
-    return toRemove;
+    for(std::size_t i: toRemove)
+    {
+        // remove object 'i' by overriding it with last one
+        if (i < m_objects.size() - 1)
+            m_objects[i] = m_objects.back();
+
+        m_objects.pop_back();
+    }
 }
 
 
