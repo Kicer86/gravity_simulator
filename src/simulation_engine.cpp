@@ -56,22 +56,6 @@ namespace
 
         return v;
     }
-
-    XY unit_vector(const XY& p)
-    {
-        XY v = p;
-        const double dist = distance(p, XY());
-
-        v.x /= dist;
-        v.y /= dist;
-
-        return v;
-    }
-
-    double vector_length(const XY& p)
-    {
-        return distance(p, XY());
-    }
 }
 
 
@@ -188,19 +172,17 @@ std::size_t SimulationEngine::collide(std::size_t i, std::size_t j)
     const int h_id = h.id();
     const int l_id = l.id();
 
-    // correct velocity
-    const double l_velocity = vector_length(l.velocity());
-    const double l_E = l.mass() * l_velocity * l_velocity / 2;   // kinetic energy of lighter object
+    // correct velocity by summing momentums
+    const double masses = h.mass() + l.mass();
+    const XY momentums = h.velocity() * h.mass() + l.velocity() * l.mass();
+    const XY newVelocity = momentums / masses;
 
-    const double h_velocity = sqrt(2 * l_E / h.mass());
-    const XY h_velocity_vector = unit_vector(l.velocity()) * h_velocity;
-
-    h.setVelocity(h.velocity() + h_velocity_vector);
+    h.setVelocity(newVelocity);
 
     // increase mass and radius
     const double newRadius = std::cbrt( std::pow( h.radius(), 3 ) + std::pow( l.radius(), 3 ) );
 
-    h.setMass( h.mass() + l.mass() );
+    h.setMass( masses );
     h.setRadius( newRadius );
 
     for(ISimulationEvents* events: m_eventObservers)
