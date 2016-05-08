@@ -51,14 +51,18 @@ void SimulationController::setScene(ObjectsScene* scene)
 
 void SimulationController::beginSimulation()
 {
-    srand(0);
+#if 0
+    srand(2);
 
-    for (int i = 0; i < 30; i++)
+    for (int i = 0; i < 4; i++)
     {
-        const double x = fRand(-1000e6, 1000e6);
-        const double y = fRand(-1000e6, 1000e6);
+        const double x = fRand(-500e6, 500e6);
+        const double y = fRand(-500e6, 500e6);
 
-        int id = m_engine.addObject( Object(x, y, 7.347673e22, 1737.1e3) );
+        const double v_x = fRand(-5e2, 5e2);
+        const double v_y = fRand(-5e2, 5e2);
+
+        int id = m_engine.addObject( Object(x, y, 7.347673e24, 1737.1e3, v_x, v_y) );
         //int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
         //int id3 = m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
         //int id4 = m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
@@ -67,6 +71,23 @@ void SimulationController::beginSimulation()
         //m_scene->addObject(id3, QPointF(0, 0));
         //m_scene->addObject(id4, QPointF(0, 0));
     }
+#elif 0
+    int id1 = m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
+    int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
+    int id3 = m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
+    int id4 = m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
+
+    m_scene->addObject(id1, QPointF(0, 0));
+    m_scene->addObject(id2, QPointF(0, 0));
+    m_scene->addObject(id3, QPointF(0, 0));
+    m_scene->addObject(id4, QPointF(0, 0));
+#elif 1
+    int id1 = m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
+    int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
+
+    m_scene->addObject(id1, QPointF(0, 0));
+    m_scene->addObject(id2, QPointF(0, 0));
+#endif
 
     m_timer.start(20);
 }
@@ -74,7 +95,7 @@ void SimulationController::beginSimulation()
 
 void SimulationController::tick()
 {
-    m_engine.stepBy(1800);
+    m_engine.stepBy(3600);
 
     const std::vector<Object>& objs = m_engine.objects();
 
