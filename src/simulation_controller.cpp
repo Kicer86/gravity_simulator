@@ -78,7 +78,7 @@ void SimulationController::tick()
 
     const std::vector<Object>& objs = m_engine.objects();
 
-    for(int i = 0; i < objs.size(); i++)
+    for(size_t i = 0; i < objs.size(); i++)
         m_scene->updatePosition(objs[i].id(), QPointF(objs[i].pos().x, objs[i].pos().y));
 }
 
