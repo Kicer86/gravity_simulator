@@ -51,8 +51,8 @@ void SimulationController::setScene(ObjectsScene* scene)
 
 void SimulationController::beginSimulation()
 {
-#if 0
-    srand(2);
+#if 1
+    srand(3);
 
     for (int i = 0; i < 4; i++)
     {
@@ -81,7 +81,7 @@ void SimulationController::beginSimulation()
     m_scene->addObject(id2, QPointF(0, 0));
     m_scene->addObject(id3, QPointF(0, 0));
     m_scene->addObject(id4, QPointF(0, 0));
-#elif 1
+#elif 0
     int id1 = m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
     int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
 
@@ -95,7 +95,7 @@ void SimulationController::beginSimulation()
 
 void SimulationController::tick()
 {
-    m_engine.stepBy(3600);
+    m_engine.stepBy(720);
 
     const std::vector<Object>& objs = m_engine.objects();
 
