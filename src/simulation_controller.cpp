@@ -54,7 +54,7 @@ void SimulationController::beginSimulation()
 #if 1
     srand(3);
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 400; i++)
     {
         const double x = fRand(-500e6, 500e6);
         const double y = fRand(-500e6, 500e6);
@@ -95,7 +95,7 @@ void SimulationController::beginSimulation()
 
 void SimulationController::tick()
 {
-    m_engine.stepBy(720);
+    m_engine.stepBy(180);
 
     const std::vector<Object>& objs = m_engine.objects();
 
