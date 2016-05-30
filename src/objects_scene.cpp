@@ -43,12 +43,15 @@ ObjectsScene::~ObjectsScene()
 }
 
 
-void ObjectsScene::addObject(int id, const XY& p)
+void ObjectsScene::addObject(int id, const Object& obj)
 {
+    const XY& p = obj.pos();
     const QPointF position(p.x, p.y);
 
-    const QSizeF size(100e6, 100e6);
-    const QRectF rect(QPointF(-50e6, -50e6), size);
+    double radius = obj.radius();
+
+    const QSizeF size(2 * radius, 2 * radius);
+    const QRectF rect(QPointF(-radius, -radius), size);
     QPen pen(Qt::red);
     pen.setWidthF(10e6);
 

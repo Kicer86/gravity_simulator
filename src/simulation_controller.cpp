@@ -95,7 +95,7 @@ void SimulationController::objectsColided(int, int id2)
 
 void SimulationController::objectCreated(int id, const Object& obj)
 {
-    m_scene->addObject(id, obj.pos());
+    m_scene->addObject(id, obj);
 }
 
 

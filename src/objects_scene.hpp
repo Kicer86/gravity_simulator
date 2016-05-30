@@ -34,7 +34,7 @@ class ObjectsScene: public QGraphicsScene
         ~ObjectsScene();
         ObjectsScene& operator=(const ObjectsScene &) = delete;
 
-        void addObject(int id, const XY &);
+        void addObject(int id, const Object &);
         void updatePosition(int id, const XY &);
         void removeObject(int id);
 
