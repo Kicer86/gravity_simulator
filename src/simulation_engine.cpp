@@ -88,6 +88,9 @@ int SimulationEngine::addObject(const Object& obj)
 
     addedObj.setId(m_nextId);
 
+    for(ISimulationEvents* events: m_eventObservers)
+        events->objectCreated(m_nextId, obj);
+
     return m_nextId++;
 }
 
@@ -96,6 +99,10 @@ void SimulationEngine::stepBy(double dt)
 {
     while (dt > 0.0)
         dt -= step();
+
+    for (const Object& obj: m_objects)
+        for(ISimulationEvents* events: m_eventObservers)
+            events->objectUpdated(obj.id(), obj);
 }
 
 
@@ -169,9 +176,6 @@ std::size_t SimulationEngine::collide(std::size_t i, std::size_t j)
     Object& h = m_objects[heavier];
     Object& l = m_objects[lighter];
 
-    const int h_id = h.id();
-    const int l_id = l.id();
-
     // correct velocity by summing momentums
     const double masses = h.mass() + l.mass();
     const XY momentums = h.velocity() * h.mass() + l.velocity() * l.mass();
@@ -186,7 +190,10 @@ std::size_t SimulationEngine::collide(std::size_t i, std::size_t j)
     h.setRadius( newRadius );
 
     for(ISimulationEvents* events: m_eventObservers)
-        events->objectsColided(h_id, l_id);
+        events->objectsColided(h, l);
+
+    for(ISimulationEvents* events: m_eventObservers)
+        events->objectAnnihilated(l);
 
     return lighter;
 }

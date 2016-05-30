@@ -66,27 +66,15 @@ void SimulationController::beginSimulation()
         //int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
         //int id3 = m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
         //int id4 = m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
-
-        m_scene->addObject(id, QPointF(x, y));
-        //m_scene->addObject(id3, QPointF(0, 0));
-        //m_scene->addObject(id4, QPointF(0, 0));
     }
 #elif 0
     int id1 = m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
     int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
     int id3 = m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
     int id4 = m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
-
-    m_scene->addObject(id1, QPointF(0, 0));
-    m_scene->addObject(id2, QPointF(0, 0));
-    m_scene->addObject(id3, QPointF(0, 0));
-    m_scene->addObject(id4, QPointF(0, 0));
 #elif 0
     int id1 = m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
     int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
-
-    m_scene->addObject(id1, QPointF(0, 0));
-    m_scene->addObject(id2, QPointF(0, 0));
 #endif
 
     m_timer.start(20);
@@ -96,15 +84,29 @@ void SimulationController::beginSimulation()
 void SimulationController::tick()
 {
     m_engine.stepBy(180);
-
-    const std::vector<Object>& objs = m_engine.objects();
-
-    for(size_t i = 0; i < objs.size(); i++)
-        m_scene->updatePosition(objs[i].id(), QPointF(objs[i].pos().x, objs[i].pos().y));
 }
 
 
-void SimulationController::objectsColided(int, int id2)
+void SimulationController::objectsColided(const Object& obj1, const Object &)
 {
-    m_scene->removeObject(id2);
+    m_scene->updateRadius(obj1.id(), obj1.radius());
 }
+
+
+void SimulationController::objectCreated(int id, const Object& obj)
+{
+    m_scene->addObject(id, obj);
+}
+
+
+void SimulationController::objectAnnihilated(const Object& obj)
+{
+    m_scene->removeObject(obj.id());
+}
+
+
+void SimulationController::objectUpdated(int id, const Object& obj)
+{
+    m_scene->updatePosition(id, obj.pos());
+}
+

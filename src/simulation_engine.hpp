@@ -91,6 +91,7 @@ struct XY
 
         return result;
     }
+
 };
 
 
@@ -170,7 +171,10 @@ struct ISimulationEvents
 {
     virtual ~ISimulationEvents() {}
 
-    virtual void objectsColided(int id1, int id2) = 0;        // first id is for object which became bigger, second id is for object that was anihiliated
+    virtual void objectsColided(const Object &, const Object &) = 0;        // first id is for object which became bigger, second id is for object that was annihilated
+    virtual void objectCreated(int id, const Object &) = 0;
+    virtual void objectAnnihilated(const Object &) = 0;
+    virtual void objectUpdated(int id, const Object &) = 0;
 };
 
 

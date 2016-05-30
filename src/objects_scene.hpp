@@ -24,6 +24,8 @@
 
 #include <QGraphicsScene>
 
+#include "simulation_engine.hpp"
+
 class ObjectsScene: public QGraphicsScene
 {
     public:
@@ -32,12 +34,15 @@ class ObjectsScene: public QGraphicsScene
         ~ObjectsScene();
         ObjectsScene& operator=(const ObjectsScene &) = delete;
 
-        void addObject(int id, const QPointF &);
-        void updatePosition(int id, const QPointF &);
+        void addObject(int id, const Object &);
+        void updatePosition(int id, const XY &);
+        void updateRadius(int id, double r);
         void removeObject(int id);
 
     private:
         std::unordered_map<int, QGraphicsItem *> m_objects;
+
+        QGraphicsItem* createItem(double);
 };
 
 #endif // OBJECTSSCENE_HPP

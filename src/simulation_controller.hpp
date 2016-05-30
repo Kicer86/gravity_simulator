@@ -46,7 +46,10 @@ class SimulationController: public QObject, ISimulationEvents
         void tick();
 
         // ISimulationEvents:
-        virtual void objectsColided(int id1, int id2) override;
+        virtual void objectsColided(const Object&, const Object&) override;
+        virtual void objectCreated(int id, const Object &) override;
+        virtual void objectAnnihilated(const Object &) override;
+        virtual void objectUpdated(int id, const Object &) override;
 };
 
 #endif // SIMULATIONCONTROLLER_HPP
