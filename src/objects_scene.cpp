@@ -50,12 +50,7 @@ void ObjectsScene::addObject(int id, const Object& obj)
 
     double radius = obj.radius();
 
-    const QSizeF size(2 * radius, 2 * radius);
-    const QRectF rect(QPointF(-radius, -radius), size);
-    QPen pen(Qt::red);
-    pen.setWidthF(10e6);
-
-    QGraphicsItem* item = addEllipse(rect, pen, QBrush(Qt::SolidPattern));
+    QGraphicsItem* item = createItem(radius);
     item->setPos(position);
 
     m_objects.insert( std::make_pair(id, item) );
@@ -73,6 +68,22 @@ void ObjectsScene::updatePosition(int id, const XY& pos)
 }
 
 
+void ObjectsScene::updateRadius(int id, double r)
+{
+    auto obj = m_objects.find(id);
+    assert(obj != m_objects.end());
+
+    QGraphicsItem* item = createItem(r);
+
+    const QPointF pos = obj->second->pos();
+    item->setPos(pos);
+
+    // swap items
+    delete obj->second;
+    obj->second = item;
+}
+
+
 void ObjectsScene::removeObject(int id)
 {
     auto obj = m_objects.find(id);
@@ -81,4 +92,17 @@ void ObjectsScene::removeObject(int id)
     removeItem(obj->second);
 
     m_objects.erase(obj);
+}
+
+
+QGraphicsItem* ObjectsScene::createItem(double radius)
+{
+    const QSizeF size(2 * radius, 2 * radius);
+    const QRectF rect(QPointF(-radius, -radius), size);
+    QPen pen(Qt::red);
+    pen.setWidthF(10e6);
+
+    QGraphicsItem* item = addEllipse(rect, pen, QBrush(Qt::SolidPattern));
+
+    return item;
 }

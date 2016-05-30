@@ -87,9 +87,9 @@ void SimulationController::tick()
 }
 
 
-void SimulationController::objectsColided(int, int id2)
+void SimulationController::objectsColided(const Object& obj1, const Object &)
 {
-
+    m_scene->updateRadius(obj1.id(), obj1.radius());
 }
 
 
@@ -99,9 +99,9 @@ void SimulationController::objectCreated(int id, const Object& obj)
 }
 
 
-void SimulationController::objectAnnihilated(int id)
+void SimulationController::objectAnnihilated(const Object& obj)
 {
-    m_scene->removeObject(id);
+    m_scene->removeObject(obj.id());
 }
 
 
