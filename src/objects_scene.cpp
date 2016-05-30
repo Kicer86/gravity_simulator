@@ -43,26 +43,30 @@ ObjectsScene::~ObjectsScene()
 }
 
 
-void ObjectsScene::addObject(int id, const QPointF& p)
+void ObjectsScene::addObject(int id, const XY& p)
 {
+    const QPointF position(p.x, p.y);
+
     const QSizeF size(100e6, 100e6);
     const QRectF rect(QPointF(-50e6, -50e6), size);
     QPen pen(Qt::red);
     pen.setWidthF(10e6);
 
     QGraphicsItem* item = addEllipse(rect, pen, QBrush(Qt::SolidPattern));
-    item->setPos(p);
+    item->setPos(position);
 
     m_objects.insert( std::make_pair(id, item) );
 }
 
 
-void ObjectsScene::updatePosition(int id, const QPointF& pos)
+void ObjectsScene::updatePosition(int id, const XY& pos)
 {
+    const QPointF position(pos.x, pos.y);
+
     auto obj = m_objects.find(id);
     assert(obj != m_objects.end());
 
-    obj->second->setPos(pos);
+    obj->second->setPos(position);
 }
 
 

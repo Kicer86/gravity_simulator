@@ -24,6 +24,8 @@
 
 #include <QGraphicsScene>
 
+#include "simulation_engine.hpp"
+
 class ObjectsScene: public QGraphicsScene
 {
     public:
@@ -32,8 +34,8 @@ class ObjectsScene: public QGraphicsScene
         ~ObjectsScene();
         ObjectsScene& operator=(const ObjectsScene &) = delete;
 
-        void addObject(int id, const QPointF &);
-        void updatePosition(int id, const QPointF &);
+        void addObject(int id, const XY &);
+        void updatePosition(int id, const XY &);
         void removeObject(int id);
 
     private:

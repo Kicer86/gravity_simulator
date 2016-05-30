@@ -88,6 +88,9 @@ int SimulationEngine::addObject(const Object& obj)
 
     addedObj.setId(m_nextId);
 
+    for(ISimulationEvents* events: m_eventObservers)
+        events->objectCreated(m_nextId, obj);
+
     return m_nextId++;
 }
 
@@ -96,6 +99,10 @@ void SimulationEngine::stepBy(double dt)
 {
     while (dt > 0.0)
         dt -= step();
+
+    for (const Object& obj: m_objects)
+        for(ISimulationEvents* events: m_eventObservers)
+            events->objectUpdated(obj.id(), obj);
 }
 
 
@@ -187,6 +194,9 @@ std::size_t SimulationEngine::collide(std::size_t i, std::size_t j)
 
     for(ISimulationEvents* events: m_eventObservers)
         events->objectsColided(h_id, l_id);
+
+    for(ISimulationEvents* events: m_eventObservers)
+        events->objectAnnihilated(l_id);
 
     return lighter;
 }
