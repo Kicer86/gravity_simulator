@@ -79,6 +79,7 @@ void ObjectsScene::updateRadius(int id, double r)
     item->setPos(pos);
 
     // swap items
+    removeItem(obj->second);
     delete obj->second;
     obj->second = item;
 }
