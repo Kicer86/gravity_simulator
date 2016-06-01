@@ -22,7 +22,7 @@
 
 #include <QDebug>
 #include <QWheelEvent>
-#include <qscrollbar.h>
+#include <QScrollBar>
 
 
 ObjectsView::ObjectsView(QWidget* p): QGraphicsView(p), m_prevPoint()
