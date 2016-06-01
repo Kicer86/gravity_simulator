@@ -93,4 +93,11 @@ void ObjectsView::resizeEvent(QResizeEvent* event)
 void ObjectsView::showEvent(QShowEvent* event)
 {
     QGraphicsView::showEvent(event);
+    
+    QGraphicsScene* s = scene();
+    if (s != nullptr)
+    {
+        const QRectF r = s->sceneRect();
+        fitInView(r, Qt::KeepAspectRatio);
+    }
 }
