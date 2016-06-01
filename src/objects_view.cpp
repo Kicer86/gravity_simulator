@@ -20,10 +20,12 @@
 
 #include "objects_view.hpp"
 
+#include <QDebug>
 #include <QWheelEvent>
+#include <qscrollbar.h>
 
 
-ObjectsView::ObjectsView(QWidget* p): QGraphicsView(p)
+ObjectsView::ObjectsView(QWidget* p): QGraphicsView(p), m_prevPoint()
 {
 
 }
@@ -36,20 +38,38 @@ ObjectsView::~ObjectsView()
 
 
 void ObjectsView::mousePressEvent(QMouseEvent* event)
-{
-    QGraphicsView::mousePressEvent(event);
+{    
+    m_prevPoint = event->pos();
 }
 
 
 void ObjectsView::mouseMoveEvent(QMouseEvent* event)
-{
-    QGraphicsView::mouseMoveEvent(event);
+{            
+    if ( (event->buttons() & Qt::LeftButton) > 0 )
+    {
+        const QPoint curPoint = event->pos();
+        const QPoint diff = curPoint - m_prevPoint;
+        
+        auto scrollBy = [](QScrollBar* scrollBar, int dx)
+        {
+            const int v = scrollBar->value();
+            const int n_v = v + dx;
+            
+            if (n_v <= scrollBar->maximum() && n_v >= scrollBar->minimum())
+                scrollBar->setValue(v + dx);
+        };
+        
+        scrollBy(horizontalScrollBar(), -diff.x());
+        scrollBy(verticalScrollBar(), -diff.y());
+        
+        m_prevPoint = curPoint;
+    }
 }
 
 
 void ObjectsView::mouseReleaseEvent(QMouseEvent* event)
-{
-    QGraphicsView::mouseReleaseEvent(event);
+{    
+    m_prevPoint = QPoint();
 }
 
 

@@ -31,6 +31,8 @@ class ObjectsView: public QGraphicsView
         ObjectsView& operator=(const ObjectsView &) = delete;
         
     protected:
+        QPoint m_prevPoint;
+        
         virtual void mousePressEvent(QMouseEvent *);
         virtual void mouseMoveEvent(QMouseEvent *);
         virtual void mouseReleaseEvent(QMouseEvent *);
