@@ -20,8 +20,10 @@
 
 #include "objects_view.hpp"
 
+#include <QWheelEvent>
 
-ObjectsView::ObjectsView()
+
+ObjectsView::ObjectsView(QWidget* p): QGraphicsView(p)
 {
 
 }
@@ -53,7 +55,12 @@ void ObjectsView::mouseReleaseEvent(QMouseEvent* event)
 
 void ObjectsView::wheelEvent(QWheelEvent* event)
 {
-    QGraphicsView::wheelEvent(event);
+    const QPoint delta = event->angleDelta();
+    
+    if (delta.y() > 0)
+        scale(1.2, 1.2);
+    else if (delta.y() < 0)
+        scale(0.82, 0.82);
 }
 
 

@@ -25,7 +25,7 @@
 class ObjectsView: public QGraphicsView
 {
     public:
-        ObjectsView();
+        ObjectsView(QWidget  *);
         ObjectsView(const ObjectsView &) = delete;
         ~ObjectsView();        
         ObjectsView& operator=(const ObjectsView &) = delete;
