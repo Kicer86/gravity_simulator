@@ -24,8 +24,10 @@
 #include <QWheelEvent>
 #include <QScrollBar>
 
+#include "simulation_controller.hpp"
 
-ObjectsView::ObjectsView(QWidget* p): QGraphicsView(p), m_prevPoint()
+
+ObjectsView::ObjectsView(QWidget* p): QGraphicsView(p), m_prevPoint(), m_controller(nullptr)
 {
 
 }
@@ -34,6 +36,12 @@ ObjectsView::ObjectsView(QWidget* p): QGraphicsView(p), m_prevPoint()
 ObjectsView::~ObjectsView()
 {
 
+}
+
+
+void ObjectsView::set(SimulationController* controller)
+{
+    m_controller = controller;
 }
 
 
@@ -100,4 +108,21 @@ void ObjectsView::showEvent(QShowEvent* event)
         const QRectF r = s->sceneRect();
         fitInView(r, Qt::KeepAspectRatio);
     }
+}
+
+
+void ObjectsView::paintEvent(QPaintEvent* event)
+{
+    QGraphicsView::paintEvent(event);
+    
+    const int fps = m_controller->fps();
+    const QString info = QString(tr("Information about simulation: FPS: %1"))
+                         .arg(fps);
+                         
+    QPainter painter(viewport());
+    const QRect infoRect = painter.boundingRect(QRect(), 0, info);
+    
+    painter.setPen(Qt::black);
+    painter.setBrush(Qt::blue);
+    painter.drawText(infoRect.bottomLeft(), info);
 }
