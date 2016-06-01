@@ -29,11 +29,22 @@ double fRand(double fMin, double fMax)
 }
 
 
-SimulationController::SimulationController(): m_engine(), m_timer(), m_scene(nullptr)
+SimulationController::SimulationController(): m_engine(), m_timer(), m_scene(nullptr), m_fps(0), m_framesCounter(0)
 {
     connect(&m_timer, &QTimer::timeout, this, &SimulationController::tick);
 
     m_engine.addEventsObserver(this);
+    
+    QTimer* fpsTimer = new QTimer(this);
+    fpsTimer->setInterval(1000);
+    
+    connect(fpsTimer, &QTimer::timeout, [this]
+    {
+        m_fps = m_framesCounter;
+        m_framesCounter = 0;
+    });
+    
+    fpsTimer->start();
 }
 
 
@@ -81,9 +92,17 @@ void SimulationController::beginSimulation()
 }
 
 
+int SimulationController::fps() const
+{
+    return m_fps;
+}
+
+
 void SimulationController::tick()
 {
     m_engine.stepBy(180);
+    
+    m_framesCounter++;
 }
 
 

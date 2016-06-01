@@ -37,11 +37,14 @@ class SimulationController: public QObject, ISimulationEvents
         void setScene(ObjectsScene *);
 
         void beginSimulation();
+        int fps() const;
 
     private:
         SimulationEngine m_engine;
         QTimer m_timer;
         ObjectsScene* m_scene;
+        int m_fps;
+        int m_framesCounter;
 
         void tick();
 
