@@ -1,5 +1,5 @@
 /*
- * Main window for gravity simulator
+ * Objects View
  * Copyright (C) 2016  Michał Walenciak <MichalWalenciak@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,24 +17,28 @@
  *
  */
 
-#include "main_window.hpp"
+#ifndef OBJECTSVIEW_HPP
+#define OBJECTSVIEW_HPP
 
-#include "ui_main_window.h"
+#include <QGraphicsView>
 
-
-MainWindow::MainWindow(): m_scene(), m_controller()
+class ObjectsView: public QGraphicsView
 {
-    ui = std::make_unique<Ui::MainWindow>();
-    ui->setupUi(this);
+    public:
+        ObjectsView(QWidget  *);
+        ObjectsView(const ObjectsView &) = delete;
+        ~ObjectsView();        
+        ObjectsView& operator=(const ObjectsView &) = delete;
+        
+    protected:
+        QPoint m_prevPoint;
+        
+        virtual void mousePressEvent(QMouseEvent *);
+        virtual void mouseMoveEvent(QMouseEvent *);
+        virtual void mouseReleaseEvent(QMouseEvent *);
+        virtual void wheelEvent(QWheelEvent *);
+        virtual void resizeEvent(QResizeEvent *);
+        virtual void showEvent(QShowEvent *);
+};
 
-    ui->graphicsView->setScene(&m_scene);
-    m_controller.setScene(&m_scene);
-
-    m_controller.beginSimulation();
-}
-
-
-MainWindow::~MainWindow()
-{
-
-}
+#endif // OBJECTSVIEW_HPP
