@@ -33,12 +33,13 @@ class ObjectsView: public QGraphicsView
     protected:
         QPoint m_prevPoint;
         
-        virtual void mousePressEvent(QMouseEvent *);
-        virtual void mouseMoveEvent(QMouseEvent *);
-        virtual void mouseReleaseEvent(QMouseEvent *);
-        virtual void wheelEvent(QWheelEvent *);
-        virtual void resizeEvent(QResizeEvent *);
-        virtual void showEvent(QShowEvent *);
+        virtual void mousePressEvent(QMouseEvent *) override;
+        virtual void mouseMoveEvent(QMouseEvent *) override;
+        virtual void mouseReleaseEvent(QMouseEvent *) override;
+        virtual void wheelEvent(QWheelEvent *) override;
+        virtual void resizeEvent(QResizeEvent *) override;
+        virtual void showEvent(QShowEvent *) override;
+        
 };
 
 #endif // OBJECTSVIEW_HPP
