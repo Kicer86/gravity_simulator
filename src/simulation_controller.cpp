@@ -29,11 +29,24 @@ double fRand(double fMin, double fMax)
 }
 
 
-SimulationController::SimulationController(): m_engine(), m_timer(), m_scene(nullptr)
+SimulationController::SimulationController(): m_engine(), m_timer(), m_scene(nullptr), m_fps(0), m_framesCounter(0)
 {
     connect(&m_timer, &QTimer::timeout, this, &SimulationController::tick);
 
     m_engine.addEventsObserver(this);
+
+    QTimer* fpsTimer = new QTimer(this);
+    fpsTimer->setInterval(1000);
+
+    connect(fpsTimer, &QTimer::timeout, [this]
+    {
+        m_fps = m_framesCounter;
+        m_framesCounter = 0;
+
+        emit fpsUpdated(m_fps);
+    });
+
+    fpsTimer->start();
 }
 
 
@@ -62,7 +75,7 @@ void SimulationController::beginSimulation()
         const double v_x = fRand(-5e2, 5e2);
         const double v_y = fRand(-5e2, 5e2);
 
-        int id = m_engine.addObject( Object(x, y, 7.347673e24, 1737.1e3, v_x, v_y) );
+        m_engine.addObject( Object(x, y, 7.347673e24, 1737.1e3, v_x, v_y) );
         //int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
         //int id3 = m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
         //int id4 = m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
@@ -77,13 +90,21 @@ void SimulationController::beginSimulation()
     int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
 #endif
 
-    m_timer.start(20);
+    m_timer.start(1000/50);
+}
+
+
+int SimulationController::fps() const
+{
+    return m_fps;
 }
 
 
 void SimulationController::tick()
 {
     m_engine.stepBy(180);
+
+    m_framesCounter++;
 }
 
 
@@ -96,12 +117,16 @@ void SimulationController::objectsColided(const Object& obj1, const Object &)
 void SimulationController::objectCreated(int id, const Object& obj)
 {
     m_scene->addObject(id, obj);
+
+    emit objectCountUpdated(m_engine.objectCount());
 }
 
 
 void SimulationController::objectAnnihilated(const Object& obj)
 {
     m_scene->removeObject(obj.id());
+
+    emit objectCountUpdated(m_engine.objectCount() - 1);  // -1 because engine emits this notification before object removal
 }
 
 
@@ -109,4 +134,3 @@ void SimulationController::objectUpdated(int id, const Object& obj)
 {
     m_scene->updatePosition(id, obj.pos());
 }
-

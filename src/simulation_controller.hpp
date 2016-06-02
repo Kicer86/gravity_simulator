@@ -28,6 +28,8 @@ class ObjectsScene;
 
 class SimulationController: public QObject, ISimulationEvents
 {
+        Q_OBJECT
+
     public:
         SimulationController();
         SimulationController(const SimulationController &) = delete;
@@ -37,11 +39,14 @@ class SimulationController: public QObject, ISimulationEvents
         void setScene(ObjectsScene *);
 
         void beginSimulation();
+        int fps() const;
 
     private:
         SimulationEngine m_engine;
         QTimer m_timer;
         ObjectsScene* m_scene;
+        int m_fps;
+        int m_framesCounter;
 
         void tick();
 
@@ -50,6 +55,10 @@ class SimulationController: public QObject, ISimulationEvents
         virtual void objectCreated(int id, const Object &) override;
         virtual void objectAnnihilated(const Object &) override;
         virtual void objectUpdated(int id, const Object &) override;
+
+    signals:
+        void fpsUpdated(int);
+        void objectCountUpdated(int);
 };
 
 #endif // SIMULATIONCONTROLLER_HPP

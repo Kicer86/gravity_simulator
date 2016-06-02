@@ -1,5 +1,5 @@
 /*
- * Objects View
+ * Widget with ifnformation about simulation
  * Copyright (C) 2016  Michał Walenciak <MichalWalenciak@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,28 +17,28 @@
  *
  */
 
-#ifndef OBJECTSVIEW_HPP
-#define OBJECTSVIEW_HPP
+#ifndef SIMULATIONINFOWIDGET_HPP
+#define SIMULATIONINFOWIDGET_HPP
 
-#include <QGraphicsView>
+#include <QWidget>
 
-class ObjectsView: public QGraphicsView
+class QLabel;
+
+class SimulationInfoWidget: public QWidget
 {
     public:
-        ObjectsView(QWidget *);
-        ObjectsView(const ObjectsView &) = delete;
-        ~ObjectsView();
-        ObjectsView& operator=(const ObjectsView &) = delete;
+        SimulationInfoWidget(QWidget *);
+        SimulationInfoWidget(const SimulationInfoWidget &) = delete;
+        ~SimulationInfoWidget();
 
-    protected:
-        QPoint m_prevPoint;
+        SimulationInfoWidget& operator=(const SimulationInfoWidget &) = delete;
 
-        virtual void mousePressEvent(QMouseEvent *) override;
-        virtual void mouseMoveEvent(QMouseEvent *) override;
-        virtual void mouseReleaseEvent(QMouseEvent *) override;
-        virtual void wheelEvent(QWheelEvent *) override;
-        virtual void resizeEvent(QResizeEvent *) override;
-        virtual void showEvent(QShowEvent *) override;
+        void updateFps(int);
+        void updateObjectCount(int);
+
+    private:
+        QLabel* m_fpsValue;
+        QLabel* m_objCountValue;
 };
 
-#endif // OBJECTSVIEW_HPP
+#endif // SIMULATIONINFOWIDGET_H

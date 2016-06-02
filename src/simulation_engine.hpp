@@ -194,6 +194,7 @@ class SimulationEngine
         double step();
 
         const std::vector<Object>& objects() const;
+        std::size_t objectCount() const;
 
     private:
         std::vector<Object> m_objects;
