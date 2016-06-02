@@ -159,9 +159,15 @@ double SimulationEngine::step()
 }
 
 
-const std::vector< Object >& SimulationEngine::objects() const
+const std::vector<Object>& SimulationEngine::objects() const
 {
     return m_objects;
+}
+
+
+std::size_t SimulationEngine::objectCount() const
+{
+    return m_objects.size();
 }
 
 
