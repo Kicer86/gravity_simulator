@@ -117,12 +117,16 @@ void SimulationController::objectsColided(const Object& obj1, const Object &)
 void SimulationController::objectCreated(int id, const Object& obj)
 {
     m_scene->addObject(id, obj);
+
+    emit objectCountUpdated(m_engine.objectCount());
 }
 
 
 void SimulationController::objectAnnihilated(const Object& obj)
 {
     m_scene->removeObject(obj.id());
+
+    emit objectCountUpdated(m_engine.objectCount() - 1);  // -1 because engine emits this notification before object removal
 }
 
 
@@ -130,4 +134,3 @@ void SimulationController::objectUpdated(int id, const Object& obj)
 {
     m_scene->updatePosition(id, obj.pos());
 }
-

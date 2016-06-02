@@ -58,6 +58,7 @@ class SimulationController: public QObject, ISimulationEvents
 
     signals:
         void fpsUpdated(int);
+        void objectCountUpdated(int);
 };
 
 #endif // SIMULATIONCONTROLLER_HPP
