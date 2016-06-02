@@ -75,7 +75,7 @@ void SimulationController::beginSimulation()
         const double v_x = fRand(-5e2, 5e2);
         const double v_y = fRand(-5e2, 5e2);
 
-        int id = m_engine.addObject( Object(x, y, 7.347673e24, 1737.1e3, v_x, v_y) );
+        m_engine.addObject( Object(x, y, 7.347673e24, 1737.1e3, v_x, v_y) );
         //int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
         //int id3 = m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
         //int id4 = m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
