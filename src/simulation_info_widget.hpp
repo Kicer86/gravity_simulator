@@ -17,12 +17,14 @@
  *
  */
 
-#ifndef SIMULATIONINFOWIDGET_H
-#define SIMULATIONINFOWIDGET_H
+#ifndef SIMULATIONINFOWIDGET_HPP
+#define SIMULATIONINFOWIDGET_HPP
 
-#include <qt/QtWidgets/QWidget>
+#include <QWidget>
 
-class SimulationInfoWidget : public QWidget
+class QLabel;
+
+class SimulationInfoWidget: public QWidget
 {
     public:
         SimulationInfoWidget(QWidget *);
@@ -31,7 +33,10 @@ class SimulationInfoWidget : public QWidget
 
         SimulationInfoWidget& operator=(const SimulationInfoWidget &) = delete;
 
+        void updateFps(int);
+
     private:
+        QLabel* m_fpsValue;
 };
 
 #endif // SIMULATIONINFOWIDGET_H

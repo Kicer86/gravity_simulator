@@ -20,14 +20,29 @@
 
 #include "simulation_info_widget.hpp"
 
+#include <QGridLayout>
+#include <QLabel>
+
 
 SimulationInfoWidget::SimulationInfoWidget(QWidget* p): QWidget(p)
 {
+    QGridLayout* mainLayout = new QGridLayout(this);
 
+    QLabel* fpsLabel = new QLabel(tr("fps:"), this);
+    m_fpsValue = new QLabel(this);
+
+    mainLayout->addWidget(fpsLabel, 0, 0);
+    mainLayout->addWidget(m_fpsValue, 0, 1);
 }
 
 
 SimulationInfoWidget::~SimulationInfoWidget()
 {
 
+}
+
+
+void SimulationInfoWidget::updateFps(int fps)
+{
+    m_fpsValue->setText(QString::number(fps));
 }
