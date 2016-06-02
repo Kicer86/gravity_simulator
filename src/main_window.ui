@@ -13,14 +13,23 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="ObjectsView" name="graphicsView"/>
+  <widget class="QWidget" name="mainWidget">
+   <layout class="QVBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="ObjectsView" name="graphicsView"/>
+    </item>
+    <item>
+     <widget class="SimulationInfoWidget" name="simulationInfo" native="true"/>
+    </item>
+   </layout>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>30</height>
+     <height>31</height>
     </rect>
    </property>
   </widget>
@@ -31,6 +40,12 @@
    <class>ObjectsView</class>
    <extends>QGraphicsView</extends>
    <header>objects_view.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SimulationInfoWidget</class>
+   <extends>QWidget</extends>
+   <header>simulation_info_widget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
