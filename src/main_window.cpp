@@ -30,6 +30,8 @@ MainWindow::MainWindow(): m_scene(), m_controller()
     ui->graphicsView->setScene(&m_scene);
     m_controller.setScene(&m_scene);
 
+    connect(&m_controller, &SimulationController::fpsUpdated, ui->simulationInfo, &SimulationInfoWidget::updateFps);
+
     m_controller.beginSimulation();
 }
 
