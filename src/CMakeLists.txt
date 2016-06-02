@@ -9,7 +9,11 @@ include_directories(SYSTEM ${Qt5_Widgets})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-qt5_wrap_cpp(moc_wrapped main_window.hpp)
+qt5_wrap_cpp(moc_wrapped
+             main_window.hpp
+             simulation_controller.hpp
+)
+
 qt5_wrap_ui(ui_wrapped main_window.ui)
 
 add_executable(gravity_simulator

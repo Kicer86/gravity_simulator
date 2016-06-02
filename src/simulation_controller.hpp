@@ -28,6 +28,8 @@ class ObjectsScene;
 
 class SimulationController: public QObject, ISimulationEvents
 {
+        Q_OBJECT
+
     public:
         SimulationController();
         SimulationController(const SimulationController &) = delete;
@@ -53,6 +55,9 @@ class SimulationController: public QObject, ISimulationEvents
         virtual void objectCreated(int id, const Object &) override;
         virtual void objectAnnihilated(const Object &) override;
         virtual void objectUpdated(int id, const Object &) override;
+
+    signals:
+        void fpsUpdated(int);
 };
 
 #endif // SIMULATIONCONTROLLER_HPP

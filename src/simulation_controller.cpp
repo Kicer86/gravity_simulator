@@ -34,16 +34,18 @@ SimulationController::SimulationController(): m_engine(), m_timer(), m_scene(nul
     connect(&m_timer, &QTimer::timeout, this, &SimulationController::tick);
 
     m_engine.addEventsObserver(this);
-    
+
     QTimer* fpsTimer = new QTimer(this);
     fpsTimer->setInterval(1000);
-    
+
     connect(fpsTimer, &QTimer::timeout, [this]
     {
         m_fps = m_framesCounter;
         m_framesCounter = 0;
+
+        emit fpsUpdated(m_fps);
     });
-    
+
     fpsTimer->start();
 }
 
@@ -101,7 +103,7 @@ int SimulationController::fps() const
 void SimulationController::tick()
 {
     m_engine.stepBy(180);
-    
+
     m_framesCounter++;
 }
 
