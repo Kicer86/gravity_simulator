@@ -24,6 +24,8 @@ add_executable(gravity_simulator
                simulation_controller.hpp
                simulation_engine.cpp
                simulation_engine.hpp
+               simulation_info_widget.cpp
+               simulation_info_widget.hpp
                ${moc_wrapped}
                ${ui_wrapped}
 )
