@@ -34,9 +34,11 @@ class SimulationInfoWidget: public QWidget
         SimulationInfoWidget& operator=(const SimulationInfoWidget &) = delete;
 
         void updateFps(int);
+        void updateObjectCount(int);
 
     private:
         QLabel* m_fpsValue;
+        QLabel* m_objCountValue;
 };
 
 #endif // SIMULATIONINFOWIDGET_H
