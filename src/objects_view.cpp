@@ -27,7 +27,7 @@
 #include "simulation_controller.hpp"
 
 
-ObjectsView::ObjectsView(QWidget* p): QGraphicsView(p), m_prevPoint(), m_controller(nullptr)
+ObjectsView::ObjectsView(QWidget* p): QGraphicsView(p), m_prevPoint()
 {
 
 }
@@ -39,44 +39,38 @@ ObjectsView::~ObjectsView()
 }
 
 
-void ObjectsView::set(SimulationController* controller)
-{
-    m_controller = controller;
-}
-
-
 void ObjectsView::mousePressEvent(QMouseEvent* event)
-{    
+{
     m_prevPoint = event->pos();
 }
 
 
 void ObjectsView::mouseMoveEvent(QMouseEvent* event)
-{            
+{
     if ( (event->buttons() & Qt::LeftButton) > 0 )
     {
         const QPoint curPoint = event->pos();
         const QPoint diff = curPoint - m_prevPoint;
-        
+
         auto scrollBy = [](QScrollBar* scrollBar, int dx)
         {
             const int v = scrollBar->value();
             const int n_v = v + dx;
-            
+
             if (n_v <= scrollBar->maximum() && n_v >= scrollBar->minimum())
                 scrollBar->setValue(v + dx);
         };
-        
+
         scrollBy(horizontalScrollBar(), -diff.x());
         scrollBy(verticalScrollBar(), -diff.y());
-        
+
         m_prevPoint = curPoint;
     }
 }
 
 
 void ObjectsView::mouseReleaseEvent(QMouseEvent* event)
-{    
+{
     m_prevPoint = QPoint();
 }
 
@@ -84,7 +78,7 @@ void ObjectsView::mouseReleaseEvent(QMouseEvent* event)
 void ObjectsView::wheelEvent(QWheelEvent* event)
 {
     const QPoint delta = event->angleDelta();
-    
+
     if (delta.y() > 0)
         scale(1.2, 1.2);
     else if (delta.y() < 0)
@@ -101,28 +95,11 @@ void ObjectsView::resizeEvent(QResizeEvent* event)
 void ObjectsView::showEvent(QShowEvent* event)
 {
     QGraphicsView::showEvent(event);
-    
+
     QGraphicsScene* s = scene();
     if (s != nullptr)
     {
         const QRectF r = s->sceneRect();
         fitInView(r, Qt::KeepAspectRatio);
     }
-}
-
-
-void ObjectsView::paintEvent(QPaintEvent* event)
-{
-    QGraphicsView::paintEvent(event);
-    
-    const int fps = m_controller->fps();
-    const QString info = QString(tr("Information about simulation: FPS: %1"))
-                         .arg(fps);
-                         
-    QPainter painter(viewport());
-    const QRect infoRect = painter.boundingRect(QRect(), 0, info);
-    
-    painter.setPen(Qt::black);
-    painter.setBrush(Qt::blue);
-    painter.drawText(infoRect.bottomLeft(), info);
 }

@@ -22,29 +22,23 @@
 
 #include <QGraphicsView>
 
-class SimulationController;
-
 class ObjectsView: public QGraphicsView
 {
     public:
-        ObjectsView(QWidget  *);
+        ObjectsView(QWidget *);
         ObjectsView(const ObjectsView &) = delete;
-        ~ObjectsView();        
+        ~ObjectsView();
         ObjectsView& operator=(const ObjectsView &) = delete;
-        
-        void set(SimulationController *);
-        
+
     protected:
         QPoint m_prevPoint;
-        SimulationController* m_controller;
-        
+
         virtual void mousePressEvent(QMouseEvent *) override;
         virtual void mouseMoveEvent(QMouseEvent *) override;
         virtual void mouseReleaseEvent(QMouseEvent *) override;
         virtual void wheelEvent(QWheelEvent *) override;
         virtual void resizeEvent(QResizeEvent *) override;
         virtual void showEvent(QShowEvent *) override;
-        virtual void paintEvent(QPaintEvent *) override;
 };
 
 #endif // OBJECTSVIEW_HPP

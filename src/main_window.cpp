@@ -27,7 +27,6 @@ MainWindow::MainWindow(): m_scene(), m_controller()
     ui = std::make_unique<Ui::MainWindow>();
     ui->setupUi(this);
 
-    ui->graphicsView->set(&m_controller);
     ui->graphicsView->setScene(&m_scene);
     m_controller.setScene(&m_scene);
 
