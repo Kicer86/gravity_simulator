@@ -90,7 +90,7 @@ void SimulationController::beginSimulation()
     int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
 #endif
 
-    m_timer.start(20);
+    m_timer.start(1000/50);
 }
 
 
