@@ -19,7 +19,31 @@
      <widget class="ObjectsView" name="graphicsView"/>
     </item>
     <item>
-     <widget class="SimulationInfoWidget" name="simulationInfo" native="true"/>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="SimulationInfoWidget" name="simulationInfo" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>20</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
