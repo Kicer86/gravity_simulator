@@ -21,6 +21,7 @@
 #define SIMULATIONCONTROLLER_HPP
 
 #include <QTimer>
+#include <QThread>
 
 #include "simulation_engine.hpp"
 
@@ -44,6 +45,7 @@ class SimulationController: public QObject, ISimulationEvents
     private:
         SimulationEngine m_engine;
         QTimer m_timer;
+        QThread m_calculations;
         ObjectsScene* m_scene;
         int m_fps;
         int m_framesCounter;
