@@ -29,6 +29,35 @@ double fRand(double fMin, double fMax)
 }
 
 
+Tick::Tick()
+{
+
+}
+
+
+
+Tick::Tick(const Tick& other)
+{
+    *this = other;
+}
+
+
+Tick& Tick::operator=(const Tick& other)
+{
+    std::lock_guard<std::mutex> lockColided(other.colidedMutex);
+    std::lock_guard<std::mutex> lockCreated(other.createdMutex);
+    std::lock_guard<std::mutex> lockAnnihilated(other.annihilatedMutex);
+    std::lock_guard<std::mutex> lockUpdated(other.updatedMutex);
+
+    colided = other.colided;
+    created = other.created;
+    annihilated = other.annihilated;
+    updated = other.updated;
+
+    return *this;
+}
+
+
 void Tick::clear()
 {
     std::lock_guard<std::mutex> lockColided(colidedMutex);

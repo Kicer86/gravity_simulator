@@ -37,12 +37,17 @@ struct Tick
     std::deque<Object> annihilated;
     std::deque<Object> updated;
 
-    std::mutex colidedMutex;
-    std::mutex createdMutex;
-    std::mutex annihilatedMutex;
-    std::mutex updatedMutex;
+    mutable std::mutex colidedMutex;
+    mutable std::mutex createdMutex;
+    mutable std::mutex annihilatedMutex;
+    mutable std::mutex updatedMutex;
+
+    Tick();
+    Tick(const Tick &);
+    Tick& operator=(const Tick &);
 
     void clear();
+
 };
 
 
