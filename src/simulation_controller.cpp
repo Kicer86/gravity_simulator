@@ -29,6 +29,20 @@ double fRand(double fMin, double fMax)
 }
 
 
+void Tick::clear()
+{
+    std::lock_guard<std::mutex> lockColided(colidedMutex);
+    std::lock_guard<std::mutex> lockCreated(createdMutex);
+    std::lock_guard<std::mutex> lockAnnihilated(annihilatedMutex);
+    std::lock_guard<std::mutex> lockUpdated(updatedMutex);
+
+    colided.clear();
+    created.clear();
+    annihilated.clear();
+    updated.clear();
+}
+
+
 SimulationController::SimulationController():
     m_engine(),
     m_timer(),
@@ -113,35 +127,46 @@ int SimulationController::fps() const
 
 void SimulationController::tick()
 {
+    m_tickData.clear();
+
     m_engine.stepBy(180);
 
     m_framesCounter++;
 }
 
 
-void SimulationController::objectsColided(const Object& obj1, const Object &)
+void SimulationController::objectsColided(const Object& obj1, const Object& obj2)
 {
-    m_scene->updateRadius(obj1.id(), obj1.radius());
+    std::lock_guard<std::mutex> lockColided(m_tickData.colidedMutex);
+    m_tickData.colided.push_back( std::make_pair(obj1, obj2) );
+    //m_scene->updateRadius(obj1.id(), obj1.radius());
 }
 
 
-void SimulationController::objectCreated(int id, const Object& obj)
+void SimulationController::objectCreated(int, const Object& obj)
 {
-    m_scene->addObject(id, obj);
+    std::lock_guard<std::mutex> lockCreated(m_tickData.createdMutex);
+    m_tickData.created.push_back( obj );
+    //m_scene->addObject(id, obj);
 
-    emit objectCountUpdated(m_engine.objectCount());
+    //emit objectCountUpdated(m_engine.objectCount());
 }
 
 
 void SimulationController::objectAnnihilated(const Object& obj)
 {
-    m_scene->removeObject(obj.id());
+    std::lock_guard<std::mutex> lockAnnihilated(m_tickData.annihilatedMutex);
+    m_tickData.annihilated.push_back( obj );
+    //m_scene->removeObject(obj.id());
 
-    emit objectCountUpdated(m_engine.objectCount() - 1);  // -1 because engine emits this notification before object removal
+    //emit objectCountUpdated(m_engine.objectCount() - 1);  // -1 because engine emits this notification before object removal
 }
 
 
-void SimulationController::objectUpdated(int id, const Object& obj)
+void SimulationController::objectUpdated(int, const Object& obj)
 {
-    m_scene->updatePosition(id, obj.pos());
+    std::lock_guard<std::mutex> lockUpdated(m_tickData.updatedMutex);
+    m_tickData.updated.push_back( obj );
+
+    //m_scene->updatePosition(id, obj.pos());
 }

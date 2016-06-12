@@ -20,12 +20,31 @@
 #ifndef SIMULATIONCONTROLLER_HPP
 #define SIMULATIONCONTROLLER_HPP
 
+#include <deque>
+#include <mutex>
+
 #include <QTimer>
 #include <QThread>
 
 #include "simulation_engine.hpp"
 
 class ObjectsScene;
+
+struct Tick
+{
+    std::deque< std::pair<Object, Object> > colided;
+    std::deque<Object> created;
+    std::deque<Object> annihilated;
+    std::deque<Object> updated;
+
+    std::mutex colidedMutex;
+    std::mutex createdMutex;
+    std::mutex annihilatedMutex;
+    std::mutex updatedMutex;
+
+    void clear();
+};
+
 
 class SimulationController: public QObject, ISimulationEvents
 {
@@ -46,6 +65,7 @@ class SimulationController: public QObject, ISimulationEvents
         SimulationEngine m_engine;
         QTimer m_timer;
         QThread m_calculations;
+        Tick m_tickData;
         ObjectsScene* m_scene;
         int m_fps;
         int m_framesCounter;
