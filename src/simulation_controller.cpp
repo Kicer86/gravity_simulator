@@ -80,6 +80,7 @@ SimulationController::SimulationController():
     m_fps(0),
     m_framesCounter(0)
 {
+    qRegisterMetaType<Tick>();
 
     m_engine.addEventsObserver(this);
 
@@ -101,6 +102,7 @@ SimulationController::SimulationController():
 
     connect(&m_timer, &QTimer::timeout, this, &SimulationController::tick, Qt::DirectConnection);
     connect(&m_calculations, SIGNAL(started()), &m_timer, SLOT(start()));
+    connect(this, &SimulationController::tickData, this, &SimulationController::updateScene);
 }
 
 
@@ -157,10 +159,16 @@ int SimulationController::fps() const
 void SimulationController::tick()
 {
     m_tickData.clear();
-
     m_engine.stepBy(180);
-
     m_framesCounter++;
+
+    emit tickData(m_tickData);
+}
+
+
+void SimulationController::updateScene(const Tick& data)
+{
+
 }
 
 

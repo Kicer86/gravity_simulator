@@ -47,8 +47,9 @@ struct Tick
     Tick& operator=(const Tick &);
 
     void clear();
-
 };
+
+Q_DECLARE_METATYPE(Tick)
 
 
 class SimulationController: public QObject, ISimulationEvents
@@ -76,6 +77,7 @@ class SimulationController: public QObject, ISimulationEvents
         int m_framesCounter;
 
         void tick();
+        void updateScene(const Tick &);
 
         // ISimulationEvents:
         virtual void objectsColided(const Object&, const Object&) override;
@@ -86,6 +88,7 @@ class SimulationController: public QObject, ISimulationEvents
     signals:
         void fpsUpdated(int);
         void objectCountUpdated(int);
+        void tickData(const Tick &);
 };
 
 #endif // SIMULATIONCONTROLLER_HPP
