@@ -168,7 +168,20 @@ void SimulationController::tick()
 
 void SimulationController::updateScene(const Tick& data)
 {
+    for(const auto& objs: data.colided)
+    {
+        const Object& obj = objs.first;
+        m_scene->updateRadius(obj.id(), obj.radius());
+    }
 
+    for(const Object& obj: data.created)
+        m_scene->addObject(obj.id(), obj);
+
+    for(const Object& obj: data.annihilated)
+        m_scene->removeObject(obj.id());
+
+    for(const Object& obj: data.updated)
+        m_scene->updatePosition(obj.id(), obj.pos());
 }
 
 
@@ -176,7 +189,6 @@ void SimulationController::objectsColided(const Object& obj1, const Object& obj2
 {
     std::lock_guard<std::mutex> lockColided(m_tickData.colidedMutex);
     m_tickData.colided.push_back( std::make_pair(obj1, obj2) );
-    //m_scene->updateRadius(obj1.id(), obj1.radius());
 }
 
 
@@ -184,7 +196,6 @@ void SimulationController::objectCreated(int, const Object& obj)
 {
     std::lock_guard<std::mutex> lockCreated(m_tickData.createdMutex);
     m_tickData.created.push_back( obj );
-    //m_scene->addObject(id, obj);
 
     //emit objectCountUpdated(m_engine.objectCount());
 }
@@ -194,7 +205,6 @@ void SimulationController::objectAnnihilated(const Object& obj)
 {
     std::lock_guard<std::mutex> lockAnnihilated(m_tickData.annihilatedMutex);
     m_tickData.annihilated.push_back( obj );
-    //m_scene->removeObject(obj.id());
 
     //emit objectCountUpdated(m_engine.objectCount() - 1);  // -1 because engine emits this notification before object removal
 }
@@ -204,6 +214,4 @@ void SimulationController::objectUpdated(int, const Object& obj)
 {
     std::lock_guard<std::mutex> lockUpdated(m_tickData.updatedMutex);
     m_tickData.updated.push_back( obj );
-
-    //m_scene->updatePosition(id, obj.pos());
 }
