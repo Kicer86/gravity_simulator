@@ -194,8 +194,15 @@ void SimulationController::objectsColided(const Object& obj1, const Object& obj2
 
 void SimulationController::objectCreated(int, const Object& obj)
 {
-    std::lock_guard<std::mutex> lockCreated(m_tickData.createdMutex);
-    m_tickData.created.push_back( obj );
+    // Not quite nice... When called from main thread (m_calculations is not running)
+    // pass event directly to scene, otherewise collect it
+    if (m_calculations.isRunning())
+    {
+        std::lock_guard<std::mutex> lockCreated(m_tickData.createdMutex);
+        m_tickData.created.push_back( obj );
+    }
+    else
+        m_scene->addObject(obj.id(), obj);
 
     //emit objectCountUpdated(m_engine.objectCount());
 }
