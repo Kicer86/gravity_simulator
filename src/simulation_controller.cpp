@@ -102,13 +102,15 @@ SimulationController::SimulationController():
 
     connect(&m_timer, &QTimer::timeout, this, &SimulationController::tick, Qt::DirectConnection);
     connect(&m_calculations, SIGNAL(started()), &m_timer, SLOT(start()));
+    connect(&m_calculations, SIGNAL(finished()), &m_timer, SLOT(stop()));
     connect(this, &SimulationController::tickData, this, &SimulationController::updateScene);
 }
 
 
 SimulationController::~SimulationController()
 {
-
+    m_calculations.quit();
+    m_calculations.wait();
 }
 
 
