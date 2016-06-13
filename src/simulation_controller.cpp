@@ -184,6 +184,8 @@ void SimulationController::updateScene(const Tick& data)
 
     for(const Object& obj: data.updated)
         m_scene->updatePosition(obj.id(), obj.pos());
+
+    emit objectCountUpdated(data.updated.size());
 }
 
 
@@ -205,8 +207,6 @@ void SimulationController::objectCreated(int, const Object& obj)
     }
     else
         m_scene->addObject(obj.id(), obj);
-
-    //emit objectCountUpdated(m_engine.objectCount());
 }
 
 
@@ -214,8 +214,6 @@ void SimulationController::objectAnnihilated(const Object& obj)
 {
     std::lock_guard<std::mutex> lockAnnihilated(m_tickData.annihilatedMutex);
     m_tickData.annihilated.push_back( obj );
-
-    //emit objectCountUpdated(m_engine.objectCount() - 1);  // -1 because engine emits this notification before object removal
 }
 
 
