@@ -89,7 +89,7 @@ int SimulationEngine::addObject(const Object& obj)
     addedObj.setId(m_nextId);
 
     for(ISimulationEvents* events: m_eventObservers)
-        events->objectCreated(m_nextId, obj);
+        events->objectCreated(m_nextId, addedObj);
 
     return m_nextId++;
 }
