@@ -20,11 +20,38 @@
 #ifndef SIMULATIONCONTROLLER_HPP
 #define SIMULATIONCONTROLLER_HPP
 
+#include <atomic>
+#include <deque>
+#include <mutex>
+
 #include <QTimer>
+#include <QThread>
 
 #include "simulation_engine.hpp"
 
 class ObjectsScene;
+
+struct Tick
+{
+    std::deque< std::pair<Object, Object> > colided;
+    std::deque<Object> created;
+    std::deque<Object> annihilated;
+    std::deque<Object> updated;
+
+    mutable std::mutex colidedMutex;
+    mutable std::mutex createdMutex;
+    mutable std::mutex annihilatedMutex;
+    mutable std::mutex updatedMutex;
+
+    Tick();
+    Tick(const Tick &);
+    Tick& operator=(const Tick &);
+
+    void clear();
+};
+
+Q_DECLARE_METATYPE(Tick)
+
 
 class SimulationController: public QObject, ISimulationEvents
 {
@@ -43,12 +70,15 @@ class SimulationController: public QObject, ISimulationEvents
 
     private:
         SimulationEngine m_engine;
-        QTimer m_timer;
+        QTimer m_stepTimer;
+        QThread m_calculationsThread;
+        Tick m_tickData;
         ObjectsScene* m_scene;
         int m_fps;
-        int m_framesCounter;
+        std::atomic<int> m_framesCounter;
 
         void tick();
+        void updateScene(const Tick &);
 
         // ISimulationEvents:
         virtual void objectsColided(const Object&, const Object&) override;
@@ -59,6 +89,7 @@ class SimulationController: public QObject, ISimulationEvents
     signals:
         void fpsUpdated(int);
         void objectCountUpdated(int);
+        void tickData(const Tick &);
 };
 
 #endif // SIMULATIONCONTROLLER_HPP

@@ -29,9 +29,58 @@ double fRand(double fMin, double fMax)
 }
 
 
-SimulationController::SimulationController(): m_engine(), m_timer(), m_scene(nullptr), m_fps(0), m_framesCounter(0)
+Tick::Tick()
 {
-    connect(&m_timer, &QTimer::timeout, this, &SimulationController::tick);
+
+}
+
+
+
+Tick::Tick(const Tick& other)
+{
+    *this = other;
+}
+
+
+Tick& Tick::operator=(const Tick& other)
+{
+    std::lock_guard<std::mutex> lockColided(other.colidedMutex);
+    std::lock_guard<std::mutex> lockCreated(other.createdMutex);
+    std::lock_guard<std::mutex> lockAnnihilated(other.annihilatedMutex);
+    std::lock_guard<std::mutex> lockUpdated(other.updatedMutex);
+
+    colided = other.colided;
+    created = other.created;
+    annihilated = other.annihilated;
+    updated = other.updated;
+
+    return *this;
+}
+
+
+void Tick::clear()
+{
+    std::lock_guard<std::mutex> lockColided(colidedMutex);
+    std::lock_guard<std::mutex> lockCreated(createdMutex);
+    std::lock_guard<std::mutex> lockAnnihilated(annihilatedMutex);
+    std::lock_guard<std::mutex> lockUpdated(updatedMutex);
+
+    colided.clear();
+    created.clear();
+    annihilated.clear();
+    updated.clear();
+}
+
+
+SimulationController::SimulationController():
+    m_engine(),
+    m_stepTimer(),
+    m_calculationsThread(),
+    m_scene(nullptr),
+    m_fps(0),
+    m_framesCounter(0)
+{
+    qRegisterMetaType<Tick>();
 
     m_engine.addEventsObserver(this);
 
@@ -47,12 +96,21 @@ SimulationController::SimulationController(): m_engine(), m_timer(), m_scene(nul
     });
 
     fpsTimer->start();
+
+    m_stepTimer.setInterval(1000/50);
+    m_stepTimer.moveToThread(&m_calculationsThread);
+
+    connect(&m_stepTimer, &QTimer::timeout, this, &SimulationController::tick, Qt::DirectConnection);  // make sure tick will be called from calculations thread
+    connect(&m_calculationsThread, SIGNAL(started()), &m_stepTimer, SLOT(start()));
+    connect(&m_calculationsThread, SIGNAL(finished()), &m_stepTimer, SLOT(stop()));
+    connect(this, &SimulationController::tickData, this, &SimulationController::updateScene);          // inter-thread communication signal
 }
 
 
 SimulationController::~SimulationController()
 {
-
+    m_calculationsThread.quit();
+    m_calculationsThread.wait();
 }
 
 
@@ -90,7 +148,12 @@ void SimulationController::beginSimulation()
     int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
 #endif
 
-    m_timer.start(1000/50);
+    // before starting simulation update scene
+    const auto& objects = m_engine.objects();
+    for (const Object& obj: objects)
+        m_scene->addObject(obj.id(), obj);
+
+    m_calculationsThread.start();
 }
 
 
@@ -102,35 +165,58 @@ int SimulationController::fps() const
 
 void SimulationController::tick()
 {
+    m_tickData.clear();
     m_engine.stepBy(180);
-
     m_framesCounter++;
+
+    emit tickData(m_tickData);
 }
 
 
-void SimulationController::objectsColided(const Object& obj1, const Object &)
+void SimulationController::updateScene(const Tick& data)
 {
-    m_scene->updateRadius(obj1.id(), obj1.radius());
+    for(const auto& objs: data.colided)
+    {
+        const Object& obj = objs.first;
+        m_scene->updateRadius(obj.id(), obj.radius());
+    }
+
+    for(const Object& obj: data.created)
+        m_scene->addObject(obj.id(), obj);
+
+    for(const Object& obj: data.annihilated)
+        m_scene->removeObject(obj.id());
+
+    for(const Object& obj: data.updated)
+        m_scene->updatePosition(obj.id(), obj.pos());
+
+    emit objectCountUpdated(data.updated.size());
 }
 
 
-void SimulationController::objectCreated(int id, const Object& obj)
+void SimulationController::objectsColided(const Object& obj1, const Object& obj2)
 {
-    m_scene->addObject(id, obj);
+    std::lock_guard<std::mutex> lockColided(m_tickData.colidedMutex);
+    m_tickData.colided.push_back( std::make_pair(obj1, obj2) );
+}
 
-    emit objectCountUpdated(m_engine.objectCount());
+
+void SimulationController::objectCreated(int, const Object& obj)
+{
+    std::lock_guard<std::mutex> lockCreated(m_tickData.createdMutex);
+    m_tickData.created.push_back( obj );
 }
 
 
 void SimulationController::objectAnnihilated(const Object& obj)
 {
-    m_scene->removeObject(obj.id());
-
-    emit objectCountUpdated(m_engine.objectCount() - 1);  // -1 because engine emits this notification before object removal
+    std::lock_guard<std::mutex> lockAnnihilated(m_tickData.annihilatedMutex);
+    m_tickData.annihilated.push_back( obj );
 }
 
 
-void SimulationController::objectUpdated(int id, const Object& obj)
+void SimulationController::objectUpdated(int, const Object& obj)
 {
-    m_scene->updatePosition(id, obj.pos());
+    std::lock_guard<std::mutex> lockUpdated(m_tickData.updatedMutex);
+    m_tickData.updated.push_back( obj );
 }
