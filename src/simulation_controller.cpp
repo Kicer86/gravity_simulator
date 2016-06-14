@@ -74,8 +74,8 @@ void Tick::clear()
 
 SimulationController::SimulationController():
     m_engine(),
-    m_timer(),
-    m_calculations(),
+    m_stepTimer(),
+    m_calculationsThread(),
     m_scene(nullptr),
     m_fps(0),
     m_framesCounter(0)
@@ -97,20 +97,20 @@ SimulationController::SimulationController():
 
     fpsTimer->start();
 
-    m_timer.setInterval(1000/50);
-    m_timer.moveToThread(&m_calculations);
+    m_stepTimer.setInterval(1000/50);
+    m_stepTimer.moveToThread(&m_calculationsThread);
 
-    connect(&m_timer, &QTimer::timeout, this, &SimulationController::tick, Qt::DirectConnection);
-    connect(&m_calculations, SIGNAL(started()), &m_timer, SLOT(start()));
-    connect(&m_calculations, SIGNAL(finished()), &m_timer, SLOT(stop()));
-    connect(this, &SimulationController::tickData, this, &SimulationController::updateScene);
+    connect(&m_stepTimer, &QTimer::timeout, this, &SimulationController::tick, Qt::DirectConnection);  // make sure tick will be called from calculations thread
+    connect(&m_calculationsThread, SIGNAL(started()), &m_stepTimer, SLOT(start()));
+    connect(&m_calculationsThread, SIGNAL(finished()), &m_stepTimer, SLOT(stop()));
+    connect(this, &SimulationController::tickData, this, &SimulationController::updateScene);          // inter-thread communication signal
 }
 
 
 SimulationController::~SimulationController()
 {
-    m_calculations.quit();
-    m_calculations.wait();
+    m_calculationsThread.quit();
+    m_calculationsThread.wait();
 }
 
 
@@ -148,7 +148,12 @@ void SimulationController::beginSimulation()
     int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
 #endif
 
-    m_calculations.start();
+    // before starting simulation update scene
+    const auto& objects = m_engine.objects();
+    for (const Object& obj: objects)
+        m_scene->addObject(obj.id(), obj);
+
+    m_calculationsThread.start();
 }
 
 
@@ -198,15 +203,8 @@ void SimulationController::objectsColided(const Object& obj1, const Object& obj2
 
 void SimulationController::objectCreated(int, const Object& obj)
 {
-    // Not quite nice... When called from main thread (m_calculations is not running)
-    // pass event directly to scene, otherewise collect it
-    if (m_calculations.isRunning())
-    {
-        std::lock_guard<std::mutex> lockCreated(m_tickData.createdMutex);
-        m_tickData.created.push_back( obj );
-    }
-    else
-        m_scene->addObject(obj.id(), obj);
+    std::lock_guard<std::mutex> lockCreated(m_tickData.createdMutex);
+    m_tickData.created.push_back( obj );
 }
 
 

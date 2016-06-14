@@ -20,6 +20,7 @@
 #ifndef SIMULATIONCONTROLLER_HPP
 #define SIMULATIONCONTROLLER_HPP
 
+#include <atomic>
 #include <deque>
 #include <mutex>
 
@@ -69,12 +70,12 @@ class SimulationController: public QObject, ISimulationEvents
 
     private:
         SimulationEngine m_engine;
-        QTimer m_timer;
-        QThread m_calculations;
+        QTimer m_stepTimer;
+        QThread m_calculationsThread;
         Tick m_tickData;
         ObjectsScene* m_scene;
         int m_fps;
-        int m_framesCounter;
+        std::atomic<int> m_framesCounter;
 
         void tick();
         void updateScene(const Tick &);
