@@ -21,6 +21,8 @@
 
 #include <set>
 
+#include <omp.h>
+
 namespace
 {
     double distance(const XY& p1, const XY& p2)
@@ -210,6 +212,7 @@ void SimulationEngine::checkForCollisions()
     std::set<std::size_t, std::greater<std::size_t>> toRemove;
 
     const std::size_t objs = m_objects.size();
+
     for(std::size_t i = 0; i < objs - 1; i++)
         for(std::size_t j = i + 1; j < objs; j++)
         {
@@ -247,6 +250,14 @@ std::vector<XY> SimulationEngine::calculateForces() const
 
     std::vector<XY> forces(objs);
 
+    // prepare private tables for threads for results, so we don't get races when accessing 'forces'
+    const int threads = omp_get_max_threads();
+    std::vector< std::vector<XY> > private_forces(threads);    // for each thread vector of its calculations
+
+    for(int t = 0; t < threads; t++)
+        private_forces[t] = std::vector<XY>(objs);             // initialize vector of results for each vector
+
+    #pragma omp parallel for schedule(static, 1)
     for(std::size_t i = 0; i < objs - 1; i++)
         for(std::size_t j = i + 1; j < objs; j++)
         {
@@ -261,9 +272,16 @@ std::vector<XY> SimulationEngine::calculateForces() const
             XY force_vector = unit_vector(o2, o1);
             force_vector *= Fg;
 
-            forces[i] += force_vector;
-            forces[j] += -force_vector;
+            const int tid = omp_get_thread_num();
+
+            private_forces[tid][i] += force_vector;
+            private_forces[tid][j] += -force_vector;
         }
+
+    // accumulate results
+    for(int t = 0; t < threads; t++)
+        for(std::size_t i = 0; i < objs; i++)
+            forces[i] += private_forces[t][i];
 
     return forces;
 }

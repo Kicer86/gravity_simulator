@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 14)
 
 find_package(Qt5Widgets REQUIRED)
+find_package(OpenMP)
 
 include_directories(SYSTEM ${Qt5_Widgets})
 
@@ -34,4 +35,5 @@ add_executable(gravity_simulator
                ${ui_wrapped}
 )
 
-target_link_libraries(gravity_simulator Qt5::Widgets)
+target_link_libraries(gravity_simulator Qt5::Widgets ${OpenMP_CXX_FLAGS})
+target_compile_options(gravity_simulator PRIVATE ${OpenMP_CXX_FLAGS})
