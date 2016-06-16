@@ -125,10 +125,10 @@ void SimulationController::beginSimulation()
 #if 1
     srand(3);
 
-    for (int i = 0; i < 400; i++)
+    for (int i = 0; i < 2000; i++)
     {
-        const double x = fRand(-500e6, 500e6);
-        const double y = fRand(-500e6, 500e6);
+        const double x = fRand(-5000e6, 5000e6);
+        const double y = fRand(-5000e6, 5000e6);
 
         const double v_x = fRand(-5e2, 5e2);
         const double v_y = fRand(-5e2, 5e2);
@@ -139,13 +139,13 @@ void SimulationController::beginSimulation()
         //int id4 = m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
     }
 #elif 0
-    int id1 = m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
-    int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
-    int id3 = m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
-    int id4 = m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
+    m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
+    m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
+    m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
+    m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
 #elif 0
-    int id1 = m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
-    int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
+    m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
+    m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
 #endif
 
     // before starting simulation update scene
@@ -165,9 +165,17 @@ int SimulationController::fps() const
 
 void SimulationController::tick()
 {
+    const std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
+
     m_tickData.clear();
-    m_engine.stepBy(180);
+    m_engine.stepBy(1800);
     m_framesCounter++;
+
+    const std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    const auto diff = end - start;
+    const auto diff_ms = std::chrono::duration_cast<std::chrono::milliseconds>(diff).count();
+
+    std::cout << "Tick time: " << diff_ms << std::endl;
 
     emit tickData(m_tickData);
 }

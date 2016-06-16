@@ -19,7 +19,10 @@
 
 #include "simulation_engine.hpp"
 
+#include <cassert>
 #include <set>
+
+#include <omp.h>
 
 namespace
 {
@@ -173,6 +176,9 @@ std::size_t SimulationEngine::objectCount() const
 
 std::size_t SimulationEngine::collide(std::size_t i, std::size_t j)
 {
+    assert(i < m_objects.size());
+    assert(j < m_objects.size());
+
     Object& o1 = m_objects[i];
     Object& o2 = m_objects[j];
 
@@ -210,6 +216,11 @@ void SimulationEngine::checkForCollisions()
     std::set<std::size_t, std::greater<std::size_t>> toRemove;
 
     const std::size_t objs = m_objects.size();
+
+    const int threads = omp_get_max_threads();
+    std::vector< std::vector< std::pair<int, int> > > toColide(threads);
+
+    #pragma omp parallel for schedule(static, 1)
     for(std::size_t i = 0; i < objs - 1; i++)
         for(std::size_t j = i + 1; j < objs; j++)
         {
@@ -218,21 +229,46 @@ void SimulationEngine::checkForCollisions()
 
             const double dist = distance(o1, o2);
 
-            if (
-                (o1.radius() + o2.radius()) > dist &&
-                toRemove.find(i) == toRemove.end() &&
-                toRemove.find(j) == toRemove.end()
-               )
+            if ( (o1.radius() + o2.radius()) > dist)
             {
-                const int destroyed = collide(i, j);
+                const int tid = omp_get_thread_num();
+                const auto colided = std::make_pair(i, j);
+                toColide[tid].push_back(colided);
+            }
+
+        }
+
+    for(int t = 0; t < threads; t++)
+    {
+        const auto& thread_colided = toColide[t];
+        for(std::size_t i = 0; i < thread_colided.size(); i++)
+        {
+            const auto& colided = thread_colided[i];
+
+            const int idx1 = colided.first;
+            const int idx2 = colided.second;
+
+            const Object& ob1 = m_objects[idx1];
+            const Object& ob2 = m_objects[idx2];
+
+            const int id1 = ob1.id();
+            const int id2 = ob2.id();
+
+            if (
+                toRemove.find(id1) == toRemove.end() &&
+                toRemove.find(id2) == toRemove.end()
+            )
+            {
+                const int destroyed = collide(idx1, idx2);
                 toRemove.insert(destroyed);
             }
         }
+    }
 
     for(std::size_t i: toRemove)
     {
         // remove object 'i' by overriding it with last one
-        if (i < m_objects.size() - 1)
+        if (i < objs - 1)
             m_objects[i] = m_objects.back();
 
         m_objects.pop_back();
@@ -247,6 +283,14 @@ std::vector<XY> SimulationEngine::calculateForces() const
 
     std::vector<XY> forces(objs);
 
+    // prepare private tables for threads for results, so we don't get races when accessing 'forces'
+    const int threads = omp_get_max_threads();
+    std::vector< std::vector<XY> > private_forces(threads);    // for each thread vector of its calculations
+
+    for(int t = 0; t < threads; t++)
+        private_forces[t] = std::vector<XY>(objs);             // initialize vector of results for each vector
+
+    #pragma omp parallel for schedule(static, 1)
     for(std::size_t i = 0; i < objs - 1; i++)
         for(std::size_t j = i + 1; j < objs; j++)
         {
@@ -261,9 +305,16 @@ std::vector<XY> SimulationEngine::calculateForces() const
             XY force_vector = unit_vector(o2, o1);
             force_vector *= Fg;
 
-            forces[i] += force_vector;
-            forces[j] += -force_vector;
+            const int tid = omp_get_thread_num();
+
+            private_forces[tid][i] += force_vector;
+            private_forces[tid][j] += -force_vector;
         }
+
+    // accumulate results
+    for(int t = 0; t < threads; t++)
+        for(std::size_t i = 0; i < objs; i++)
+            forces[i] += private_forces[t][i];
 
     return forces;
 }
