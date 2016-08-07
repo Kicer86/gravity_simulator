@@ -8,8 +8,14 @@ include(FeatureSummary)
 add_subdirectory(accelerators)
 
 find_package(Qt5Widgets REQUIRED)
+find_package(OpenCL REQUIRED)
+find_package(Boost REQUIRED)
 
-include_directories(SYSTEM ${Qt5_Widgets})
+include_directories(SYSTEM
+                    ${Qt5_Widgets}
+                    ${OpenCL_INCLUDE_DIRS}
+                    ${Boost_INCLUDE_DIRS}
+                    )
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -43,7 +49,11 @@ add_executable(gravity_simulator
                $<TARGET_OBJECTS:accelerators>
 )
 
-target_link_libraries(gravity_simulator PRIVATE ${ACC_LINKER_FLAGS} Qt5::Widgets)
-target_compile_options(gravity_simulator PRIVATE)
+target_link_libraries(gravity_simulator
+                      PRIVATE
+                        Qt5::Widgets
+                        ${ACC_LINKER_FLAGS}
+                        ${OpenCL_LIBRARIES}
+)
 
 feature_summary(WHAT ALL)
