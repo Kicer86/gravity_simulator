@@ -25,7 +25,9 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
+#include <memory>
 
+struct IAccelerator;
 
 struct XY
 {
@@ -199,14 +201,11 @@ class SimulationEngine
     private:
         std::vector<Object> m_objects;
         std::vector<ISimulationEvents *> m_eventObservers;
-        double m_dt;
+        std::unique_ptr<IAccelerator> m_accelerator;
         int m_nextId;
 
         std::size_t collide(std::size_t, std::size_t);
         void checkForCollisions();
-
-        std::vector<XY> calculateForces() const;
-        std::vector<XY> calculateVelocities(const std::vector<XY> &, double) const;
 };
 
 #endif // SIMULATIONENGINE_HPP
