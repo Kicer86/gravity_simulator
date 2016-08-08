@@ -88,6 +88,7 @@ double OpenMPAccelerator::step()
     {
         const std::vector<XY> speeds = calculateVelocities(forces, m_dt);
 
+        // figure out maximum distance made by single object
         double max_travel = 0.0;
 
         for(std::size_t i = 0; i < objs; i++)
@@ -104,6 +105,7 @@ double OpenMPAccelerator::step()
                 max_travel = travel;
         }
 
+        // do not allow too big jumps (precission loss) nor no small ones (performance loss)
         if (max_travel > 100e3)
             m_dt = m_dt * 100e3 / max_travel;
         else if (max_travel < 1e3)
@@ -113,6 +115,7 @@ double OpenMPAccelerator::step()
     }
     while(optimal == false);
 
+    // apply new positions and speeds
     for(std::size_t i = 0; i < objs; i++)
     {
         Object& o = m_objects[i];

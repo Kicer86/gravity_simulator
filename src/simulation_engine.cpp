@@ -161,6 +161,7 @@ void SimulationEngine::checkForCollisions()
     const int threads = omp_get_max_threads();
     std::vector< std::vector< std::pair<int, int> > > toColide(threads);
 
+    // calculate collisions in parallel
     #pragma omp parallel for schedule(static, 1)
     for(std::size_t i = 0; i < objs - 1; i++)
         for(std::size_t j = i + 1; j < objs; j++)
@@ -179,6 +180,7 @@ void SimulationEngine::checkForCollisions()
 
         }
 
+    // collect data from threads into one set of objects to be removed
     for(int t = 0; t < threads; t++)
     {
         const auto& thread_colided = toColide[t];
@@ -195,10 +197,7 @@ void SimulationEngine::checkForCollisions()
             const int id1 = ob1.id();
             const int id2 = ob2.id();
 
-            if (
-                toRemove.find(id1) == toRemove.end() &&
-                toRemove.find(id2) == toRemove.end()
-            )
+            if (toRemove.find(id1) == toRemove.end() && toRemove.find(id2) == toRemove.end())
             {
                 const int destroyed = collide(idx1, idx2);
                 toRemove.insert(destroyed);
@@ -206,6 +205,7 @@ void SimulationEngine::checkForCollisions()
         }
     }
 
+    // remove destroyed objects
     for(std::size_t i: toRemove)
     {
         // remove object 'i' by overriding it with last one
