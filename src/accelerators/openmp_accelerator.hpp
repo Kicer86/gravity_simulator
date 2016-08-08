@@ -22,15 +22,26 @@
 
 #include "iaccelerator.hpp"
 
+#include <vector>
+
+#include "../simulation_engine.hpp"
+
 class OpenMPAccelerator: public IAccelerator
 {
     public:
-        OpenMPAccelerator();
+        OpenMPAccelerator(std::vector<Object> &);
         OpenMPAccelerator(const OpenMPAccelerator &) = delete;
         ~OpenMPAccelerator();
         OpenMPAccelerator& operator=(const OpenMPAccelerator &);
 
         virtual double step();
+
+    private:
+        std::vector<Object>& m_objects;
+        double m_dt;
+
+        std::vector<XY> calculateForces() const;
+        std::vector<XY> calculateVelocities(const std::vector<XY> &, double) const;
 };
 
 #endif // OPENMPACCELERATOR_HPP
