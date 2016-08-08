@@ -44,6 +44,8 @@ add_executable(gravity_simulator
                simulation_engine.hpp
                simulation_info_widget.cpp
                simulation_info_widget.hpp
+               accelerators/opencl_accelerator.cpp
+               accelerators/opencl_accelerator.hpp
                ${moc_wrapped}
                ${ui_wrapped}
                $<TARGET_OBJECTS:accelerators>
