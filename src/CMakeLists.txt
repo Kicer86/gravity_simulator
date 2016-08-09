@@ -21,6 +21,8 @@ add_executable(gravity_simulator
                main.cpp
                main_window.cpp
                main_window.hpp
+               object.cpp
+               object.hpp
                objects.cpp
                objects.hpp
                objects_scene.cpp
