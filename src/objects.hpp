@@ -20,6 +20,10 @@
 #ifndef OBJECTS_HPP
 #define OBJECTS_HPP
 
+#include <vector>
+
+#include "object.hpp"
+
 class Objects
 {
     public:
@@ -28,6 +32,37 @@ class Objects
         ~Objects();
 
         Objects& operator=(const Objects &) = delete;
+
+        const std::vector<double>& getX() const;
+        std::vector<double>& getX();
+
+        const std::vector<double>& getY() const;
+        std::vector<double>& getY();
+
+        const std::vector<double>& getVX() const;
+        std::vector<double>& getVX();
+
+        const std::vector<double>& getVY() const;
+        std::vector<double>& getVY();
+
+        const std::vector<double>& getMass() const;
+        std::vector<double>& getMass();
+
+        const std::vector<double>& getRadius() const;
+        std::vector<double>& getRadius();
+
+        const std::vector<int>& getId() const;
+        std::vector<int>& getId();
+
+    private:
+        // objects data
+        std::vector<double> m_x;
+        std::vector<double> m_y;
+        std::vector<double> m_vx;
+        std::vector<double> m_vy;
+        std::vector<double> m_mass;
+        std::vector<double> m_radius;
+        std::vector<int> m_id;
 };
 
 #endif // OBJECTS_HPP
