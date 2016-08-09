@@ -19,6 +19,10 @@
 
 #include "opencl_accelerator.hpp"
 
+// tutorials:
+// https://anteru.net/blog/2012/11/03/2009/
+
+
 OpenCLAccelerator::OpenCLAccelerator()
 {
 
