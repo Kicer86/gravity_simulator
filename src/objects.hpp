@@ -33,6 +33,7 @@ class Objects
 
         Objects& operator=(const Objects &) = delete;
 
+        // raw data access for accelerators' purposes
         const std::vector<double>& getX() const;
         std::vector<double>& getX();
 
