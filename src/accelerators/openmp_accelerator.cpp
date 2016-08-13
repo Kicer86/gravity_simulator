@@ -20,9 +20,7 @@
 #include "openmp_accelerator.hpp"
 
 #include <cmath>
-
 #include <omp.h>
-
 
 namespace
 {
