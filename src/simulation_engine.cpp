@@ -26,25 +26,6 @@
 
 #include "accelerators/openmp_accelerator.hpp"
 
-namespace
-{
-    double distance(const XY& p1, const XY& p2)
-    {
-        const double dist = sqrt( (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) );
-
-        return dist;
-    }
-
-    double distance(const Object& o1, const Object& o2)
-    {
-        const XY& p1 = o1.pos();
-        const XY& p2 = o2.pos();
-        const double dist = distance(p1, p2);
-
-        return dist;
-    }
-}
-
 
 SimulationEngine::SimulationEngine():
     m_objects(),
@@ -169,7 +150,7 @@ void SimulationEngine::checkForCollisions()
             const Object& o1 = m_objects[i];
             const Object& o2 = m_objects[j];
 
-            const double dist = distance(o1, o2);
+            const double dist = utils::distance(o1, o2);
 
             if ( (o1.radius() + o2.radius()) > dist)
             {

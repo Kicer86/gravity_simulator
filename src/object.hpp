@@ -65,5 +65,13 @@ class Object
         void setPos(const XY& p);
 };
 
+namespace utils
+{
+    double distance(const XY &, const XY &);
+    double distance(const Object &, const Object &);
+    XY unit_vector(const XY &, const XY &);
+    XY unit_vector(const Object &, const Object &);
+}
+
 
 #endif // OBJECT_HPP

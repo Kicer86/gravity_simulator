@@ -19,45 +19,7 @@
 
 #include "openmp_accelerator.hpp"
 
-#include <cmath>
 #include <omp.h>
-
-namespace
-{
-    double distance(const XY& p1, const XY& p2)
-    {
-        const double dist = sqrt( (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) );
-
-        return dist;
-    }
-
-    double distance(const Object& o1, const Object& o2)
-    {
-        const XY& p1 = o1.pos();
-        const XY& p2 = o2.pos();
-        const double dist = distance(p1, p2);
-
-        return dist;
-    }
-
-    XY unit_vector(const XY& p1, const XY& p2)
-    {
-        XY v( p1 - p2 );
-        const double dist = distance(p1, p2);
-
-        v.x /= dist;
-        v.y /= dist;
-
-        return v;
-    }
-
-    XY unit_vector(const Object& o1, const Object& o2)
-    {
-        const XY v = unit_vector(o1.pos(), o2.pos());
-
-        return v;
-    }
-}
 
 
 OpenMPAccelerator::OpenMPAccelerator(std::vector<Object>& objects): m_objects(objects), m_dt(60.0)
@@ -98,7 +60,7 @@ double OpenMPAccelerator::step()
             v[i] = dV + o.velocity();
             pos[i] = o.pos() + v[i] * m_dt;
 
-            const double travel = distance(pos[i], o.pos());
+            const double travel = utils::distance(pos[i], o.pos());
 
             if (travel > max_travel)
                 max_travel = travel;
@@ -148,12 +110,12 @@ std::vector<XY> OpenMPAccelerator::calculateForces() const
                 const Object& o1 = m_objects[i];
                 const Object& o2 = m_objects[j];
 
-                const double dist = distance(o1, o2);
+                const double dist = utils::distance(o1, o2);
                 const double dist2 = dist * dist;
                 const double masses = o1.mass() * o2.mass();
                 const double Fg = G * masses / dist2;
 
-                XY force_vector = unit_vector(o2, o1);
+                XY force_vector = utils::unit_vector(o2, o1);
                 force_vector *= Fg;
 
                 const int tid = omp_get_thread_num();

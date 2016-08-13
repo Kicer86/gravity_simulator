@@ -19,6 +19,8 @@
 
 #include "object.hpp"
 
+#include <cmath>
+
 
 XY::XY(double _x, double _y): x(_x), y(_y)
 {
@@ -165,4 +167,45 @@ void Object::setVelocity(const XY& v)
 void Object::setPos(const XY& p)
 {
     m_pos = p;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+namespace utils
+{
+    double distance(const XY& p1, const XY& p2)
+    {
+        const double dist = sqrt( (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y) );
+
+        return dist;
+    }
+
+    double distance(const Object& o1, const Object& o2)
+    {
+        const XY& p1 = o1.pos();
+        const XY& p2 = o2.pos();
+        const double dist = distance(p1, p2);
+
+        return dist;
+    }
+
+    XY unit_vector(const XY& p1, const XY& p2)
+    {
+        XY v( p1 - p2 );
+        const double dist = distance(p1, p2);
+
+        v.x /= dist;
+        v.y /= dist;
+
+        return v;
+    }
+
+    XY unit_vector(const Object& o1, const Object& o2)
+    {
+        const XY v = unit_vector(o1.pos(), o2.pos());
+
+        return v;
+    }
 }
