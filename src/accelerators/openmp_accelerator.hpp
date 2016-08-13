@@ -24,7 +24,7 @@
 
 #include <vector>
 
-#include "../simulation_engine.hpp"
+#include "../object.hpp"
 
 class OpenMPAccelerator: public IAccelerator
 {
