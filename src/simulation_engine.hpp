@@ -55,7 +55,7 @@ class SimulationEngine
         void addEventsObserver(ISimulationEvents *);
 
         int addObject(const Object &);
-        void stepBy(double);
+        int stepBy(double);
         double step();
 
         const std::vector<Object>& objects() const;

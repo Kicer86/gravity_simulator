@@ -63,14 +63,21 @@ int SimulationEngine::addObject(const Object& obj)
 }
 
 
-void SimulationEngine::stepBy(double dt)
+int SimulationEngine::stepBy(double dt)
 {
+    int steps = 0;
+
     while (dt > 0.0)
+    {
         dt -= step();
+        steps++;
+    }
 
     for (const Object& obj: m_objects)
         for(ISimulationEvents* events: m_eventObservers)
             events->objectUpdated(obj.id(), obj);
+
+    return steps;
 }
 
 
