@@ -168,14 +168,14 @@ void SimulationController::tick()
     const std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
     m_tickData.clear();
-    m_engine.stepBy(1800);
+    const int steps = m_engine.stepBy(1800);
     m_framesCounter++;
 
     const std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     const auto diff = end - start;
     const auto diff_ms = std::chrono::duration_cast<std::chrono::milliseconds>(diff).count();
 
-    std::cout << "Tick time: " << diff_ms << std::endl;
+    std::cout << "Tick time: " << diff_ms << ", steps: " << steps << std::endl;
 
     emit tickData(m_tickData);
 }
