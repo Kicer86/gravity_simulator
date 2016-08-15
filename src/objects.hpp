@@ -39,11 +39,15 @@ class Objects
         std::size_t insert(const Object &, std::size_t id);    // returns Object's index. Index is valid until next modification of Objects
         void erase(std::size_t idx);                           // erase item at index 'idx'. Last item will overwrite 'idx' and list will shrink
 
-        //
+        // hight level access
         void setPos(std::size_t idx, const XY &);
         void setVelocity(std::size_t idx, const XY &);
         void setMass(std::size_t idx, double);
         void setRadius(std::size_t idx, double);
+
+        XY getPos(std::size_t idx) const;
+        XY getVelocity(std::size_t idx) const;
+        //
 
         // raw data access for accelerators' purposes
         const std::vector<double>& getX() const;

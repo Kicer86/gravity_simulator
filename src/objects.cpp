@@ -35,7 +35,7 @@ Objects::Objects():
     m_radius(),
     m_id()
 {
-    
+
 }
 
 
@@ -134,6 +134,22 @@ void Objects::setMass(std::size_t idx, double mass)
 void Objects::setRadius(std::size_t idx, double radius)
 {
     m_radius[idx] = radius;
+}
+
+
+XY Objects::getPos(std::size_t idx) const
+{
+    const XY xy(m_x[idx], m_y[idx]);
+
+    return xy;
+}
+
+
+XY Objects::getVelocity(std::size_t idx) const
+{
+    const XY vxy(m_vx[idx], m_vy[idx]);
+
+    return vxy;
 }
 
 
