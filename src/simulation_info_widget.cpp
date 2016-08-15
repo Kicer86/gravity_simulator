@@ -24,7 +24,10 @@
 #include <QLabel>
 
 
-SimulationInfoWidget::SimulationInfoWidget(QWidget* p): QWidget(p)
+SimulationInfoWidget::SimulationInfoWidget(QWidget* p):
+    QWidget(p),
+    m_fpsValue(nullptr),
+    m_objCountValue(nullptr)
 {
     QGridLayout* mainLayout = new QGridLayout(this);
 

@@ -22,7 +22,10 @@
 #include "ui_main_window.h"
 
 
-MainWindow::MainWindow(): m_scene(), m_controller()
+MainWindow::MainWindow():
+    ui(),
+    m_scene(),
+    m_controller()
 {
     ui = std::make_unique<Ui::MainWindow>();
     ui->setupUi(this);

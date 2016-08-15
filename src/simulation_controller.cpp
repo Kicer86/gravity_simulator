@@ -24,19 +24,35 @@
 
 double fRand(double fMin, double fMax)
 {
-    double f = (double)rand() / RAND_MAX;
+    double f = static_cast<double>(rand()) / RAND_MAX;
     return fMin + f * (fMax - fMin);
 }
 
 
-Tick::Tick()
+Tick::Tick():
+    colided(),
+    created(),
+    annihilated(),
+    updated(),
+    colidedMutex(),
+    createdMutex(),
+    annihilatedMutex(),
+    updatedMutex()
 {
 
 }
 
 
 
-Tick::Tick(const Tick& other)
+Tick::Tick(const Tick& other):
+    colided(),
+    created(),
+    annihilated(),
+    updated(),
+    colidedMutex(),
+    createdMutex(),
+    annihilatedMutex(),
+    updatedMutex()
 {
     *this = other;
 }
@@ -76,6 +92,7 @@ SimulationController::SimulationController():
     m_engine(),
     m_stepTimer(),
     m_calculationsThread(),
+    m_tickData(),
     m_scene(nullptr),
     m_fps(0),
     m_framesCounter(0)
