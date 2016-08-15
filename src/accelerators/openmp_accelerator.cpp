@@ -90,7 +90,7 @@ double OpenMPAccelerator::step()
 XY OpenMPAccelerator::force(std::size_t i, std::size_t j) const
 {
     const double G = 6.6732e-11;
-    
+
     const double x1 = m_objects.getX()[i];
     const double y1 = m_objects.getY()[i];
     const double x2 = m_objects.getX()[j];
@@ -128,7 +128,6 @@ std::vector<XY> OpenMPAccelerator::calculateForces() const
         for(std::size_t j = i + 1; j < objs; j++)
         {
             const XY force_vector = force(i, j);
-
             const int tid = omp_get_thread_num();
 
             private_forces[tid][i] += force_vector;
