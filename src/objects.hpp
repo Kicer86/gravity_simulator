@@ -32,6 +32,18 @@ class Objects
         ~Objects();
 
         Objects& operator=(const Objects &) = delete;
+        Object operator[](std::size_t idx) const;              // returns Object for given index (index ≠ Object::id)
+
+        std::size_t size() const;
+
+        std::size_t insert(const Object &, std::size_t id);    // returns Object's index. Index is valid until next modification of Objects
+        void erase(std::size_t idx);                           // erase item at index 'idx'. Last item will overwrite 'idx' and list will shrink
+
+        //
+        void setPos(std::size_t idx, const XY &);
+        void setVelocity(std::size_t idx, const XY &);
+        void setMass(std::size_t idx, double);
+        void setRadius(std::size_t idx, double);
 
         // raw data access for accelerators' purposes
         const std::vector<double>& getX() const;
