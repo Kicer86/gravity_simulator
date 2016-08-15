@@ -190,8 +190,8 @@ void SimulationEngine::checkForCollisions()
             const int idx1 = colided.first;
             const int idx2 = colided.second;
 
-            const Object& ob1 = m_objects[idx1];
-            const Object& ob2 = m_objects[idx2];
+            const Object ob1 = m_objects[idx1];
+            const Object ob2 = m_objects[idx2];
 
             const int id1 = ob1.id();
             const int id2 = ob2.id();
