@@ -238,6 +238,7 @@ std::vector<XY> AVXAccelerator::calculateForces() const
     return forces;
 }
 
+
 std::vector<XY> AVXAccelerator::calculateVelocities(const std::vector<XY>& forces, double dt) const
 {
     std::vector<XY> result;

@@ -144,6 +144,7 @@ std::vector<XY> OpenMPAccelerator::calculateForces() const
     return forces;
 }
 
+
 std::vector<XY> OpenMPAccelerator::calculateVelocities(const std::vector<XY>& forces, double dt) const
 {
     std::vector<XY> result;
