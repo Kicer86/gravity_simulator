@@ -46,8 +46,8 @@ namespace utils
 
     vector unit_vector(const __m256d& x1, const __m256d& y1, const __m256d& x2, const __m256d& y2)
     {
-        const __m256d x_diff = _mm256_sub_pd(x1, x2);
-        const __m256d y_diff = _mm256_sub_pd(y1, y2);
+        const __m256d x_diff = _mm256_sub_pd(x2, x1);
+        const __m256d y_diff = _mm256_sub_pd(y2, y1);
 
         const __m256d dist = distance(x1, y1, x2, y2);
 
