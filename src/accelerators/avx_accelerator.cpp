@@ -170,7 +170,7 @@ std::vector<XY> AVXAccelerator::calculateForces() const
         const std::size_t last_simd_idx = objs & (-4);
 
         // pre AVX calculations (for elements before first_simd_idx)
-        for(std::size_t j = i + 1; j < first_simd_idx; j++)
+        for(std::size_t j = i + 1; j < std::min(first_simd_idx, objs); j++)
         {
             const XY force_vector = force(i, j);
             const int tid = 0;
@@ -220,7 +220,7 @@ std::vector<XY> AVXAccelerator::calculateForces() const
         }
 
         // post AVX calculations (for elements after last_simd_idx)
-        for(std::size_t j = last_simd_idx; j < objs; j++)
+        for(std::size_t j = std::max(last_simd_idx, i + 1); j < objs; j++)
         {
             const XY force_vector = force(i, j);
             const int tid = 0;
