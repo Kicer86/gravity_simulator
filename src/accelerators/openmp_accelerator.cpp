@@ -102,26 +102,26 @@ std::vector<XY> OpenMPAccelerator::calculateForces() const
     for(int t = 0; t < threads; t++)
         private_forces[t] = std::vector<XY>(objs);             // initialize vector of results for each vector
 
-        #pragma omp parallel for schedule(static, 1)
-        for(std::size_t i = 0; i < objs - 1; i++)
-            for(std::size_t j = i + 1; j < objs; j++)
-            {
-                const Object& o1 = m_objects[i];
-                const Object& o2 = m_objects[j];
+    #pragma omp parallel for schedule(static, 1)
+    for(std::size_t i = 0; i < objs - 1; i++)
+        for(std::size_t j = i + 1; j < objs; j++)
+        {
+            const Object& o1 = m_objects[i];
+            const Object& o2 = m_objects[j];
 
-                const double dist = utils::distance(o1, o2);
-                const double dist2 = dist * dist;
-                const double masses = o1.mass() * o2.mass();
-                const double Fg = G * masses / dist2;
+            const double dist = utils::distance(o1, o2);
+            const double dist2 = dist * dist;
+            const double masses = o1.mass() * o2.mass();
+            const double Fg = G * masses / dist2;
 
-                XY force_vector = utils::unit_vector(o2, o1);
-                force_vector *= Fg;
+            XY force_vector = utils::unit_vector(o2, o1);
+            force_vector *= Fg;
 
-                const int tid = omp_get_thread_num();
+            const int tid = omp_get_thread_num();
 
-                private_forces[tid][i] += force_vector;
-                private_forces[tid][j] += -force_vector;
-            }
+            private_forces[tid][i] += force_vector;
+            private_forces[tid][j] += -force_vector;
+        }
 
     // accumulate results
     for(int t = 0; t < threads; t++)
