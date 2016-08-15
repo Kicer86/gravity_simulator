@@ -24,12 +24,12 @@
 
 #include <vector>
 
-#include "../object.hpp"
+#include "../objects.hpp"
 
 class OpenMPAccelerator: public IAccelerator
 {
     public:
-        OpenMPAccelerator(std::vector<Object> &);
+        OpenMPAccelerator(Objects &);
         OpenMPAccelerator(const OpenMPAccelerator &) = delete;
         ~OpenMPAccelerator();
         OpenMPAccelerator& operator=(const OpenMPAccelerator &);
@@ -37,7 +37,7 @@ class OpenMPAccelerator: public IAccelerator
         virtual double step();
 
     private:
-        std::vector<Object>& m_objects;
+        Objects& m_objects;
         double m_dt;
 
         std::vector<XY> calculateForces() const;

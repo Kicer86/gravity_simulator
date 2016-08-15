@@ -22,7 +22,7 @@
 #include <omp.h>
 
 
-OpenMPAccelerator::OpenMPAccelerator(std::vector<Object>& objects): m_objects(objects), m_dt(60.0)
+OpenMPAccelerator::OpenMPAccelerator(Objects& objects): m_objects(objects), m_dt(60.0)
 {
 
 }
@@ -79,9 +79,8 @@ double OpenMPAccelerator::step()
     // apply new positions and speeds
     for(std::size_t i = 0; i < objs; i++)
     {
-        Object& o = m_objects[i];
-        o.setPos(pos[i]);
-        o.setVelocity(v[i]);
+        m_objects.setPos(i, pos[i]);
+        m_objects.setVelocity(i, v[i]);
     }
 
     return m_dt;
