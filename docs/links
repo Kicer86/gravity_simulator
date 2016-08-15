@@ -7,3 +7,6 @@ http://www.codeproject.com/Articles/874396/Crunching-Numbers-with-AVX-and-AVX
 
 General about optimizations:
 http://www.walkingrandomly.com/?p=3378
+
+// SIMD examples:
+http://sci.tuomastonteri.fi/programming/sse
