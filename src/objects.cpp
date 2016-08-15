@@ -35,7 +35,13 @@ Objects::Objects():
     m_radius(),
     m_id()
 {
-
+    m_x.reserve(INITIAL_SIZE);
+    m_y.reserve(INITIAL_SIZE);
+    m_vx.reserve(INITIAL_SIZE);
+    m_vy.reserve(INITIAL_SIZE);
+    m_mass.reserve(INITIAL_SIZE);
+    m_radius.reserve(INITIAL_SIZE);
+    m_id.reserve(INITIAL_SIZE);
 }
 
 
@@ -153,83 +159,83 @@ XY Objects::getVelocity(std::size_t idx) const
 }
 
 
-const std::vector<double>& Objects::getX() const
+const Objects::DataVector& Objects::getX() const
 {
     return m_x;
 }
 
 
-std::vector<double>& Objects::getX()
+Objects::DataVector& Objects::getX()
 {
     return m_x;
 }
 
-const std::vector<double>& Objects::getY() const
+const Objects::DataVector& Objects::getY() const
 {
     return m_y;
 }
 
 
-std::vector<double>& Objects::getY()
+Objects::DataVector& Objects::getY()
 {
     return m_y;
 }
 
 
-const std::vector<double>& Objects::getVX() const
+const Objects::DataVector& Objects::getVX() const
 {
     return m_vx;
 }
 
 
-std::vector<double>& Objects::getVX()
+Objects::DataVector& Objects::getVX()
 {
     return m_vx;
 }
 
 
-const std::vector<double>& Objects::getVY() const
+const Objects::DataVector& Objects::getVY() const
 {
     return m_vy;
 }
 
 
-std::vector<double>& Objects::getVY()
+Objects::DataVector& Objects::getVY()
 {
     return m_vy;
 }
 
 
-const std::vector<double>& Objects::getMass() const
+const Objects::DataVector& Objects::getMass() const
 {
     return m_mass;
 }
 
 
-std::vector<double>& Objects::getMass()
+Objects::DataVector& Objects::getMass()
 {
     return m_mass;
 }
 
 
-const std::vector<double>& Objects::getRadius() const
+const Objects::DataVector& Objects::getRadius() const
 {
     return m_radius;
 }
 
-std::vector<double>& Objects::getRadius()
+Objects::DataVector& Objects::getRadius()
 {
     return m_radius;
 }
 
 
-const std::vector<int>& Objects::getId() const
+const Objects::DataVector& Objects::getId() const
 {
     return m_id;
 }
 
 
-std::vector<int>& Objects::getId()
+Objects::DataVector& Objects::getId()
 {
     return m_id;
 }
