@@ -139,7 +139,7 @@ void SimulationController::setScene(ObjectsScene* scene)
 
 void SimulationController::beginSimulation()
 {
-#if 1
+#if 0
     srand(3);
 
     for (int i = 0; i < 2000; i++)
@@ -160,6 +160,11 @@ void SimulationController::beginSimulation()
     m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
     m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
     m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
+#elif 1
+    m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
+
+    for(int i = 1; i < 8; i++)
+        m_engine.addObject( Object(384400e3 * i, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
 #elif 0
     m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
     m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
