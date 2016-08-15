@@ -20,11 +20,12 @@
 #ifndef OPENMPACCELERATOR_H
 #define OPENMPACCELERATOR_H
 
-#include "iaccelerator.hpp"
-
 #include <vector>
 
-#include "../objects.hpp"
+#include "iaccelerator.hpp"
+#include "../object.hpp"
+
+class Objects;
 
 class OpenMPAccelerator: public IAccelerator
 {

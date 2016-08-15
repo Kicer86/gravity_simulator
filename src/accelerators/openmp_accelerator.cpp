@@ -21,6 +21,8 @@
 
 #include <omp.h>
 
+#include "../objects.hpp"
+
 
 OpenMPAccelerator::OpenMPAccelerator(Objects& objects): m_objects(objects), m_dt(60.0)
 {
