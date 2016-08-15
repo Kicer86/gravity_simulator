@@ -1,0 +1,4 @@
+ 
+AVX:
+http://stackoverflow.com/questions/21840673/gcc-generates-sse-instructions-instead-of-avx
+https://software.intel.com/en-us/articles/introduction-to-intel-advanced-vector-extensions
