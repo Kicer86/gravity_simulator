@@ -25,146 +25,11 @@
 #include <cmath>
 #include <iostream>
 #include <vector>
+#include <memory>
 
+#include "objects.hpp"
 
-struct XY
-{
-    double x;
-    double y;
-
-    XY(double _x, double _y): x(_x), y(_y) {}
-    XY(): x(0.0), y(0.0) {}
-
-    XY operator-(const XY& other) const
-    {
-        XY result = *this;
-        result.x -= other.x;
-        result.y -= other.y;
-
-        return result;
-    }
-
-    XY& operator*=(double v)
-    {
-        x *= v;
-        y *= v;
-
-        return *this;
-    }
-
-    XY operator*(double v) const
-    {
-        XY result(x, y);
-        result *= v;
-
-        return result;
-    }
-
-    XY& operator+=(const XY& other)
-    {
-        x += other.x;
-        y += other.y;
-
-        return *this;
-    }
-
-    XY operator+(const XY& other) const
-    {
-        XY result(x, y);
-        result += other;
-
-        return result;
-    }
-
-    XY operator-() const
-    {
-        XY result(-x, -y);
-
-        return result;
-    }
-
-    XY operator/(double v) const
-    {
-        XY result = *this;
-        result.x /= v;
-        result.y /= v;
-
-        return result;
-    }
-
-};
-
-
-class Object
-{
-        XY m_pos;
-        XY m_v;
-        double m_mass;
-        double m_radius;
-
-        int m_id;
-
-    public:
-        Object(double x, double y, double m, double r, double v_x = 0.0, double v_y = 0.0):
-            m_pos(x, y),
-            m_v(v_x, v_y),
-            m_mass(m),
-            m_radius(r),
-            m_id(0)
-        {
-
-        }
-
-        double mass() const
-        {
-            return m_mass;
-        }
-
-        double radius() const
-        {
-            return m_radius;
-        }
-
-        const XY& pos() const
-        {
-            return m_pos;
-        }
-
-        const XY& velocity() const
-        {
-            return m_v;
-        }
-
-        int id() const
-        {
-            return m_id;
-        }
-
-        void setId(int id)
-        {
-            m_id = id;
-        }
-
-        void setMass(double m)
-        {
-            m_mass = m;
-        }
-
-        void setRadius(double r)
-        {
-            m_radius = r;
-        }
-
-        void setVelocity(const XY& v)
-        {
-            m_v = v;
-        }
-
-        void setPos(const XY& p)
-        {
-            m_pos = p;
-        }
-};
+struct IAccelerator;
 
 
 struct ISimulationEvents
@@ -190,23 +55,20 @@ class SimulationEngine
         void addEventsObserver(ISimulationEvents *);
 
         int addObject(const Object &);
-        void stepBy(double);
+        int stepBy(double);
         double step();
 
-        const std::vector<Object>& objects() const;
+        const Objects& objects() const;
         std::size_t objectCount() const;
 
     private:
-        std::vector<Object> m_objects;
+        Objects m_objects;
         std::vector<ISimulationEvents *> m_eventObservers;
-        double m_dt;
+        std::unique_ptr<IAccelerator> m_accelerator;
         int m_nextId;
 
         std::size_t collide(std::size_t, std::size_t);
         void checkForCollisions();
-
-        std::vector<XY> calculateForces() const;
-        std::vector<XY> calculateVelocities(const std::vector<XY> &, double) const;
 };
 
 #endif // SIMULATIONENGINE_HPP

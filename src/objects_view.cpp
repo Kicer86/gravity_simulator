@@ -69,7 +69,7 @@ void ObjectsView::mouseMoveEvent(QMouseEvent* event)
 }
 
 
-void ObjectsView::mouseReleaseEvent(QMouseEvent* event)
+void ObjectsView::mouseReleaseEvent(QMouseEvent *)
 {
     m_prevPoint = QPoint();
 }

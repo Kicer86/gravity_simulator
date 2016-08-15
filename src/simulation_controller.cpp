@@ -24,19 +24,35 @@
 
 double fRand(double fMin, double fMax)
 {
-    double f = (double)rand() / RAND_MAX;
+    double f = static_cast<double>(rand()) / RAND_MAX;
     return fMin + f * (fMax - fMin);
 }
 
 
-Tick::Tick()
+Tick::Tick():
+    colided(),
+    created(),
+    annihilated(),
+    updated(),
+    colidedMutex(),
+    createdMutex(),
+    annihilatedMutex(),
+    updatedMutex()
 {
 
 }
 
 
 
-Tick::Tick(const Tick& other)
+Tick::Tick(const Tick& other):
+    colided(),
+    created(),
+    annihilated(),
+    updated(),
+    colidedMutex(),
+    createdMutex(),
+    annihilatedMutex(),
+    updatedMutex()
 {
     *this = other;
 }
@@ -76,6 +92,7 @@ SimulationController::SimulationController():
     m_engine(),
     m_stepTimer(),
     m_calculationsThread(),
+    m_tickData(),
     m_scene(nullptr),
     m_fps(0),
     m_framesCounter(0)
@@ -150,8 +167,11 @@ void SimulationController::beginSimulation()
 
     // before starting simulation update scene
     const auto& objects = m_engine.objects();
-    for (const Object& obj: objects)
+    for (std::size_t i = 0; i < objects.size(); i++)
+    {
+        const Object obj = objects[i];
         m_scene->addObject(obj.id(), obj);
+    }
 
     m_calculationsThread.start();
 }
@@ -168,14 +188,14 @@ void SimulationController::tick()
     const std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 
     m_tickData.clear();
-    m_engine.stepBy(1800);
+    const int steps = m_engine.stepBy(1800);
     m_framesCounter++;
 
     const std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
     const auto diff = end - start;
     const auto diff_ms = std::chrono::duration_cast<std::chrono::milliseconds>(diff).count();
 
-    std::cout << "Tick time: " << diff_ms << std::endl;
+    std::cout << "Tick time: " << diff_ms << ", steps: " << steps << std::endl;
 
     emit tickData(m_tickData);
 }

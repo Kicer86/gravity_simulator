@@ -21,6 +21,10 @@ add_executable(gravity_simulator
                main.cpp
                main_window.cpp
                main_window.hpp
+               object.cpp
+               object.hpp
+               objects.cpp
+               objects.hpp
                objects_scene.cpp
                objects_scene.hpp
                objects_view.cpp
@@ -31,6 +35,9 @@ add_executable(gravity_simulator
                simulation_engine.hpp
                simulation_info_widget.cpp
                simulation_info_widget.hpp
+               accelerators/iaccelerator.hpp
+               accelerators/openmp_accelerator.cpp
+               accelerators/openmp_accelerator.hpp
                ${moc_wrapped}
                ${ui_wrapped}
 )

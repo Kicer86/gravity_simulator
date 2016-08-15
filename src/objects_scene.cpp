@@ -26,7 +26,7 @@
 #include <QPen>
 
 
-ObjectsScene::ObjectsScene()
+ObjectsScene::ObjectsScene(): m_objects()
 {
     const double grid = 400e6;
     QPen pen;
