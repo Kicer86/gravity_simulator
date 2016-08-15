@@ -20,19 +20,34 @@
 #ifndef AVXACCELERATOR_HPP
 #define AVXACCELERATOR_HPP
 
+#include <vector>
+
 #include "iaccelerator.hpp"
 
+#include "../object.hpp"
+
+class Objects;
 
 class AVXAccelerator: public IAccelerator
 {
     public:
-        AVXAccelerator();
+        AVXAccelerator(Objects &);
         AVXAccelerator(const AVXAccelerator &) = delete;
         ~AVXAccelerator();
 
         AVXAccelerator& operator=(const AVXAccelerator &) = delete;
 
         virtual double step();
+
+    protected:
+        Objects& m_objects;
+
+    private:
+        double m_dt;
+
+        XY force(std::size_t, std::size_t) const;
+        std::vector<XY> calculateForces() const;
+        std::vector<XY> calculateVelocities(const std::vector<XY> &, double) const;
 };
 
 #endif // AVXACCELERATOR_HPP
