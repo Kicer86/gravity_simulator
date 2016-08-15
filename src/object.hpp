@@ -47,7 +47,11 @@ class Object
         double m_mass;
         double m_radius;
 
-        int m_id;
+        int m_id;                  // object id used for object identification
+
+        Object(double x, double y, double m, double r, double v_x, double v_y, int id);
+
+        friend class Objects;
 
     public:
         Object(double x, double y, double m, double r, double v_x = 0.0, double v_y = 0.0);
@@ -57,12 +61,6 @@ class Object
         const XY& pos() const;
         const XY& velocity() const;
         int id() const;
-
-        void setId(int id);
-        void setMass(double m);
-        void setRadius(double r);
-        void setVelocity(const XY& v);
-        void setPos(const XY& p);
 };
 
 namespace utils

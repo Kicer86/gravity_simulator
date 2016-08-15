@@ -100,12 +100,19 @@ XY XY::operator/(double v) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Object::Object(double x, double y, double m, double r, double v_x, double v_y):
+Object::Object(double x, double y, double m, double r, double v_x, double v_y, int id):
     m_pos(x, y),
     m_v(v_x, v_y),
     m_mass(m),
     m_radius(r),
-    m_id(0)
+    m_id(id)
+{
+
+}
+
+
+Object::Object(double x, double y, double m, double r, double v_x, double v_y):
+    Object(x, y, m, r, v_x, v_y, 0)
 {
 
 }
@@ -138,35 +145,6 @@ const XY& Object::velocity() const
 int Object::id() const
 {
     return m_id;
-}
-
-void Object::setId(int id)
-{
-    m_id = id;
-}
-
-
-void Object::setMass(double m)
-{
-    m_mass = m;
-}
-
-
-void Object::setRadius(double r)
-{
-    m_radius = r;
-}
-
-
-void Object::setVelocity(const XY& v)
-{
-    m_v = v;
-}
-
-
-void Object::setPos(const XY& p)
-{
-    m_pos = p;
 }
 
 
