@@ -52,7 +52,7 @@ class Objects
                 };
 
                 // return maximum number of elements that can be allocated
-                size_type max_size () const throw()
+                size_type max_size() const throw()
                 {
                     return std::numeric_limits<std::size_t>::max() / sizeof(T);
                 }
@@ -72,7 +72,9 @@ class Objects
                     num += alignment - 1;
                     num &= (-alignment);
 
-                    return static_cast<pointer>( aligned_alloc(alignment, num) );
+                    const std::size_t num_bytes = num * sizeof(T);
+
+                    return static_cast<pointer>( aligned_alloc(alignment, num_bytes) );
                 }
 
                 void deallocate(T* ptr, std::size_t)
