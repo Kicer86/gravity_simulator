@@ -1,5 +1,5 @@
 /*
- * OpenMP based accelerator for base calculations.
+ * AVX based accelerator for base calculations.
  * Copyright (C) 2016  Michał Walenciak <MichalWalenciak@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,23 +17,25 @@
  *
  */
 
-#ifndef OPENMPACCELERATOR_H
-#define OPENMPACCELERATOR_H
+#ifndef AVXACCELERATOR_HPP
+#define AVXACCELERATOR_HPP
 
 #include <vector>
 
 #include "iaccelerator.hpp"
+
 #include "../object.hpp"
 
 class Objects;
 
-class OpenMPAccelerator: public IAccelerator
+class AVXAccelerator: public IAccelerator
 {
     public:
-        OpenMPAccelerator(Objects &);
-        OpenMPAccelerator(const OpenMPAccelerator &) = delete;
-        ~OpenMPAccelerator();
-        OpenMPAccelerator& operator=(const OpenMPAccelerator &) = delete;
+        AVXAccelerator(Objects &);
+        AVXAccelerator(const AVXAccelerator &) = delete;
+        ~AVXAccelerator();
+
+        AVXAccelerator& operator=(const AVXAccelerator &) = delete;
 
         virtual double step();
 
@@ -48,4 +50,4 @@ class OpenMPAccelerator: public IAccelerator
         std::vector<XY> calculateVelocities(const std::vector<XY> &, double) const;
 };
 
-#endif // OPENMPACCELERATOR_HPP
+#endif // AVXACCELERATOR_HPP

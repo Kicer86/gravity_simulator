@@ -24,6 +24,7 @@
 
 #include <omp.h>
 
+#include "accelerators/avx_accelerator.hpp"
 #include "accelerators/openmp_accelerator.hpp"
 
 
@@ -33,7 +34,7 @@ SimulationEngine::SimulationEngine():
     m_accelerator(nullptr),
     m_nextId(1)                        // 0 is reserved for invalid entry
 {
-    m_accelerator = std::make_unique<OpenMPAccelerator>(m_objects);
+    m_accelerator = std::make_unique<AVXAccelerator>(m_objects);
 }
 
 
@@ -189,8 +190,8 @@ void SimulationEngine::checkForCollisions()
             const int idx1 = colided.first;
             const int idx2 = colided.second;
 
-            const Object& ob1 = m_objects[idx1];
-            const Object& ob2 = m_objects[idx2];
+            const Object ob1 = m_objects[idx1];
+            const Object ob2 = m_objects[idx2];
 
             const int id1 = ob1.id();
             const int id2 = ob2.id();

@@ -20,7 +20,14 @@
 
 #include "simulation_controller.hpp"
 
+#include <cassert>
+
 #include "objects_scene.hpp"
+
+bool equal(double l, double r)
+{
+    return std::abs(l - r) < 0.00001;
+}
 
 double fRand(double fMin, double fMax)
 {
@@ -139,7 +146,7 @@ void SimulationController::setScene(ObjectsScene* scene)
 
 void SimulationController::beginSimulation()
 {
-#if 1
+#if 0
     srand(3);
 
     for (int i = 0; i < 2000; i++)
@@ -160,9 +167,50 @@ void SimulationController::beginSimulation()
     m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
     m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
     m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
+#elif 1
+    m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
+
+    for(int i = 1; i < 16; i++)
+        m_engine.addObject( Object(384400e3 * i/10, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
 #elif 0
     m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
     m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
+#endif
+
+#if 0
+    SimulationEngine engine1(false);
+    SimulationEngine engine2(true);
+
+    engine1.addObject( Object(0, 0, 5.9736e24, 6371e3) );
+
+    for(int i = 1; i < 8; i++)
+        engine1.addObject( Object(384400e3 * i/10, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
+
+    engine2.addObject( Object(0, 0, 5.9736e24, 6371e3) );
+
+    for(int i = 1; i < 8; i++)
+        engine2.addObject( Object(384400e3 * i/10, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
+
+    for(int i = 0; ;i++)
+    {
+        engine1.step();
+        engine2.step();
+
+        const Objects& obj1 = engine1.objects();
+        const Objects& obj2 = engine2.objects();
+
+        assert( obj1.size() == obj2.size() );
+        for(std::size_t j = 0; j < obj1.size(); j++)
+        {
+            assert( obj1.getId()[j] == obj2.getId()[j] );
+            assert( equal(obj1.getX()[j], obj2.getX()[j]) );
+            assert( equal(obj1.getY()[j], obj2.getY()[j]) );
+            assert( equal(obj1.getVX()[j], obj2.getVX()[j]) );
+            assert( equal(obj1.getVY()[j], obj2.getVY()[j]) );
+            assert( equal(obj1.getMass()[j], obj2.getMass()[j]) );
+            assert( equal(obj1.getRadius()[j], obj2.getRadius()[j]) );
+        }
+    }
 #endif
 
     // before starting simulation update scene

@@ -20,6 +20,8 @@
 #ifndef OBJECTS_HPP
 #define OBJECTS_HPP
 
+#include <cstdlib>
+#include <limits>
 #include <vector>
 
 #include "object.hpp"
@@ -27,6 +29,62 @@
 class Objects
 {
     public:
+
+        // based on http://www.josuttis.com/cppcode/myalloc.hpp.html
+        template<typename T, int alignment>
+        class AlignmentAllocator
+        {
+            public:
+                // type definitions
+                typedef T        value_type;
+                typedef T*       pointer;
+                typedef const T* const_pointer;
+                typedef T&       reference;
+                typedef const T& const_reference;
+                typedef std::size_t    size_type;
+                typedef std::ptrdiff_t difference_type;
+
+                // rebind allocator to type U
+                template <class U>
+                struct rebind
+                {
+                    typedef AlignmentAllocator<U, alignment> other;
+                };
+
+                // return maximum number of elements that can be allocated
+                size_type max_size() const throw()
+                {
+                    return std::numeric_limits<std::size_t>::max() / sizeof(T);
+                }
+
+                // return address of values
+                pointer address (reference value) const
+                {
+                    return &value;
+                }
+                const_pointer address (const_reference value) const
+                {
+                    return &value;
+                }
+
+                pointer allocate(std::size_t num, const void* = 0)
+                {
+                    num += alignment - 1;
+                    num &= (-alignment);
+
+                    const std::size_t num_bytes = num * sizeof(T);
+
+                    return static_cast<pointer>( aligned_alloc(alignment, num_bytes) );
+                }
+
+                void deallocate(T* ptr, std::size_t)
+                {
+                    free(ptr);
+                }
+        };
+
+        typedef std::vector<double, AlignmentAllocator<double, 64>> DataVector;
+
         Objects();
         Objects(const Objects &) = delete;
         ~Objects();
@@ -50,35 +108,37 @@ class Objects
         //
 
         // raw data access for accelerators' purposes
-        const std::vector<double>& getX() const;
-        std::vector<double>& getX();
+        const DataVector& getX() const;
+        DataVector& getX();
 
-        const std::vector<double>& getY() const;
-        std::vector<double>& getY();
+        const DataVector& getY() const;
+        DataVector& getY();
 
-        const std::vector<double>& getVX() const;
-        std::vector<double>& getVX();
+        const DataVector& getVX() const;
+        DataVector& getVX();
 
-        const std::vector<double>& getVY() const;
-        std::vector<double>& getVY();
+        const DataVector& getVY() const;
+        DataVector& getVY();
 
-        const std::vector<double>& getMass() const;
-        std::vector<double>& getMass();
+        const DataVector& getMass() const;
+        DataVector& getMass();
 
-        const std::vector<double>& getRadius() const;
-        std::vector<double>& getRadius();
+        const DataVector& getRadius() const;
+        DataVector& getRadius();
 
         const std::vector<int>& getId() const;
         std::vector<int>& getId();
 
     private:
+
         // objects data
-        std::vector<double> m_x;
-        std::vector<double> m_y;
-        std::vector<double> m_vx;
-        std::vector<double> m_vy;
-        std::vector<double> m_mass;
-        std::vector<double> m_radius;
+
+        DataVector m_x;
+        DataVector m_y;
+        DataVector m_vx;
+        DataVector m_vy;
+        DataVector m_mass;
+        DataVector m_radius;
         std::vector<int> m_id;
 };
 

@@ -35,6 +35,8 @@ add_executable(gravity_simulator
                simulation_engine.hpp
                simulation_info_widget.cpp
                simulation_info_widget.hpp
+               accelerators/avx_accelerator.cpp
+               accelerators/avx_accelerator.hpp
                accelerators/iaccelerator.hpp
                accelerators/openmp_accelerator.cpp
                accelerators/openmp_accelerator.hpp
