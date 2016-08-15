@@ -24,7 +24,7 @@
 
 #include <omp.h>
 
-#include "accelerators/openmp_accelerator.hpp"
+#include "accelerators/avx_accelerator.hpp"
 
 
 SimulationEngine::SimulationEngine():
@@ -33,7 +33,7 @@ SimulationEngine::SimulationEngine():
     m_accelerator(nullptr),
     m_nextId(1)                        // 0 is reserved for invalid entry
 {
-    m_accelerator = std::make_unique<OpenMPAccelerator>(m_objects);
+    m_accelerator = std::make_unique<AVXAccelerator>(m_objects);
 }
 
 
