@@ -87,11 +87,32 @@ double OpenMPAccelerator::step()
 }
 
 
+XY OpenMPAccelerator::force(std::size_t i, std::size_t j) const
+{
+    const double G = 6.6732e-11;
+    
+    const double x1 = m_objects.getX()[i];
+    const double y1 = m_objects.getY()[i];
+    const double x2 = m_objects.getX()[j];
+    const double y2 = m_objects.getY()[j];
+    const double m1 = m_objects.getMass()[i];
+    const double m2 = m_objects.getMass()[j];
+
+    const double dist = utils::distance(x1, y1, x2, y2);
+    const double dist2 = dist * dist;
+    const double masses = m1 * m2;
+    const double Fg = G * masses / dist2;
+
+    XY force_vector = utils::unit_vector(x1, y1, x2, y2);
+    force_vector *= Fg;
+
+    return force_vector;
+}
+
 
 std::vector<XY> OpenMPAccelerator::calculateForces() const
 {
     const std::size_t objs = m_objects.size();
-    const double G = 6.6732e-11;
 
     std::vector<XY> forces(objs);
 
@@ -106,20 +127,7 @@ std::vector<XY> OpenMPAccelerator::calculateForces() const
     for(std::size_t i = 0; i < objs - 1; i++)
         for(std::size_t j = i + 1; j < objs; j++)
         {
-            const double x1 = m_objects.getX()[i];
-            const double y1 = m_objects.getY()[i];
-            const double x2 = m_objects.getX()[j];
-            const double y2 = m_objects.getY()[j];
-            const double m1 = m_objects.getMass()[i];
-            const double m2 = m_objects.getMass()[j];
-
-            const double dist = utils::distance(x1, y1, x2, y2);
-            const double dist2 = dist * dist;
-            const double masses = m1 * m2;
-            const double Fg = G * masses / dist2;
-
-            XY force_vector = utils::unit_vector(x1, y1, x2, y2);
-            force_vector *= Fg;
+            const XY force_vector = force(i, j);
 
             const int tid = omp_get_thread_num();
 

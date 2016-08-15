@@ -32,14 +32,17 @@ class OpenMPAccelerator: public IAccelerator
         OpenMPAccelerator(Objects &);
         OpenMPAccelerator(const OpenMPAccelerator &) = delete;
         ~OpenMPAccelerator();
-        OpenMPAccelerator& operator=(const OpenMPAccelerator &);
+        OpenMPAccelerator& operator=(const OpenMPAccelerator &) = delete;
 
         virtual double step();
 
-    private:
+    protected:
         Objects& m_objects;
+
+    private:
         double m_dt;
 
+        XY force(std::size_t, std::size_t) const;
         std::vector<XY> calculateForces() const;
         std::vector<XY> calculateVelocities(const std::vector<XY> &, double) const;
 };
