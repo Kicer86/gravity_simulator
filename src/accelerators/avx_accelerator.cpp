@@ -210,14 +210,11 @@ std::vector<XY> AVXAccelerator::calculateForces() const
             force_vector.x = _mm256_mul_pd(force_vector.x, Fg);
             force_vector.y = _mm256_mul_pd(force_vector.y, Fg);
 
-            const double* force_vector_x = reinterpret_cast<const double *>( & force_vector.x );
-            const double* force_vector_y = reinterpret_cast<const double *>( & force_vector.y );
-
             const int tid = 0;
-            private_forces[tid][i] += XY(force_vector_x[0], force_vector_y[0]);
-            private_forces[tid][j + 0] += XY(-force_vector_x[1], -force_vector_y[1]);
-            private_forces[tid][j + 1] += XY(-force_vector_x[2], -force_vector_y[2]);
-            private_forces[tid][j + 2] += XY(-force_vector_x[3], -force_vector_y[3]);
+            private_forces[tid][i] += XY(force_vector.x[0], force_vector.y[0]);
+            private_forces[tid][j + 0] += XY(-force_vector.x[1], -force_vector.y[1]);
+            private_forces[tid][j + 1] += XY(-force_vector.x[2], -force_vector.y[2]);
+            private_forces[tid][j + 2] += XY(-force_vector.x[3], -force_vector.y[3]);
         }
 
         // post AVX calculations (for elements after last_simd_idx)
