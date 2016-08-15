@@ -186,35 +186,36 @@ std::vector<XY> AVXAccelerator::calculateForces() const
             const double G = 6.6732e-11;
 
             const double xi    = m_objects.getX()[i];
-            const __m256d x1   = {xi, xi, xi, xi};
-            const __m256d x234 = _mm256_load_pd( &m_objects.getX()[j] );
+            const __m256d x0   = {xi, xi, xi, xi};
+            const __m256d x1234 = _mm256_load_pd( &m_objects.getX()[j] );
 
             const double yi    = m_objects.getY()[i];
-            const __m256d y1   = {yi, yi, yi, yi};
-            const __m256d y234 = _mm256_load_pd( &m_objects.getY()[j] );
+            const __m256d y0   = {yi, yi, yi, yi};
+            const __m256d y1234 = _mm256_load_pd( &m_objects.getY()[j] );
 
             const double mi    = m_objects.getMass()[i];
-            const __m256d m1   = {mi, mi, mi, mi};
-            const __m256d m234 = _mm256_load_pd( &m_objects.getMass()[j] );
+            const __m256d m0   = {mi, mi, mi, mi};
+            const __m256d m1234 = _mm256_load_pd( &m_objects.getMass()[j] );
 
-            const __m256d dist = utils::distance(x1, y1, x234, y234);
+            const __m256d dist = utils::distance(x0, y0, x1234, y1234);
             const __m256d dist2 = _mm256_mul_pd(dist, dist);
-            const __m256d masses = _mm256_mul_pd(m1, m234);
+            const __m256d masses = _mm256_mul_pd(m0, m1234);
 
             const __m256d vG = {G, G, G, G};
             const __m256d G_masses = _mm256_mul_pd(vG, masses);
             const __m256d Fg = _mm256_div_pd(G_masses, dist2);
 
-            utils::vector force_vector = utils::unit_vector(x1, y1, x234, y234);
+            utils::vector force_vector = utils::unit_vector(x0, y0, x1234, y1234);
 
             force_vector.x = _mm256_mul_pd(force_vector.x, Fg);
             force_vector.y = _mm256_mul_pd(force_vector.y, Fg);
 
             const int tid = 0;
-            private_forces[tid][i] += XY(force_vector.x[0], force_vector.y[0]);
-            private_forces[tid][j + 0] += XY(-force_vector.x[1], -force_vector.y[1]);
-            private_forces[tid][j + 1] += XY(-force_vector.x[2], -force_vector.y[2]);
-            private_forces[tid][j + 2] += XY(-force_vector.x[3], -force_vector.y[3]);
+            for (int k = 0; k < 4; k++)
+            {
+                private_forces[tid][i] += XY(force_vector.x[k], force_vector.y[k]);
+                private_forces[tid][j + k] += XY(-force_vector.x[k], -force_vector.y[k]);
+            }
         }
 
         // post AVX calculations (for elements after last_simd_idx)
