@@ -25,6 +25,7 @@
 #include <omp.h>
 
 #include "accelerators/avx_accelerator.hpp"
+#include "accelerators/openmp_accelerator.hpp"
 
 
 SimulationEngine::SimulationEngine():
