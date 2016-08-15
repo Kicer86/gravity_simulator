@@ -166,8 +166,8 @@ std::vector<XY> AVXAccelerator::calculateForces() const
     for(std::size_t i = 0; i < objs - 1; i++)
     {
         // AVX can be used for 4 element aligned packs.
-        const std::size_t first_simd_idx = (i + 4) & (-3);
-        const std::size_t last_simd_idx = objs & (-3);
+        const std::size_t first_simd_idx = (i + 4) & (-4);
+        const std::size_t last_simd_idx = objs & (-4);
 
         // pre AVX calculations (for elements before first_simd_idx)
         for(std::size_t j = i + 1; j < first_simd_idx; j++)
@@ -184,20 +184,23 @@ std::vector<XY> AVXAccelerator::calculateForces() const
         {
             const double G = 6.6732e-11;
 
-            const __m256d x1   = _mm256_broadcast_sd( &m_objects.getX()[i] );
+            const double xi    = m_objects.getX()[i];
+            const __m256d x1   = {xi, xi, xi, xi};
             const __m256d x234 = _mm256_load_pd( &m_objects.getX()[j] );
 
-            const __m256d y1   = _mm256_broadcast_sd( &m_objects.getY()[i] );
+            const double yi    = m_objects.getY()[i];
+            const __m256d y1   = {yi, yi, yi, yi};
             const __m256d y234 = _mm256_load_pd( &m_objects.getY()[j] );
 
-            const __m256d m1   = _mm256_broadcast_sd( &m_objects.getMass()[i] );
+            const double mi    = m_objects.getMass()[i];
+            const __m256d m1   = {mi, mi, mi, mi};
             const __m256d m234 = _mm256_load_pd( &m_objects.getMass()[j] );
 
             const __m256d dist = utils::distance(x1, y1, x234, y234);
             const __m256d dist2 = _mm256_mul_pd(dist, dist);
             const __m256d masses = _mm256_mul_pd(m1, m234);
 
-            const __m256d vG = _mm256_broadcast_sd(&G);
+            const __m256d vG = {G, G, G, G};
             const __m256d G_masses = _mm256_mul_pd(vG, masses);
             const __m256d Fg = _mm256_div_pd(G_masses, dist2);
 
