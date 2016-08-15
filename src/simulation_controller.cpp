@@ -167,8 +167,11 @@ void SimulationController::beginSimulation()
 
     // before starting simulation update scene
     const auto& objects = m_engine.objects();
-    for (const Object& obj: objects)
+    for (std::size_t i = 0; i < objects.size(); i++)
+    {
+        const Object obj = objects[i];
         m_scene->addObject(obj.id(), obj);
+    }
 
     m_calculationsThread.start();
 }
