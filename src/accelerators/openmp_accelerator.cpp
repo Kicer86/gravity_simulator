@@ -54,7 +54,7 @@ double OpenMPAccelerator::step()
 
         for(std::size_t i = 0; i < objs; i++)
         {
-            const Object& o = m_objects[i];
+            Object o = m_objects[i];
 
             const XY& dV = speeds[i];
             v[i] = dV + o.velocity();
@@ -106,15 +106,19 @@ std::vector<XY> OpenMPAccelerator::calculateForces() const
     for(std::size_t i = 0; i < objs - 1; i++)
         for(std::size_t j = i + 1; j < objs; j++)
         {
-            const Object& o1 = m_objects[i];
-            const Object& o2 = m_objects[j];
+            const double x1 = m_objects.getX()[i];
+            const double y1 = m_objects.getY()[i];
+            const double x2 = m_objects.getX()[j];
+            const double y2 = m_objects.getY()[j];
+            const double m1 = m_objects.getMass()[i];
+            const double m2 = m_objects.getMass()[j];
 
-            const double dist = utils::distance(o1, o2);
+            const double dist = utils::distance(x1, y1, x2, y2);
             const double dist2 = dist * dist;
-            const double masses = o1.mass() * o2.mass();
+            const double masses = m1 * m2;
             const double Fg = G * masses / dist2;
 
-            XY force_vector = utils::unit_vector(o2, o1);
+            XY force_vector = utils::unit_vector(x1, y1, x2, y2);
             force_vector *= Fg;
 
             const int tid = omp_get_thread_num();

@@ -160,12 +160,16 @@ void SimulationEngine::checkForCollisions()
     for(std::size_t i = 0; i < objs - 1; i++)
         for(std::size_t j = i + 1; j < objs; j++)
         {
-            const Object& o1 = m_objects[i];
-            const Object& o2 = m_objects[j];
+            const double x1 = m_objects.getX()[i];
+            const double y1 = m_objects.getY()[i];
+            const double x2 = m_objects.getX()[j];
+            const double y2 = m_objects.getY()[j];
+            const double r1 = m_objects.getRadius()[i];
+            const double r2 = m_objects.getRadius()[j];
 
-            const double dist = utils::distance(o1, o2);
+            const double dist = utils::distance(x1, y1, x2, y2);
 
-            if ( (o1.radius() + o2.radius()) > dist)
+            if ( (r1 + r2) > dist)
             {
                 const int tid = omp_get_thread_num();
                 const auto colided = std::make_pair(i, j);
@@ -199,7 +203,7 @@ void SimulationEngine::checkForCollisions()
         }
     }
 
-    // remove destroyed objects (remember to go from farthest objects) 
+    // remove destroyed objects (remember to go from farthest objects)
     for(std::size_t i: toRemove)
         m_objects.erase(i);
 }
