@@ -27,7 +27,7 @@
 #include <vector>
 #include <memory>
 
-#include "object.hpp"
+#include "objects.hpp"
 
 struct IAccelerator;
 
@@ -58,11 +58,11 @@ class SimulationEngine
         int stepBy(double);
         double step();
 
-        const std::vector<Object>& objects() const;
+        const Objects& objects() const;
         std::size_t objectCount() const;
 
     private:
-        std::vector<Object> m_objects;
+        Objects m_objects;
         std::vector<ISimulationEvents *> m_eventObservers;
         std::unique_ptr<IAccelerator> m_accelerator;
         int m_nextId;

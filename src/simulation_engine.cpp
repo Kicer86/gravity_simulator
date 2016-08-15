@@ -31,7 +31,7 @@ SimulationEngine::SimulationEngine():
     m_objects(),
     m_eventObservers(),
     m_accelerator(nullptr),
-    m_nextId(0)
+    m_nextId(1)                        // 0 is reserved for invalid entry
 {
     m_accelerator = std::make_unique<OpenMPAccelerator>(m_objects);
 }
@@ -51,10 +51,9 @@ void SimulationEngine::addEventsObserver(ISimulationEvents* observer)
 
 int SimulationEngine::addObject(const Object& obj)
 {
-    m_objects.push_back(obj);
-    Object& addedObj = m_objects.back();
-
-    addedObj.setId(m_nextId);
+    assert(obj.id() == 0);
+    const auto idx =  m_objects.insert(obj, m_nextId);
+    const Object addedObj = m_objects[idx];
 
     for(ISimulationEvents* events: m_eventObservers)
         events->objectCreated(m_nextId, addedObj);
@@ -73,9 +72,12 @@ int SimulationEngine::stepBy(double dt)
         steps++;
     }
 
-    for (const Object& obj: m_objects)
+    for (std::size_t i = 0; i < m_objects.size(); i++)
         for(ISimulationEvents* events: m_eventObservers)
+        {
+            const Object obj = m_objects[i];
             events->objectUpdated(obj.id(), obj);
+        }
 
     return steps;
 }
@@ -91,7 +93,7 @@ double SimulationEngine::step()
 }
 
 
-const std::vector<Object>& SimulationEngine::objects() const
+const Objects& SimulationEngine::objects() const
 {
     return m_objects;
 }
@@ -108,27 +110,27 @@ std::size_t SimulationEngine::collide(std::size_t i, std::size_t j)
     assert(i < m_objects.size());
     assert(j < m_objects.size());
 
-    Object& o1 = m_objects[i];
-    Object& o2 = m_objects[j];
+    const double mass1 = m_objects.getMass()[i];
+    const double mass2 = m_objects.getMass()[j];
 
-    const std::size_t heavier = o1.mass() > o2.mass()? i: j;
+    const std::size_t heavier = mass1 > mass2? i: j;
     const std::size_t lighter = heavier == i? j : i;
 
-    Object& h = m_objects[heavier];
-    Object& l = m_objects[lighter];
+    Object h = m_objects[heavier];
+    Object l = m_objects[lighter];
 
     // correct velocity by summing momentums
     const double masses = h.mass() + l.mass();
     const XY momentums = h.velocity() * h.mass() + l.velocity() * l.mass();
     const XY newVelocity = momentums / masses;
 
-    h.setVelocity(newVelocity);
+    m_objects.setVelocity(heavier, newVelocity);
 
     // increase mass and radius
     const double newRadius = std::cbrt( std::pow( h.radius(), 3 ) + std::pow( l.radius(), 3 ) );
 
-    h.setMass( masses );
-    h.setRadius( newRadius );
+    m_objects.setMass(heavier, masses);
+    m_objects.setRadius(heavier, newRadius);
 
     for(ISimulationEvents* events: m_eventObservers)
         events->objectsColided(h, l);
@@ -142,6 +144,10 @@ std::size_t SimulationEngine::collide(std::size_t i, std::size_t j)
 
 void SimulationEngine::checkForCollisions()
 {
+    // Container for object to be removed.
+    // It is neccesary to keep objects in right order (from greater idx to lower one).
+    // Without it erase algorithm may lead to serious errors
+    // (object is erased by being overwriten with last one).
     std::set<std::size_t, std::greater<std::size_t>> toRemove;
 
     const std::size_t objs = m_objects.size();
@@ -193,13 +199,7 @@ void SimulationEngine::checkForCollisions()
         }
     }
 
-    // remove destroyed objects
+    // remove destroyed objects (remember to go from farthest objects) 
     for(std::size_t i: toRemove)
-    {
-        // remove object 'i' by overriding it with last one
-        if (i < objs - 1)
-            m_objects[i] = m_objects.back();
-
-        m_objects.pop_back();
-    }
+        m_objects.erase(i);
 }
