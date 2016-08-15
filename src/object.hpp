@@ -66,9 +66,12 @@ class Object
 namespace utils
 {
     double distance(const XY &, const XY &);
-    double distance(const Object &, const Object &);
+    double distance(double x1, double y1,
+                    double x2, double y2);
+
     XY unit_vector(const XY &, const XY &);
-    XY unit_vector(const Object &, const Object &);
+    XY unit_vector(double x1, double y1,
+                       double x2, double y2);
 }
 
 
