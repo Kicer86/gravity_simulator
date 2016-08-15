@@ -229,13 +229,13 @@ Objects::DataVector& Objects::getRadius()
 }
 
 
-const Objects::DataVector& Objects::getId() const
+const std::vector<int>& Objects::getId() const
 {
     return m_id;
 }
 
 
-Objects::DataVector& Objects::getId()
+std::vector<int>& Objects::getId()
 {
     return m_id;
 }

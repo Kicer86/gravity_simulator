@@ -126,8 +126,8 @@ class Objects
         const DataVector& getRadius() const;
         DataVector& getRadius();
 
-        const DataVector& getId() const;
-        DataVector& getId();
+        const std::vector<int>& getId() const;
+        std::vector<int>& getId();
 
     private:
 
@@ -139,7 +139,7 @@ class Objects
         DataVector m_vy;
         DataVector m_mass;
         DataVector m_radius;
-        DataVector m_id;
+        std::vector<int> m_id;
 };
 
 #endif // OBJECTS_HPP
