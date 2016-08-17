@@ -22,7 +22,7 @@ if(OpenMP_FOUND)
 
 endif()
 
-add_feature_info(OpenMP_accelerator ${OpenMP_FOUND} "speeds up calculations.")
+add_feature_info(OpenMP_accelerator OpenMP_FOUND "speeds up calculations.")
 
 
 # detect AVX (not nice solution)
