@@ -139,7 +139,6 @@ std::vector< std::pair< int, int > > MTAcceleratorBase::collisions() const
                 const auto colided = std::make_pair(i, j);
                 toColide[tid].push_back(colided);
             }
-
         }
 
     std::vector<std::pair<int, int>> result;
