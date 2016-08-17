@@ -25,13 +25,14 @@
 #include <omp.h>
 
 #include "accelerators/avx_accelerator.hpp"
-#include "accelerators/openmp_accelerator.hpp"
+#include "accelerators/cpu_accelerator.hpp"
 
 
 SimulationEngine::SimulationEngine():
     m_objects(),
     m_eventObservers(),
     m_accelerator(nullptr),
+    m_dt(60.0),
     m_nextId(1)                        // 0 is reserved for invalid entry
 {
     m_accelerator = std::make_unique<AVXAccelerator>(m_objects);
@@ -86,11 +87,56 @@ int SimulationEngine::stepBy(double dt)
 
 double SimulationEngine::step()
 {
-    const double dt = m_accelerator->step();
+    bool optimal = false;
+
+    const std::size_t objs = m_objects.size();
+
+    std::vector<XY> v(objs);
+    std::vector<XY> pos(objs);
+
+    const std::vector<XY> forces = m_accelerator->forces();
+
+    do
+    {
+        const std::vector<XY> speeds = m_accelerator->velocities(forces, m_dt);
+
+        // figure out maximum distance made by single object
+        double max_travel = 0.0;
+
+        for(std::size_t i = 0; i < objs; i++)
+        {
+            Object o = m_objects[i];
+
+            const XY& dV = speeds[i];
+            v[i] = dV + o.velocity();
+            pos[i] = o.pos() + v[i] * m_dt;
+
+            const double travel = utils::distance(pos[i], o.pos());
+
+            if (travel > max_travel)
+                max_travel = travel;
+        }
+
+        // do not allow too big jumps (precission loss) nor no small ones (performance loss)
+        if (max_travel > 100e3)
+            m_dt = m_dt * 100e3 / max_travel;
+        else if (max_travel < 1e3)
+            m_dt = m_dt * 1e3 / max_travel;
+        else
+            optimal = true;
+    }
+    while(optimal == false);
+
+    // apply new positions and speeds
+    for(std::size_t i = 0; i < objs; i++)
+    {
+        m_objects.setPos(i, pos[i]);
+        m_objects.setVelocity(i, v[i]);
+    }
 
     checkForCollisions();
 
-    return dt;
+    return m_dt;
 }
 
 
@@ -151,56 +197,25 @@ void SimulationEngine::checkForCollisions()
     // (object is erased by being overwriten with last one).
     std::set<std::size_t, std::greater<std::size_t>> toRemove;
 
-    const std::size_t objs = m_objects.size();
+    std::vector<std::pair<int, int>> toColide = m_accelerator->collisions();
 
-    const int threads = omp_get_max_threads();
-    std::vector< std::vector< std::pair<int, int> > > toColide(threads);
-
-    // calculate collisions in parallel
-    #pragma omp parallel for schedule(static, 1)
-    for(std::size_t i = 0; i < objs - 1; i++)
-        for(std::size_t j = i + 1; j < objs; j++)
-        {
-            const double x1 = m_objects.getX()[i];
-            const double y1 = m_objects.getY()[i];
-            const double x2 = m_objects.getX()[j];
-            const double y2 = m_objects.getY()[j];
-            const double r1 = m_objects.getRadius()[i];
-            const double r2 = m_objects.getRadius()[j];
-
-            const double dist = utils::distance(x1, y1, x2, y2);
-
-            if ( (r1 + r2) > dist)
-            {
-                const int tid = omp_get_thread_num();
-                const auto colided = std::make_pair(i, j);
-                toColide[tid].push_back(colided);
-            }
-
-        }
-
-    // collect data from threads into one set of objects to be removed
-    for(int t = 0; t < threads; t++)
+    for(std::size_t i = 0; i < toColide.size(); i++)
     {
-        const auto& thread_colided = toColide[t];
-        for(std::size_t i = 0; i < thread_colided.size(); i++)
+        const auto& colided = toColide[i];
+
+        const int idx1 = colided.first;
+        const int idx2 = colided.second;
+
+        const Object ob1 = m_objects[idx1];
+        const Object ob2 = m_objects[idx2];
+
+        const int id1 = ob1.id();
+        const int id2 = ob2.id();
+
+        if (toRemove.find(id1) == toRemove.end() && toRemove.find(id2) == toRemove.end())
         {
-            const auto& colided = thread_colided[i];
-
-            const int idx1 = colided.first;
-            const int idx2 = colided.second;
-
-            const Object ob1 = m_objects[idx1];
-            const Object ob2 = m_objects[idx2];
-
-            const int id1 = ob1.id();
-            const int id2 = ob2.id();
-
-            if (toRemove.find(id1) == toRemove.end() && toRemove.find(id2) == toRemove.end())
-            {
-                const int destroyed = collide(idx1, idx2);
-                toRemove.insert(destroyed);
-            }
+            const int destroyed = collide(idx1, idx2);
+            toRemove.insert(destroyed);
         }
     }
 

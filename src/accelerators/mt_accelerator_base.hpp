@@ -1,5 +1,5 @@
 /*
- * OpenMP based accelerator for base calculations.
+ * Base for multi thread accelerators
  * Copyright (C) 2016  Michał Walenciak <MichalWalenciak@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,35 +17,33 @@
  *
  */
 
-#ifndef OPENMPACCELERATOR_H
-#define OPENMPACCELERATOR_H
+#ifndef MTACCELERATOR_BASE_HPP
+#define MTACCELERATOR_BASE_HPP
 
 #include <vector>
 
 #include "iaccelerator.hpp"
-#include "../object.hpp"
 
 class Objects;
 
-class OpenMPAccelerator: public IAccelerator
+class MTAcceleratorBase: public IAccelerator
 {
     public:
-        OpenMPAccelerator(Objects &);
-        OpenMPAccelerator(const OpenMPAccelerator &) = delete;
-        ~OpenMPAccelerator();
-        OpenMPAccelerator& operator=(const OpenMPAccelerator &) = delete;
+        MTAcceleratorBase(Objects &);
+        MTAcceleratorBase(const MTAcceleratorBase &) = delete;
+        ~MTAcceleratorBase();
+        MTAcceleratorBase& operator=(const MTAcceleratorBase &) = delete;
 
-        virtual double step();
+        virtual std::vector<XY> forces() final;
+        std::vector<XY> velocities(const std::vector<XY>& forces, double dt) const;
+        virtual std::vector< std::pair<int, int> > collisions() const final;
 
     protected:
         Objects& m_objects;
 
-    private:
-        double m_dt;
-
         XY force(std::size_t, std::size_t) const;
-        std::vector<XY> calculateForces() const;
-        std::vector<XY> calculateVelocities(const std::vector<XY> &, double) const;
+
+        virtual void forcesFor(std::size_t, std::vector<XY> &) const = 0;
 };
 
-#endif // OPENMPACCELERATOR_HPP
+#endif // MTACCELERATOR_BASE_HPP

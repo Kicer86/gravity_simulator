@@ -65,6 +65,7 @@ class SimulationEngine
         Objects m_objects;
         std::vector<ISimulationEvents *> m_eventObservers;
         std::unique_ptr<IAccelerator> m_accelerator;
+        double m_dt;
         int m_nextId;
 
         std::size_t collide(std::size_t, std::size_t);

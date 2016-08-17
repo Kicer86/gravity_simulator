@@ -1,5 +1,5 @@
 /*
- * AVX based accelerator for base calculations.
+ * Cpu based accelerator for calculations.
  * Copyright (C) 2016  Michał Walenciak <MichalWalenciak@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,28 +17,26 @@
  *
  */
 
-#ifndef AVXACCELERATOR_HPP
-#define AVXACCELERATOR_HPP
+#ifndef CPUACCELERATOR_HPP
+#define CPUACCELERATOR_HPP
 
 #include <vector>
 
 #include "mt_accelerator_base.hpp"
-
 #include "../object.hpp"
 
 class Objects;
 
-class AVXAccelerator: public MTAcceleratorBase
+class CpuAccelerator: public MTAcceleratorBase
 {
     public:
-        AVXAccelerator(Objects &);
-        AVXAccelerator(const AVXAccelerator &) = delete;
-        ~AVXAccelerator();
-
-        AVXAccelerator& operator=(const AVXAccelerator &) = delete;
+        CpuAccelerator(Objects &);
+        CpuAccelerator(const CpuAccelerator &) = delete;
+        ~CpuAccelerator();
+        CpuAccelerator& operator=(const CpuAccelerator &) = delete;
 
     private:
         virtual void forcesFor(std::size_t, std::vector<XY> &) const override;
 };
 
-#endif // AVXACCELERATOR_HPP
+#endif // CPUACCELERATOR_HPP
