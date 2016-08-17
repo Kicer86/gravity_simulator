@@ -87,7 +87,6 @@ void AVXAccelerator::forcesFor(std::size_t i, std::vector<XY>& forces) const
     for(; j < std::min(first_simd_idx, objs); j++)
     {
         const XY force_vector = force(i, j);
-        const int tid = 0;
 
         forces[i] += force_vector;
         forces[j] += -force_vector;
@@ -123,7 +122,6 @@ void AVXAccelerator::forcesFor(std::size_t i, std::vector<XY>& forces) const
         force_vector.x = _mm256_mul_pd(force_vector.x, Fg);
         force_vector.y = _mm256_mul_pd(force_vector.y, Fg);
 
-        const int tid = 0;
         for (int k = 0; k < 4; k++)
         {
             forces[i] += XY(force_vector.x[k], force_vector.y[k]);
@@ -135,11 +133,8 @@ void AVXAccelerator::forcesFor(std::size_t i, std::vector<XY>& forces) const
     for(; j < objs; j++)
     {
         const XY force_vector = force(i, j);
-        const int tid = 0;
 
         forces[i] += force_vector;
         forces[j] += -force_vector;
     }
 }
-
-
