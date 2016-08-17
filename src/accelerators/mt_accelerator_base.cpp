@@ -24,7 +24,7 @@
 #include "../objects.hpp"
 
 
-MTAcceleratorBase::MTAcceleratorBase(Objects& objects): m_objects(objects), m_dt(60.0)
+MTAcceleratorBase::MTAcceleratorBase(Objects& objects): m_objects(objects)
 {
 
 }
@@ -36,56 +36,32 @@ MTAcceleratorBase::~MTAcceleratorBase()
 }
 
 
-double MTAcceleratorBase::step()
+std::vector<XY> MTAcceleratorBase::forces()
 {
-    bool optimal = false;
-
     const std::size_t objs = m_objects.size();
 
-    std::vector<XY> v(objs);
-    std::vector<XY> pos(objs);
+    std::vector<XY> forces(objs);
 
-    const std::vector<XY> forces = calculateForces();
+    // prepare private tables for threads for results, so we don't get races when accessing 'forces'
+    const int threads = omp_get_max_threads();
+    std::vector< std::vector<XY> > private_forces(threads);    // for each thread vector of its calculations
 
-    do
+    for(int t = 0; t < threads; t++)
+        private_forces[t] = std::vector<XY>(objs);             // initialize vector of results for each vector
+
+    #pragma omp parallel for schedule(static, 1)
+    for(std::size_t i = 0; i < objs - 1; i++)
     {
-        const std::vector<XY> speeds = calculateVelocities(forces, m_dt);
+        const int tid = omp_get_thread_num();
+        forcesFor(i, objs, private_forces[tid]);
+    }
 
-        // figure out maximum distance made by single object
-        double max_travel = 0.0;
-
+    // accumulate results
+    for(int t = 0; t < threads; t++)
         for(std::size_t i = 0; i < objs; i++)
-        {
-            Object o = m_objects[i];
+            forces[i] += private_forces[t][i];
 
-            const XY& dV = speeds[i];
-            v[i] = dV + o.velocity();
-            pos[i] = o.pos() + v[i] * m_dt;
-
-            const double travel = utils::distance(pos[i], o.pos());
-
-            if (travel > max_travel)
-                max_travel = travel;
-        }
-
-        // do not allow too big jumps (precission loss) nor no small ones (performance loss)
-        if (max_travel > 100e3)
-            m_dt = m_dt * 100e3 / max_travel;
-        else if (max_travel < 1e3)
-            m_dt = m_dt * 1e3 / max_travel;
-        else
-            optimal = true;
-    }
-    while(optimal == false);
-
-    // apply new positions and speeds
-    for(std::size_t i = 0; i < objs; i++)
-    {
-        m_objects.setPos(i, pos[i]);
-        m_objects.setVelocity(i, v[i]);
-    }
-
-    return m_dt;
+    return forces;
 }
 
 
@@ -109,6 +85,29 @@ XY MTAcceleratorBase::force(std::size_t i, std::size_t j) const
     force_vector *= Fg;
 
     return force_vector;
+}
+
+
+std::vector<XY> MTAcceleratorBase::velocities(const std::vector<XY>& forces, double dt) const
+{
+    std::vector<XY> result;
+    result.reserve(m_objects.size());
+
+    for(std::size_t i = 0; i < m_objects.size(); i++)
+    {
+        const XY& dF = forces[i];
+        const Object& o = m_objects[i];
+
+        // F=am ⇒ a = F/m
+        const XY a = dF / o.mass();
+
+        // ΔV = aΔt
+        const XY dv = a * dt;
+
+        result.push_back(dv);
+    }
+
+    return result;
 }
 
 
@@ -149,58 +148,6 @@ std::vector< std::pair< int, int > > MTAcceleratorBase::collisions() const
         const auto& thread_colided = toColide[t];
         for(std::size_t i = 0; i < thread_colided.size(); i++)
             result.push_back( thread_colided[i] );
-    }
-
-    return result;
-}
-
-
-std::vector<XY> MTAcceleratorBase::calculateForces() const
-{
-    const std::size_t objs = m_objects.size();
-
-    std::vector<XY> forces(objs);
-
-    // prepare private tables for threads for results, so we don't get races when accessing 'forces'
-    const int threads = omp_get_max_threads();
-    std::vector< std::vector<XY> > private_forces(threads);    // for each thread vector of its calculations
-
-    for(int t = 0; t < threads; t++)
-        private_forces[t] = std::vector<XY>(objs);             // initialize vector of results for each vector
-
-    #pragma omp parallel for schedule(static, 1)
-    for(std::size_t i = 0; i < objs - 1; i++)
-    {
-        const int tid = omp_get_thread_num();
-        forcesFor(i, objs, private_forces[tid]);
-    }
-
-    // accumulate results
-    for(int t = 0; t < threads; t++)
-        for(std::size_t i = 0; i < objs; i++)
-            forces[i] += private_forces[t][i];
-
-    return forces;
-}
-
-
-std::vector<XY> MTAcceleratorBase::calculateVelocities(const std::vector<XY>& forces, double dt) const
-{
-    std::vector<XY> result;
-    result.reserve(m_objects.size());
-
-    for(std::size_t i = 0; i < m_objects.size(); i++)
-    {
-        const XY& dF = forces[i];
-        const Object& o = m_objects[i];
-
-        // F=am ⇒ a = F/m
-        const XY a = dF / o.mass();
-
-        // ΔV = aΔt
-        const XY dv = a * dt;
-
-        result.push_back(dv);
     }
 
     return result;

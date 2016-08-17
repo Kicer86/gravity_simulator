@@ -32,6 +32,7 @@ SimulationEngine::SimulationEngine():
     m_objects(),
     m_eventObservers(),
     m_accelerator(nullptr),
+    m_dt(60.0),
     m_nextId(1)                        // 0 is reserved for invalid entry
 {
     m_accelerator = std::make_unique<OpenMPAccelerator>(m_objects);
@@ -86,11 +87,56 @@ int SimulationEngine::stepBy(double dt)
 
 double SimulationEngine::step()
 {
-    const double dt = m_accelerator->step();
+    bool optimal = false;
+
+    const std::size_t objs = m_objects.size();
+
+    std::vector<XY> v(objs);
+    std::vector<XY> pos(objs);
+
+    const std::vector<XY> forces = m_accelerator->forces();
+
+    do
+    {
+        const std::vector<XY> speeds = m_accelerator->velocities(forces, m_dt);
+
+        // figure out maximum distance made by single object
+        double max_travel = 0.0;
+
+        for(std::size_t i = 0; i < objs; i++)
+        {
+            Object o = m_objects[i];
+
+            const XY& dV = speeds[i];
+            v[i] = dV + o.velocity();
+            pos[i] = o.pos() + v[i] * m_dt;
+
+            const double travel = utils::distance(pos[i], o.pos());
+
+            if (travel > max_travel)
+                max_travel = travel;
+        }
+
+        // do not allow too big jumps (precission loss) nor no small ones (performance loss)
+        if (max_travel > 100e3)
+            m_dt = m_dt * 100e3 / max_travel;
+        else if (max_travel < 1e3)
+            m_dt = m_dt * 1e3 / max_travel;
+        else
+            optimal = true;
+    }
+    while(optimal == false);
+
+    // apply new positions and speeds
+    for(std::size_t i = 0; i < objs; i++)
+    {
+        m_objects.setPos(i, pos[i]);
+        m_objects.setVelocity(i, v[i]);
+    }
 
     checkForCollisions();
 
-    return dt;
+    return m_dt;
 }
 
 
