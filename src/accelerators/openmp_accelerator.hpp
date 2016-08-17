@@ -17,17 +17,17 @@
  *
  */
 
-#ifndef OPENMPACCELERATOR_H
-#define OPENMPACCELERATOR_H
+#ifndef OPENMPACCELERATOR_HPP
+#define OPENMPACCELERATOR_HPP
 
 #include <vector>
 
-#include "iaccelerator.hpp"
+#include "mt_accelerator_base.hpp"
 #include "../object.hpp"
 
 class Objects;
 
-class OpenMPAccelerator: public IAccelerator
+class OpenMPAccelerator: public MTAcceleratorBase
 {
     public:
         OpenMPAccelerator(Objects &);
@@ -35,17 +35,8 @@ class OpenMPAccelerator: public IAccelerator
         ~OpenMPAccelerator();
         OpenMPAccelerator& operator=(const OpenMPAccelerator &) = delete;
 
-        virtual double step();
-
-    protected:
-        Objects& m_objects;
-
     private:
-        double m_dt;
-
-        XY force(std::size_t, std::size_t) const;
-        std::vector<XY> calculateForces() const;
-        std::vector<XY> calculateVelocities(const std::vector<XY> &, double) const;
+        virtual void forcesFor(std::size_t, std::size_t, std::vector<XY> &) const override;
 };
 
 #endif // OPENMPACCELERATOR_HPP

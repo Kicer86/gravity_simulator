@@ -22,7 +22,7 @@ if(OpenMP_FOUND)
 
 endif()
 
-ADD_FEATURE_INFO(OpenMP_accelerator ${OpenMP_FOUND} "speeds up calculations.")
+add_feature_info(OpenMP_accelerator ${OpenMP_FOUND} "speeds up calculations.")
 
 
 # detect AVX (not nice solution)
@@ -51,7 +51,19 @@ if (AVX_FOUND)
 
 endif()
 
-ADD_FEATURE_INFO(AVX_accelerator ${AVX_FOUND} "speeds up calculations.")
+add_feature_info(AVX_accelerator ${AVX_FOUND} "speeds up calculations.")
+
+if(AVX_FOUND OR OpenMP_FOUND)
+    list(APPEND ACC_SRC
+        mt_accelerator_base.cpp
+        mt_accelerator_base.hpp
+    )
+
+    if (OpenMP_FOUND)
+        set_source_files_properties(mt_accelerator_base.cpp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+    endif()
+
+endif()
 
 # It would be nice to directly link related libraries here, but CMake (so far) does not allow
 # OBJECT type library to link anything.
