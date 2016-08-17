@@ -10,7 +10,7 @@ set(ACC_LINKER_FLAGS)
 
 find_package(OpenMP)
 
-if(OpenMP_FOUND)
+if(OPENMP_FOUND)
 
     list(APPEND ACC_SRC
         cpu_accelerator.cpp
@@ -18,11 +18,10 @@ if(OpenMP_FOUND)
     )
 
     set_source_files_properties(cpu_accelerator.cpp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-    list(APPEND ACC_LINKER_FLAGS ${OpenMP_CXX_FLAGS})
 
 endif()
 
-add_feature_info(OpenMP_accelerator OpenMP_FOUND "speeds up calculations.")
+add_feature_info(OpenMP_accelerator OPENMP_FOUND "speeds up calculations.")
 
 
 # detect AVX (not nice solution)
@@ -53,14 +52,16 @@ endif()
 
 add_feature_info(AVX_accelerator AVX_FOUND "speeds up calculations.")
 
-if(AVX_FOUND OR OpenMP_FOUND)
+if(AVX_FOUND OR OPENMP_FOUND)
+
     list(APPEND ACC_SRC
         mt_accelerator_base.cpp
         mt_accelerator_base.hpp
     )
 
-    if (OpenMP_FOUND)
+    if (OPENMP_FOUND)
         set_source_files_properties(mt_accelerator_base.cpp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+        list(APPEND ACC_LINKER_FLAGS ${OpenMP_CXX_FLAGS})
     endif()
 
 endif()
