@@ -17,11 +17,7 @@
  *
  */
 
-#include "openmp_accelerator.hpp"
-
-#include <omp.h>
-
-#include "../objects.hpp"
+#include "cpu_accelerator.hpp"
 
 
 CpuAccelerator::CpuAccelerator(Objects& objects): MTAcceleratorBase(objects)

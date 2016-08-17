@@ -13,11 +13,11 @@ find_package(OpenMP)
 if(OpenMP_FOUND)
 
     list(APPEND ACC_SRC
-        openmp_accelerator.cpp
-        openmp_accelerator.hpp
+        cpu_accelerator.cpp
+        cpu_accelerator.hpp
     )
 
-    set_source_files_properties(openmp_accelerator.cpp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+    set_source_files_properties(cpu_accelerator.cpp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
     list(APPEND ACC_LINKER_FLAGS ${OpenMP_CXX_FLAGS})
 
 endif()
