@@ -1,5 +1,5 @@
 /*
- * OpenMP based accelerator for base calculations.
+ * Cpu based accelerator for calculations.
  * Copyright (C) 2016  Michał Walenciak <MichalWalenciak@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,8 +17,8 @@
  *
  */
 
-#ifndef OPENMPACCELERATOR_HPP
-#define OPENMPACCELERATOR_HPP
+#ifndef CPUACCELERATOR_HPP
+#define CPUACCELERATOR_HPP
 
 #include <vector>
 
@@ -27,16 +27,16 @@
 
 class Objects;
 
-class OpenMPAccelerator: public MTAcceleratorBase
+class CpuAccelerator: public MTAcceleratorBase
 {
     public:
-        OpenMPAccelerator(Objects &);
-        OpenMPAccelerator(const OpenMPAccelerator &) = delete;
-        ~OpenMPAccelerator();
-        OpenMPAccelerator& operator=(const OpenMPAccelerator &) = delete;
+        CpuAccelerator(Objects &);
+        CpuAccelerator(const CpuAccelerator &) = delete;
+        ~CpuAccelerator();
+        CpuAccelerator& operator=(const CpuAccelerator &) = delete;
 
     private:
         virtual void forcesFor(std::size_t, std::size_t, std::vector<XY> &) const override;
 };
 
-#endif // OPENMPACCELERATOR_HPP
+#endif // CPUACCELERATOR_HPP

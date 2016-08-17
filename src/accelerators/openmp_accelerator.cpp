@@ -1,5 +1,5 @@
 /*
- * OpenMP based accelerator for base calculations.
+ * Cpu based accelerator for calculations.
  * Copyright (C) 2016  Michał Walenciak <MichalWalenciak@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -24,19 +24,19 @@
 #include "../objects.hpp"
 
 
-OpenMPAccelerator::OpenMPAccelerator(Objects& objects): MTAcceleratorBase(objects)
+CpuAccelerator::CpuAccelerator(Objects& objects): MTAcceleratorBase(objects)
 {
 
 }
 
 
-OpenMPAccelerator::~OpenMPAccelerator()
+CpuAccelerator::~CpuAccelerator()
 {
 
 }
 
 
-void OpenMPAccelerator::forcesFor(std::size_t i, std::size_t count, std::vector<XY>& forces) const
+void CpuAccelerator::forcesFor(std::size_t i, std::size_t count, std::vector<XY>& forces) const
 {
     for(std::size_t j = i + 1; j < count; j++)
     {
