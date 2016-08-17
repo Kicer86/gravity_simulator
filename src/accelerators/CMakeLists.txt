@@ -1,12 +1,14 @@
 
-find_package(OpenMP)
-
 set(ACC_SRS
         iaccelerator.hpp
 )
 
 set(ACC_COMPILATOR_FLAGS)
 set(ACC_LINKER_FLAGS)
+
+#detect OpenMP
+
+find_package(OpenMP)
 
 if(OpenMP_FOUND)
 
@@ -19,9 +21,37 @@ if(OpenMP_FOUND)
     list(APPEND ACC_LINKER_FLAGS ${OpenMP_CXX_FLAGS})
 
 endif()
-               #accelerators/avx_accelerator.cpp
-               #accelerators/avx_accelerator.hpp
 
+ADD_FEATURE_INFO(OpenMP_accelerator ${OpenMP_FOUND} "speeds up calculations.")
+
+
+# detect AVX (not nice solution)
+set(AVX_FOUND 0)
+if(UNIX)
+
+    try_run(AVX_DETECTION_RUN AVX_DETECTION_COMPILE
+            ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/detect_avx.c
+            COMPILE_DEFINITIONS -mavx
+    )
+
+    if (AVX_DETECTION_COMPILE AND AVX_DETECTION_RUN)
+        set(AVX_FOUND 1)
+    endif()
+
+endif()
+
+if (AVX_FOUND)
+
+    list(APPEND ACC_SRC
+        avx_accelerator.cpp
+        avx_accelerator.hpp
+    )
+
+    set_source_files_properties(avx_accelerator.cpp PROPERTIES COMPILE_FLAGS "-mavx")
+
+endif()
+
+ADD_FEATURE_INFO(AVX_accelerator ${AVX_FOUND} "speeds up calculations.")
 
 # It would be nice to directly link related libraries here, but CMake (so far) does not allow
 # OBJECT type library to link anything.

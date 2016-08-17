@@ -3,6 +3,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 14)
 
+include(FeatureSummary)
+
 add_subdirectory(accelerators)
 
 find_package(Qt5Widgets REQUIRED)
@@ -43,3 +45,5 @@ add_executable(gravity_simulator
 
 target_link_libraries(gravity_simulator PRIVATE ${ACC_LINKER_FLAGS} Qt5::Widgets)
 target_compile_options(gravity_simulator PRIVATE)
+
+feature_summary(WHAT ALL)
