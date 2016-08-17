@@ -3,8 +3,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 14)
 
+add_subdirectory(accelerators)
+
 find_package(Qt5Widgets REQUIRED)
-find_package(OpenMP)
 
 include_directories(SYSTEM ${Qt5_Widgets})
 
@@ -35,14 +36,10 @@ add_executable(gravity_simulator
                simulation_engine.hpp
                simulation_info_widget.cpp
                simulation_info_widget.hpp
-               accelerators/avx_accelerator.cpp
-               accelerators/avx_accelerator.hpp
-               accelerators/iaccelerator.hpp
-               accelerators/openmp_accelerator.cpp
-               accelerators/openmp_accelerator.hpp
                ${moc_wrapped}
                ${ui_wrapped}
+               $<TARGET_OBJECTS:accelerators>
 )
 
-target_link_libraries(gravity_simulator Qt5::Widgets ${OpenMP_CXX_FLAGS})
-target_compile_options(gravity_simulator PRIVATE ${OpenMP_CXX_FLAGS})
+target_link_libraries(gravity_simulator PRIVATE ${ACC_LINKER_FLAGS} Qt5::Widgets)
+target_compile_options(gravity_simulator PRIVATE)
