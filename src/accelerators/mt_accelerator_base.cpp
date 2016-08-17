@@ -53,7 +53,7 @@ std::vector<XY> MTAcceleratorBase::forces()
     for(std::size_t i = 0; i < objs - 1; i++)
     {
         const int tid = omp_get_thread_num();
-        forcesFor(i, objs, private_forces[tid]);
+        forcesFor(i, private_forces[tid]);
     }
 
     // accumulate results

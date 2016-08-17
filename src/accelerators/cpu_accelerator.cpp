@@ -19,6 +19,8 @@
 
 #include "cpu_accelerator.hpp"
 
+#include "../objects.hpp"
+
 
 CpuAccelerator::CpuAccelerator(Objects& objects): MTAcceleratorBase(objects)
 {
@@ -32,8 +34,10 @@ CpuAccelerator::~CpuAccelerator()
 }
 
 
-void CpuAccelerator::forcesFor(std::size_t i, std::size_t count, std::vector<XY>& forces) const
+void CpuAccelerator::forcesFor(std::size_t i, std::vector<XY>& forces) const
 {
+    const std::size_t count = m_objects.size();
+
     for(std::size_t j = i + 1; j < count; j++)
     {
         const XY force_vector = force(i, j);

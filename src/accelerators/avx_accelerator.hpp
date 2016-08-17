@@ -38,7 +38,7 @@ class AVXAccelerator: public MTAcceleratorBase
         AVXAccelerator& operator=(const AVXAccelerator &) = delete;
 
     private:
-        virtual void forcesFor(std::size_t, std::size_t, std::vector<XY> &) const override;
+        virtual void forcesFor(std::size_t, std::vector<XY> &) const override;
 };
 
 #endif // AVXACCELERATOR_HPP

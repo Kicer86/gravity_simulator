@@ -36,7 +36,7 @@ class CpuAccelerator: public MTAcceleratorBase
         CpuAccelerator& operator=(const CpuAccelerator &) = delete;
 
     private:
-        virtual void forcesFor(std::size_t, std::size_t, std::vector<XY> &) const override;
+        virtual void forcesFor(std::size_t, std::vector<XY> &) const override;
 };
 
 #endif // CPUACCELERATOR_HPP

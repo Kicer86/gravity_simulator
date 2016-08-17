@@ -43,7 +43,7 @@ class MTAcceleratorBase: public IAccelerator
 
         XY force(std::size_t, std::size_t) const;
 
-        virtual void forcesFor(std::size_t, std::size_t, std::vector<XY> &) const = 0;
+        virtual void forcesFor(std::size_t, std::vector<XY> &) const = 0;
 };
 
 #endif // MTACCELERATOR_BASE_HPP

@@ -74,7 +74,7 @@ AVXAccelerator::~AVXAccelerator()
 }
 
 
-void AVXAccelerator::forcesFor(std::size_t i, std::size_t, std::vector<XY>& forces) const
+void AVXAccelerator::forcesFor(std::size_t i, std::vector<XY>& forces) const
 {
     const std::size_t objs = m_objects.size();
 
