@@ -51,7 +51,7 @@ if (AVX_FOUND)
 
 endif()
 
-add_feature_info(AVX_accelerator ${AVX_FOUND} "speeds up calculations.")
+add_feature_info(AVX_accelerator AVX_FOUND "speeds up calculations.")
 
 if(AVX_FOUND OR OpenMP_FOUND)
     list(APPEND ACC_SRC
