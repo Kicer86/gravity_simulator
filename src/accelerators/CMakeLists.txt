@@ -25,6 +25,7 @@ add_feature_info(OpenMP_accelerator OPENMP_FOUND "speeds up calculations.")
 
 
 # detect AVX (not nice solution)
+
 set(AVX_ENABLED 0)
 if(UNIX)
 
