@@ -22,16 +22,23 @@
 
 #include "iaccelerator.hpp"
 
+class Objects;
+
 class OpenCLAccelerator: public IAccelerator
 {
     public:
-        OpenCLAccelerator();
+        OpenCLAccelerator(Objects &);
         OpenCLAccelerator(const OpenCLAccelerator &) = delete;
         ~OpenCLAccelerator();
 
         OpenCLAccelerator& operator=(const OpenCLAccelerator &) = delete;
 
-        virtual double step();
+        virtual std::vector<XY> forces() override;
+        virtual std::vector<XY> velocities(const std::vector<XY>& forces, double dt) const override;
+        virtual std::vector<std::pair<int, int>> collisions() const override;
+
+    private:
+        Objects& m_objects;
 };
 
 #endif // OPENCLACCELERATOR_HPP

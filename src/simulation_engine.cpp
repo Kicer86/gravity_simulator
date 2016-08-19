@@ -26,6 +26,7 @@
 
 #include "accelerators/avx_accelerator.hpp"
 #include "accelerators/cpu_accelerator.hpp"
+#include "accelerators/opencl_accelerator.hpp"
 
 
 SimulationEngine::SimulationEngine():
@@ -35,7 +36,7 @@ SimulationEngine::SimulationEngine():
     m_dt(60.0),
     m_nextId(1)                        // 0 is reserved for invalid entry
 {
-    m_accelerator = std::make_unique<AVXAccelerator>(m_objects);
+    m_accelerator = std::make_unique<OpenCLAccelerator>(m_objects);
 }
 
 
