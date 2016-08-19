@@ -38,21 +38,8 @@
 
 OpenCLAccelerator::OpenCLAccelerator(Objects& objects): m_objects(objects)
 {
-
-}
-
-
-OpenCLAccelerator::~OpenCLAccelerator()
-{
-
-}
-
-
-std::vector<XY> OpenCLAccelerator::forces()
-{
     const char kernel_source[] = BOOST_COMPUTE_STRINGIZE_SOURCE
     (
-
         struct XY
         {
             double x;
@@ -119,23 +106,35 @@ std::vector<XY> OpenCLAccelerator::forces()
                 forceY[i] += force_vector.y;
             }
         }
-
     );
 
+    m_device = boost::compute::system::default_device();
+    m_context = boost::compute::context(m_device);
+    m_program = boost::compute::program::create_with_source(kernel_source, m_context);
+
+    m_program.build();
+}
+
+
+OpenCLAccelerator::~OpenCLAccelerator()
+{
+
+}
+
+
+std::vector<XY> OpenCLAccelerator::forces()
+{
     const int count = m_objects.size();
     std::vector<double> host_forceX(count);
     std::vector<double> host_forceY(count);
 
-    boost::compute::device device = boost::compute::system::default_device();
+    boost::compute::command_queue queue(m_context, m_device);
 
-    boost::compute::context context(device);
-    boost::compute::command_queue queue(context, device);
-
-    boost::compute::buffer objX(context, count * sizeof(double));
-    boost::compute::buffer objY(context, count * sizeof(double));
-    boost::compute::buffer mass(context, count * sizeof(double));
-    boost::compute::buffer forceX(context, count * sizeof(double));
-    boost::compute::buffer forceY(context, count * sizeof(double));
+    boost::compute::buffer objX(m_context, count * sizeof(double));
+    boost::compute::buffer objY(m_context, count * sizeof(double));
+    boost::compute::buffer mass(m_context, count * sizeof(double));
+    boost::compute::buffer forceX(m_context, count * sizeof(double));
+    boost::compute::buffer forceY(m_context, count * sizeof(double));
 
     queue.enqueue_write_buffer(objX, 0, count * sizeof(double), m_objects.getX().data());
     queue.enqueue_write_buffer(objY, 0, count * sizeof(double), m_objects.getY().data());
@@ -143,11 +142,7 @@ std::vector<XY> OpenCLAccelerator::forces()
     queue.enqueue_write_buffer(forceX, 0, count * sizeof(double), host_forceX.data());
     queue.enqueue_write_buffer(forceY, 0, count * sizeof(double), host_forceY.data());
 
-    boost::compute::program program = boost::compute::program::create_with_source(kernel_source, context);
-
-    program.build();
-
-    boost::compute::kernel kernel(program, "forces");
+    boost::compute::kernel kernel(m_program, "forces");
 
     kernel.set_arg(0, objX);
     kernel.set_arg(1, objY);
@@ -215,7 +210,7 @@ std::vector<std::pair<int, int>> OpenCLAccelerator::collisions() const
 
             if ( (r1 + r2) > dist)
             {
-                const int tid = 1;
+                const int tid = 0;
                 const auto colided = std::make_pair(i, j);
                 toColide[tid].push_back(colided);
             }

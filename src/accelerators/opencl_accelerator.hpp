@@ -20,6 +20,8 @@
 #ifndef OPENCLACCELERATOR_HPP
 #define OPENCLACCELERATOR_HPP
 
+#include <boost/compute/core.hpp>
+
 #include "iaccelerator.hpp"
 
 class Objects;
@@ -39,6 +41,9 @@ class OpenCLAccelerator: public IAccelerator
 
     private:
         Objects& m_objects;
+        boost::compute::program m_program;
+        boost::compute::context m_context;
+        boost::compute::device  m_device;
 };
 
 #endif // OPENCLACCELERATOR_HPP
