@@ -6,27 +6,28 @@ set(ACC_SRS
 set(ACC_COMPILATOR_FLAGS)
 set(ACC_LINKER_FLAGS)
 
+option(ENABLE_OPENMP "Allows to disable OpenMP even if detected" ON)
+
+
+# CPU accelerator (OpenMP friendly)
+
+list(APPEND ACC_SRC
+    cpu_accelerator.cpp
+    cpu_accelerator.hpp
+    mt_accelerator_base.cpp
+    mt_accelerator_base.hpp
+)
+
 #detect OpenMP
 
 find_package(OpenMP)
 
-if(OPENMP_FOUND)
-
-    list(APPEND ACC_SRC
-        cpu_accelerator.cpp
-        cpu_accelerator.hpp
-    )
-
-    set_source_files_properties(cpu_accelerator.cpp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-
-endif()
-
-add_feature_info(OpenMP_accelerator OPENMP_FOUND "speeds up calculations.")
+add_feature_info(Multithread_support OPENMP_FOUND "speeds up calculations.")
 
 
-# detect AVX (not nice solution)
+# detect AVX
 
-set(AVX_ENABLED 0)
+set(AVX_FOUND 0)
 if(UNIX)
 
     try_run(AVX_DETECTION_RUN AVX_DETECTION_COMPILE
@@ -35,12 +36,14 @@ if(UNIX)
     )
 
     if (AVX_DETECTION_COMPILE AND AVX_DETECTION_RUN)
-        set(AVX_ENABLED 1)
+        set(AVX_FOUND 1)
     endif()
 
 endif()
 
-if (AVX_ENABLED)
+# AVX accelerator (OpenMP friendly)
+
+if (AVX_FOUND)
 
     list(APPEND ACC_SRC
         avx_accelerator.cpp
@@ -51,10 +54,10 @@ if (AVX_ENABLED)
 
 endif()
 
-add_feature_info(AVX_accelerator AVX_ENABLED "speeds up calculations.")
+add_feature_info(AVX_accelerator AVX_FOUND "speeds up calculations.")
 
 
-#detect OpenCL
+#detect OpenCL (OpenMP friendly)
 
 find_package(OpenCL)
 find_package(Boost)
@@ -82,21 +85,23 @@ endif()
 add_feature_info(OpenCL_accelerator OPENCL_ENABLED  "speeds up calculations.")
 
 
-# Thread base accelerators base
+# OpenMP setup
 
-if(AVX_ENABLED OR OPENMP_FOUND)
+if(OPENMP_FOUND AND ENABLE_OPENMP)
 
-    list(APPEND ACC_SRC
-        mt_accelerator_base.cpp
-        mt_accelerator_base.hpp
-    )
+    set_source_files_properties(cpu_accelerator.cpp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+    set_source_files_properties(mt_accelerator_base.cpp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+    set_source_files_properties(opencl_accelerator.cpp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
 
-    if (OPENMP_FOUND)
-        set_source_files_properties(mt_accelerator_base.cpp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-        list(APPEND ACC_LINKER_FLAGS ${OpenMP_CXX_FLAGS})
-    endif()
+    list(APPEND ACC_LINKER_FLAGS ${OpenMP_CXX_FLAGS})
+
+else()
+
+    # add fake implementation of openmp functions
+    list(APPEND ACC_SRC fake_openmp.cpp)
 
 endif()
+
 
 # It would be nice to directly link related libraries here, but CMake (so far) does not allow
 # OBJECT type library to link anything.
