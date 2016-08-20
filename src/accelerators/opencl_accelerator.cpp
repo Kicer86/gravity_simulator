@@ -19,6 +19,8 @@
 
 #include "opencl_accelerator.hpp"
 
+#include "omp.h"
+
 #define BOOST_COMPUTE_DEBUG_KERNEL_COMPILATION
 
 #include <boost/compute/core.hpp>
@@ -74,18 +76,15 @@ OpenCLAccelerator::OpenCLAccelerator(Objects& objects): m_objects(objects)
                              __global const double* objY,
                              __global const double* mass,
                              __global double* forceX,
-                             __global double* forceY,
-                             const int count
+                             __global double* forceY
                             )
         {
             const int i = get_global_id(0);
+            const int j = get_global_id(0);
             const double G = 6.6732e-11;
 
-            for(int j = 0; j < count; j++)
+            if (i != j)
             {
-                if (i == j)
-                    continue;
-
                 const double x1 = objX[i];
                 const double y1 = objY[i];
                 const double x2 = objX[j];
@@ -136,11 +135,11 @@ std::vector<XY> OpenCLAccelerator::forces()
     boost::compute::buffer forceX(m_context, count * sizeof(double));
     boost::compute::buffer forceY(m_context, count * sizeof(double));
 
-    queue.enqueue_write_buffer(objX, 0, count * sizeof(double), m_objects.getX().data());
-    queue.enqueue_write_buffer(objY, 0, count * sizeof(double), m_objects.getY().data());
-    queue.enqueue_write_buffer(mass, 0, count * sizeof(double), m_objects.getMass().data());
-    queue.enqueue_write_buffer(forceX, 0, count * sizeof(double), host_forceX.data());
-    queue.enqueue_write_buffer(forceY, 0, count * sizeof(double), host_forceY.data());
+    auto objXFuture = queue.enqueue_write_buffer_async(objX, 0, count * sizeof(double), m_objects.getX().data());
+    auto objYFuture = queue.enqueue_write_buffer_async(objY, 0, count * sizeof(double), m_objects.getY().data());
+    auto massFuture = queue.enqueue_write_buffer_async(mass, 0, count * sizeof(double), m_objects.getMass().data());
+    auto forceXFuture = queue.enqueue_write_buffer_async(forceX, 0, count * sizeof(double), host_forceX.data());
+    auto forceYFuture = queue.enqueue_write_buffer_async(forceY, 0, count * sizeof(double), host_forceY.data());
 
     boost::compute::kernel kernel(m_program, "forces");
 
@@ -149,12 +148,23 @@ std::vector<XY> OpenCLAccelerator::forces()
     kernel.set_arg(2, mass);
     kernel.set_arg(3, forceX);
     kernel.set_arg(4, forceY);
-    kernel.set_arg(5, count);
 
-    queue.enqueue_1d_range_kernel(kernel, 0, count, 0);
+    objXFuture.wait();
+    objYFuture.wait();
+    massFuture.wait();
+    forceXFuture.wait();
+    forceYFuture.wait();
 
-    queue.enqueue_read_buffer(forceX, 0, count * sizeof(double), host_forceX.data());
-    queue.enqueue_read_buffer(forceY, 0, count * sizeof(double), host_forceY.data());
+    const size_t global_work_offset[] = { 0, 0 };
+    const size_t global_work_size[] = { count, count };
+    const size_t local_work_size[] = { 1, 1 };
+    queue.enqueue_nd_range_kernel(kernel, 2, global_work_offset, global_work_size, local_work_size);
+
+    auto forceXReadFuture = queue.enqueue_read_buffer_async(forceX, 0, count * sizeof(double), host_forceX.data());
+    auto forceYReadFuture = queue.enqueue_read_buffer_async(forceY, 0, count * sizeof(double), host_forceY.data());
+
+    forceXReadFuture.wait();
+    forceYReadFuture.wait();
 
     std::vector<XY> result(count);
     for(int i = 0; i < count; i++)
@@ -191,7 +201,7 @@ std::vector<std::pair<int, int>> OpenCLAccelerator::collisions() const
 {
     const std::size_t objs = m_objects.size();
 
-    const int threads = 1;
+    const int threads = omp_get_max_threads();
     std::vector< std::vector< std::pair<int, int> > > toColide(threads);
 
     // calculate collisions in parallel
@@ -210,7 +220,7 @@ std::vector<std::pair<int, int>> OpenCLAccelerator::collisions() const
 
             if ( (r1 + r2) > dist)
             {
-                const int tid = 0;
+                const int tid = omp_get_thread_num();
                 const auto colided = std::make_pair(i, j);
                 toColide[tid].push_back(colided);
             }
