@@ -2,6 +2,8 @@
 #ifndef IACCELERATOR_HPP
 #define IACCELERATOR_HPP
 
+#include <vector>
+
 #include "../object.hpp"
 
 struct IAccelerator

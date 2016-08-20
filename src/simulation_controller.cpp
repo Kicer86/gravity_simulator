@@ -167,11 +167,11 @@ void SimulationController::beginSimulation()
     m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
     m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
     m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
-#elif 1
+#elif 0
     m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
 
     for(int i = 1; i < 16; i++)
-        m_engine.addObject( Object(384400e3 * i/10, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
+        m_engine.addObject( Object(384400e3 * i/10, 0, 7.347673e22,  1737.1e3, 0, 1.022e3 * (i%2? 1: -1)) );
 #elif 0
     m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
     m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
@@ -211,6 +211,15 @@ void SimulationController::beginSimulation()
             assert( equal(obj1.getRadius()[j], obj2.getRadius()[j]) );
         }
     }
+#endif
+
+
+// for performance checks
+#if 0
+    for(int i = 0; i < 150; i++)
+        m_engine.step();
+
+    exit(0);
 #endif
 
     // before starting simulation update scene

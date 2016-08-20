@@ -9,7 +9,9 @@ add_subdirectory(accelerators)
 
 find_package(Qt5Widgets REQUIRED)
 
-include_directories(SYSTEM ${Qt5_Widgets})
+include_directories(SYSTEM
+                    ${Qt5_Widgets}
+)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -43,7 +45,10 @@ add_executable(gravity_simulator
                $<TARGET_OBJECTS:accelerators>
 )
 
-target_link_libraries(gravity_simulator PRIVATE ${ACC_LINKER_FLAGS} Qt5::Widgets)
-target_compile_options(gravity_simulator PRIVATE)
+target_link_libraries(gravity_simulator
+                      PRIVATE
+                        Qt5::Widgets
+                        ${ACC_LINKER_FLAGS}
+)
 
 feature_summary(WHAT ALL)
