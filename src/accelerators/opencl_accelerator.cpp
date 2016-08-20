@@ -76,15 +76,18 @@ OpenCLAccelerator::OpenCLAccelerator(Objects& objects): m_objects(objects)
                              __global const double* objY,
                              __global const double* mass,
                              __global double* forceX,
-                             __global double* forceY
+                             __global double* forceY,
+                             const int count
                             )
         {
             const int i = get_global_id(0);
-            const int j = get_global_id(0);
             const double G = 6.6732e-11;
 
-            if (i != j)
+            for(int j = 0; j < count; j++)
             {
+                if (i == j)
+                    continue;
+
                 const double x1 = objX[i];
                 const double y1 = objY[i];
                 const double x2 = objX[j];
@@ -148,6 +151,7 @@ std::vector<XY> OpenCLAccelerator::forces()
     kernel.set_arg(2, mass);
     kernel.set_arg(3, forceX);
     kernel.set_arg(4, forceY);
+    kernel.set_arg(5, count);
 
     objXFuture.wait();
     objYFuture.wait();
@@ -155,10 +159,7 @@ std::vector<XY> OpenCLAccelerator::forces()
     forceXFuture.wait();
     forceYFuture.wait();
 
-    const size_t global_work_offset[] = { 0, 0 };
-    const size_t global_work_size[] = { count, count };
-    const size_t local_work_size[] = { 1, 1 };
-    queue.enqueue_nd_range_kernel(kernel, 2, global_work_offset, global_work_size, local_work_size);
+    queue.enqueue_1d_range_kernel(kernel, 0, count, 0);
 
     auto forceXReadFuture = queue.enqueue_read_buffer_async(forceX, 0, count * sizeof(double), host_forceX.data());
     auto forceYReadFuture = queue.enqueue_read_buffer_async(forceY, 0, count * sizeof(double), host_forceY.data());
