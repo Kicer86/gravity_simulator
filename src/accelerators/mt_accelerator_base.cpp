@@ -67,19 +67,18 @@ std::vector<XY> MTAcceleratorBase::forces()
 
 XY MTAcceleratorBase::force(std::size_t i, std::size_t j) const
 {
-    const double G = 6.6732e-11;
+    const BaseType G = 6.6732e-11;
 
-    const double x1 = m_objects.getX()[i];
-    const double y1 = m_objects.getY()[i];
-    const double x2 = m_objects.getX()[j];
-    const double y2 = m_objects.getY()[j];
-    const double m1 = m_objects.getMass()[i];
-    const double m2 = m_objects.getMass()[j];
+    const BaseType x1 = m_objects.getX()[i];
+    const BaseType y1 = m_objects.getY()[i];
+    const BaseType x2 = m_objects.getX()[j];
+    const BaseType y2 = m_objects.getY()[j];
+    const BaseType m1 = m_objects.getMass()[i];
+    const BaseType m2 = m_objects.getMass()[j];
 
-    const double dist = utils::distance(x1, y1, x2, y2);
-    const double dist2 = dist * dist;
-    const double masses = m1 * m2;
-    const double Fg = G * masses / dist2;
+    const BaseType dist = utils::distance(x1, y1, x2, y2);
+    const BaseType dist2 = dist * dist;
+    const BaseType Fg = (G * m1) * (m2 / dist2);               // (G * m1) and (m2 / dist2) are here to decrease partial results - for floats "m1 * m2" may be a killer
 
     XY force_vector = utils::unit_vector(x1, y1, x2, y2);
     force_vector *= Fg;
@@ -123,14 +122,14 @@ std::vector< std::pair< int, int > > MTAcceleratorBase::collisions() const
     for(std::size_t i = 0; i < objs - 1; i++)
         for(std::size_t j = i + 1; j < objs; j++)
         {
-            const double x1 = m_objects.getX()[i];
-            const double y1 = m_objects.getY()[i];
-            const double x2 = m_objects.getX()[j];
-            const double y2 = m_objects.getY()[j];
-            const double r1 = m_objects.getRadius()[i];
-            const double r2 = m_objects.getRadius()[j];
+            const BaseType x1 = m_objects.getX()[i];
+            const BaseType y1 = m_objects.getY()[i];
+            const BaseType x2 = m_objects.getX()[j];
+            const BaseType y2 = m_objects.getY()[j];
+            const BaseType r1 = m_objects.getRadius()[i];
+            const BaseType r2 = m_objects.getRadius()[j];
 
-            const double dist = utils::distance(x1, y1, x2, y2);
+            const BaseType dist = utils::distance(x1, y1, x2, y2);
 
             if ( (r1 + r2) > dist)
             {

@@ -28,7 +28,7 @@
 
 ObjectsScene::ObjectsScene(): m_objects()
 {
-    const double grid = 400e6;
+    const BaseType grid = 400e6;
     QPen pen;
     pen.setWidth(10e6);
 
@@ -48,7 +48,7 @@ void ObjectsScene::addObject(int id, const Object& obj)
     const XY& p = obj.pos();
     const QPointF position(p.x, p.y);
 
-    double radius = obj.radius();
+    BaseType radius = obj.radius();
 
     QGraphicsItem* item = createItem(radius);
     item->setPos(position);
@@ -68,7 +68,7 @@ void ObjectsScene::updatePosition(int id, const XY& pos)
 }
 
 
-void ObjectsScene::updateRadius(int id, double r)
+void ObjectsScene::updateRadius(int id, BaseType r)
 {
     auto obj = m_objects.find(id);
     assert(obj != m_objects.end());
@@ -96,7 +96,7 @@ void ObjectsScene::removeObject(int id)
 }
 
 
-QGraphicsItem* ObjectsScene::createItem(double radius)
+QGraphicsItem* ObjectsScene::createItem(BaseType radius)
 {
     const QSizeF size(2 * radius, 2 * radius);
     const QRectF rect(QPointF(-radius, -radius), size);

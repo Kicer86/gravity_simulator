@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "object.hpp"
+#include "types.hpp"
 
 class Objects
 {
@@ -83,7 +84,7 @@ class Objects
                 }
         };
 
-        typedef std::vector<double, AlignmentAllocator<double, 64>> DataVector;
+        typedef std::vector<BaseType, AlignmentAllocator<BaseType, 64>> DataVector;
 
         Objects();
         Objects(const Objects &) = delete;
@@ -100,8 +101,8 @@ class Objects
         // hight level access
         void setPos(std::size_t idx, const XY &);
         void setVelocity(std::size_t idx, const XY &);
-        void setMass(std::size_t idx, double);
-        void setRadius(std::size_t idx, double);
+        void setMass(std::size_t idx, BaseType);
+        void setRadius(std::size_t idx, BaseType);
 
         XY getPos(std::size_t idx) const;
         XY getVelocity(std::size_t idx) const;

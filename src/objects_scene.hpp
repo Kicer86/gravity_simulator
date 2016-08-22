@@ -36,13 +36,13 @@ class ObjectsScene: public QGraphicsScene
 
         void addObject(int id, const Object &);
         void updatePosition(int id, const XY &);
-        void updateRadius(int id, double r);
+        void updateRadius(int id, BaseType r);
         void removeObject(int id);
 
     private:
         std::unordered_map<int, QGraphicsItem *> m_objects;
 
-        QGraphicsItem* createItem(double);
+        QGraphicsItem* createItem(BaseType);
 };
 
 #endif // OBJECTSSCENE_HPP

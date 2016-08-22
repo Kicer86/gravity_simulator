@@ -22,7 +22,7 @@
 #include <cmath>
 
 
-XY::XY(double _x, double _y): x(_x), y(_y)
+XY::XY(BaseType _x, BaseType _y): x(_x), y(_y)
 {
 
 }
@@ -44,7 +44,7 @@ XY XY::operator-(const XY& other) const
 }
 
 
-XY& XY::operator*=(double v)
+XY& XY::operator*=(BaseType v)
 {
     x *= v;
     y *= v;
@@ -53,7 +53,7 @@ XY& XY::operator*=(double v)
 }
 
 
-XY XY::operator*(double v) const
+XY XY::operator*(BaseType v) const
 {
     XY result(x, y);
     result *= v;
@@ -88,7 +88,7 @@ XY XY::operator-() const
 }
 
 
-XY XY::operator/(double v) const
+XY XY::operator/(BaseType v) const
 {
     XY result = *this;
     result.x /= v;
@@ -100,7 +100,7 @@ XY XY::operator/(double v) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Object::Object(double x, double y, double m, double r, double v_x, double v_y, int id):
+Object::Object(BaseType x, BaseType y, BaseType m, BaseType r, BaseType v_x, BaseType v_y, int id):
     m_pos(x, y),
     m_v(v_x, v_y),
     m_mass(m),
@@ -111,20 +111,20 @@ Object::Object(double x, double y, double m, double r, double v_x, double v_y, i
 }
 
 
-Object::Object(double x, double y, double m, double r, double v_x, double v_y):
+Object::Object(BaseType x, BaseType y, BaseType m, BaseType r, BaseType v_x, BaseType v_y):
     Object(x, y, m, r, v_x, v_y, 0)
 {
 
 }
 
 
-double Object::mass() const
+BaseType Object::mass() const
 {
     return m_mass;
 }
 
 
-double Object::radius() const
+BaseType Object::radius() const
 {
     return m_radius;
 }
@@ -153,15 +153,15 @@ int Object::id() const
 
 namespace utils
 {
-    double distance(const XY& p1, const XY& p2)
+    BaseType distance(const XY& p1, const XY& p2)
     {
         return distance(p1.x, p1.y, p2.x, p2.y);
     }
 
 
-    double distance(double x1, double y1, double x2, double y2)
+    BaseType distance(BaseType x1, BaseType y1, BaseType x2, BaseType y2)
     {
-        const double dist = sqrt( (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) );
+        const BaseType dist = sqrt( (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) );
 
         return dist;
     }
@@ -173,10 +173,10 @@ namespace utils
     }
 
 
-    XY unit_vector(double x1, double y1, double x2, double y2)
+    XY unit_vector(BaseType x1, BaseType y1, BaseType x2, BaseType y2)
     {
         XY v( x2 - x1, y2 - y1);
-        const double dist = distance(x1, y1, x2, y2);
+        const BaseType dist = distance(x1, y1, x2, y2);
 
         v.x /= dist;
         v.y /= dist;

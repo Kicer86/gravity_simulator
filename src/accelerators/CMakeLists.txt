@@ -7,6 +7,7 @@ set(ACC_COMPILATOR_FLAGS)
 set(ACC_LINKER_FLAGS)
 
 option(ENABLE_OPENMP "Allows to disable OpenMP even if detected" ON)
+option(ENABLE_AVX    "Allows to disable AVX extensions even if detected" ON)
 
 
 # CPU accelerator (OpenMP friendly)
@@ -43,7 +44,7 @@ endif()
 
 # AVX accelerator (OpenMP friendly)
 
-if (AVX_FOUND)
+if (AVX_FOUND AND ENABLE_AVX)
 
     list(APPEND ACC_SRC
         avx_accelerator.cpp

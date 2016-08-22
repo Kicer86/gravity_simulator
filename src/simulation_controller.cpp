@@ -24,14 +24,14 @@
 
 #include "objects_scene.hpp"
 
-bool equal(double l, double r)
+bool equal(BaseType l, BaseType r)
 {
     return std::abs(l - r) < 0.00001;
 }
 
-double fRand(double fMin, double fMax)
+BaseType fRand(BaseType fMin, BaseType fMax)
 {
-    double f = static_cast<double>(rand()) / RAND_MAX;
+    BaseType f = static_cast<BaseType>(rand()) / RAND_MAX;
     return fMin + f * (fMax - fMin);
 }
 
@@ -146,16 +146,16 @@ void SimulationController::setScene(ObjectsScene* scene)
 
 void SimulationController::beginSimulation()
 {
-#if 1
+#if 0
     srand(3);
 
     for (int i = 0; i < 2000; i++)
     {
-        const double x = fRand(-5000e6, 5000e6);
-        const double y = fRand(-5000e6, 5000e6);
+        const BaseType x = fRand(-5000e6, 5000e6);
+        const BaseType y = fRand(-5000e6, 5000e6);
 
-        const double v_x = fRand(-5e2, 5e2);
-        const double v_y = fRand(-5e2, 5e2);
+        const BaseType v_x = fRand(-5e2, 5e2);
+        const BaseType v_y = fRand(-5e2, 5e2);
 
         m_engine.addObject( Object(x, y, 7.347673e24, 1737.1e3, v_x, v_y) );
         //int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
@@ -167,7 +167,7 @@ void SimulationController::beginSimulation()
     m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
     m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
     m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
-#elif 0
+#elif 1
     m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
 
     for(int i = 1; i < 16; i++)

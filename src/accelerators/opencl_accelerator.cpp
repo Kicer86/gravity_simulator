@@ -38,7 +38,11 @@
 // https://anteru.net/blog/2012/11/03/2009/
 
 
-OpenCLAccelerator::OpenCLAccelerator(Objects& objects): m_objects(objects)
+OpenCLAccelerator::OpenCLAccelerator(Objects& objects):
+    m_objects(objects),
+    m_program(),
+    m_context(),
+    m_device()
 {
     const char kernel_source[] = BOOST_COMPUTE_STRINGIZE_SOURCE
     (

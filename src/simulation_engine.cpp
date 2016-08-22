@@ -36,7 +36,7 @@ SimulationEngine::SimulationEngine():
     m_dt(60.0),
     m_nextId(1)                        // 0 is reserved for invalid entry
 {
-    m_accelerator = std::make_unique<AVXAccelerator>(m_objects);
+    m_accelerator = std::make_unique<CpuAccelerator>(m_objects);
 }
 
 
@@ -102,7 +102,7 @@ double SimulationEngine::step()
         const std::vector<XY> speeds = m_accelerator->velocities(forces, m_dt);
 
         // figure out maximum distance made by single object
-        double max_travel = 0.0;
+        BaseType max_travel = 0.0;
 
         for(std::size_t i = 0; i < objs; i++)
         {
@@ -112,7 +112,7 @@ double SimulationEngine::step()
             v[i] = dV + o.velocity();
             pos[i] = o.pos() + v[i] * m_dt;
 
-            const double travel = utils::distance(pos[i], o.pos());
+            const BaseType travel = utils::distance(pos[i], o.pos());
 
             if (travel > max_travel)
                 max_travel = travel;
@@ -158,8 +158,8 @@ std::size_t SimulationEngine::collide(std::size_t i, std::size_t j)
     assert(i < m_objects.size());
     assert(j < m_objects.size());
 
-    const double mass1 = m_objects.getMass()[i];
-    const double mass2 = m_objects.getMass()[j];
+    const BaseType mass1 = m_objects.getMass()[i];
+    const BaseType mass2 = m_objects.getMass()[j];
 
     const std::size_t heavier = mass1 > mass2? i: j;
     const std::size_t lighter = heavier == i? j : i;
@@ -168,14 +168,14 @@ std::size_t SimulationEngine::collide(std::size_t i, std::size_t j)
     Object l = m_objects[lighter];
 
     // correct velocity by summing momentums
-    const double masses = h.mass() + l.mass();
+    const BaseType masses = h.mass() + l.mass();
     const XY momentums = h.velocity() * h.mass() + l.velocity() * l.mass();
     const XY newVelocity = momentums / masses;
 
     m_objects.setVelocity(heavier, newVelocity);
 
     // increase mass and radius
-    const double newRadius = std::cbrt( std::pow( h.radius(), 3 ) + std::pow( l.radius(), 3 ) );
+    const BaseType newRadius = std::cbrt( std::pow( h.radius(), 3 ) + std::pow( l.radius(), 3 ) );
 
     m_objects.setMass(heavier, masses);
     m_objects.setRadius(heavier, newRadius);
