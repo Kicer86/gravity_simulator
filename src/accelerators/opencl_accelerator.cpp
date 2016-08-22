@@ -48,26 +48,26 @@ OpenCLAccelerator::OpenCLAccelerator(Objects& objects):
     (
         struct XY
         {
-            double x;
-            double y;
+            float x;
+            float y;
         };
 
 
-        double point_distance(double x1, double y1, double x2, double y2)
+        float point_distance(float x1, float y1, float x2, float y2)
         {
-            const double dist = sqrt( (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) );
+            const float dist = sqrt( (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) );
 
             return dist;
         }
 
 
-        struct XY unit_vector(double x1, double y1, double x2, double y2)
+        struct XY unit_vector(float x1, float y1, float x2, float y2)
         {
             struct XY v;
             v.x = x2 - x1;
             v.y = y2 - y1;
 
-            const double dist = point_distance(x1, y1, x2, y2);
+            const float dist = point_distance(x1, y1, x2, y2);
 
             v.x /= dist;
             v.y /= dist;
@@ -76,33 +76,32 @@ OpenCLAccelerator::OpenCLAccelerator(Objects& objects):
         }
 
 
-        __kernel void forces(__global const double* objX,
-                             __global const double* objY,
-                             __global const double* mass,
-                             __global double* forceX,
-                             __global double* forceY,
+        __kernel void forces(__global const float* objX,
+                             __global const float* objY,
+                             __global const float* mass,
+                             __global float* forceX,
+                             __global float* forceY,
                              const int count
                             )
         {
             const int i = get_global_id(0);
-            const double G = 6.6732e-11;
+            const float G = 6.6732e-11;
 
             for(int j = 0; j < count; j++)
             {
                 if (i == j)
                     continue;
 
-                const double x1 = objX[i];
-                const double y1 = objY[i];
-                const double x2 = objX[j];
-                const double y2 = objY[j];
-                const double m1 = mass[i];
-                const double m2 = mass[j];
+                const float x1 = objX[i];
+                const float y1 = objY[i];
+                const float x2 = objX[j];
+                const float y2 = objY[j];
+                const float m1 = mass[i];
+                const float m2 = mass[j];
 
-                const double dist = point_distance(x1, y1, x2, y2);
-                const double dist2 = dist * dist;
-                const double masses = m1 * m2;
-                const double Fg = G * masses / dist2;
+                const float dist = point_distance(x1, y1, x2, y2);
+                const float dist2 = dist * dist;
+                const float Fg = (G * m1) * (m2 / dist2);
 
                 struct XY force_vector = unit_vector(x1, y1, x2, y2);
                 force_vector.x *= Fg;
@@ -131,22 +130,22 @@ OpenCLAccelerator::~OpenCLAccelerator()
 std::vector<XY> OpenCLAccelerator::forces()
 {
     const int count = m_objects.size();
-    std::vector<double> host_forceX(count);
-    std::vector<double> host_forceY(count);
+    std::vector<float> host_forceX(count);
+    std::vector<float> host_forceY(count);
 
     boost::compute::command_queue queue(m_context, m_device);
 
-    boost::compute::buffer objX(m_context, count * sizeof(double));
-    boost::compute::buffer objY(m_context, count * sizeof(double));
-    boost::compute::buffer mass(m_context, count * sizeof(double));
-    boost::compute::buffer forceX(m_context, count * sizeof(double));
-    boost::compute::buffer forceY(m_context, count * sizeof(double));
+    boost::compute::buffer objX(m_context, count * sizeof(float));
+    boost::compute::buffer objY(m_context, count * sizeof(float));
+    boost::compute::buffer mass(m_context, count * sizeof(float));
+    boost::compute::buffer forceX(m_context, count * sizeof(float));
+    boost::compute::buffer forceY(m_context, count * sizeof(float));
 
-    auto objXFuture = queue.enqueue_write_buffer_async(objX, 0, count * sizeof(double), m_objects.getX().data());
-    auto objYFuture = queue.enqueue_write_buffer_async(objY, 0, count * sizeof(double), m_objects.getY().data());
-    auto massFuture = queue.enqueue_write_buffer_async(mass, 0, count * sizeof(double), m_objects.getMass().data());
-    auto forceXFuture = queue.enqueue_write_buffer_async(forceX, 0, count * sizeof(double), host_forceX.data());
-    auto forceYFuture = queue.enqueue_write_buffer_async(forceY, 0, count * sizeof(double), host_forceY.data());
+    auto objXFuture = queue.enqueue_write_buffer_async(objX, 0, count * sizeof(float), m_objects.getX().data());
+    auto objYFuture = queue.enqueue_write_buffer_async(objY, 0, count * sizeof(float), m_objects.getY().data());
+    auto massFuture = queue.enqueue_write_buffer_async(mass, 0, count * sizeof(float), m_objects.getMass().data());
+    auto forceXFuture = queue.enqueue_write_buffer_async(forceX, 0, count * sizeof(float), host_forceX.data());
+    auto forceYFuture = queue.enqueue_write_buffer_async(forceY, 0, count * sizeof(float), host_forceY.data());
 
     boost::compute::kernel kernel(m_program, "forces");
 
@@ -165,8 +164,8 @@ std::vector<XY> OpenCLAccelerator::forces()
 
     queue.enqueue_1d_range_kernel(kernel, 0, count, 0);
 
-    auto forceXReadFuture = queue.enqueue_read_buffer_async(forceX, 0, count * sizeof(double), host_forceX.data());
-    auto forceYReadFuture = queue.enqueue_read_buffer_async(forceY, 0, count * sizeof(double), host_forceY.data());
+    auto forceXReadFuture = queue.enqueue_read_buffer_async(forceX, 0, count * sizeof(float), host_forceX.data());
+    auto forceYReadFuture = queue.enqueue_read_buffer_async(forceY, 0, count * sizeof(float), host_forceY.data());
 
     forceXReadFuture.wait();
     forceYReadFuture.wait();
@@ -214,14 +213,14 @@ std::vector<std::pair<int, int>> OpenCLAccelerator::collisions() const
     for(std::size_t i = 0; i < objs - 1; i++)
         for(std::size_t j = i + 1; j < objs; j++)
         {
-            const double x1 = m_objects.getX()[i];
-            const double y1 = m_objects.getY()[i];
-            const double x2 = m_objects.getX()[j];
-            const double y2 = m_objects.getY()[j];
-            const double r1 = m_objects.getRadius()[i];
-            const double r2 = m_objects.getRadius()[j];
+            const float x1 = m_objects.getX()[i];
+            const float y1 = m_objects.getY()[i];
+            const float x2 = m_objects.getX()[j];
+            const float y2 = m_objects.getY()[j];
+            const float r1 = m_objects.getRadius()[i];
+            const float r2 = m_objects.getRadius()[j];
 
-            const double dist = utils::distance(x1, y1, x2, y2);
+            const float dist = utils::distance(x1, y1, x2, y2);
 
             if ( (r1 + r2) > dist)
             {
