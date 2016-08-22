@@ -36,7 +36,7 @@ SimulationEngine::SimulationEngine():
     m_dt(60.0),
     m_nextId(1)                        // 0 is reserved for invalid entry
 {
-    m_accelerator = std::make_unique<CpuAccelerator>(m_objects);
+    m_accelerator = std::make_unique<AVXAccelerator>(m_objects);
 }
 
 

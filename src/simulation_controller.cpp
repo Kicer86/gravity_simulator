@@ -170,7 +170,7 @@ void SimulationController::beginSimulation()
 #elif 1
     m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
 
-    for(int i = 1; i < 16; i++)
+    for(int i = 1; i < 32; i++)
         m_engine.addObject( Object(384400e3 * i/10, 0, 7.347673e22,  1737.1e3, 0, 1.022e3 * (i%2? 1: -1)) );
 #elif 0
     m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
