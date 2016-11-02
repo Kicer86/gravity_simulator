@@ -20,22 +20,24 @@
 #ifndef OBJECT_HPP
 #define OBJECT_HPP
 
+#include "types.hpp"
+
 
 struct XY
 {
-    double x;
-    double y;
+    BaseType x;
+    BaseType y;
 
-    XY(double _x, double _y);
+    XY(BaseType _x, BaseType _y);
     XY();
 
     XY operator-(const XY& other) const;
-    XY& operator*=(double v);
-    XY operator*(double v) const;
+    XY& operator*=(BaseType v);
+    XY operator*(BaseType v) const;
     XY& operator+=(const XY& other);
     XY operator+(const XY& other) const;
     XY operator-() const;
-    XY operator/(double v) const;
+    XY operator/(BaseType v) const;
 
 };
 
@@ -44,20 +46,20 @@ class Object
 {
         XY m_pos;
         XY m_v;
-        double m_mass;
-        double m_radius;
+        BaseType m_mass;
+        BaseType m_radius;
 
         int m_id;                  // object id used for object identification
 
-        Object(double x, double y, double m, double r, double v_x, double v_y, int id);
+        Object(BaseType x, BaseType y, BaseType m, BaseType r, BaseType v_x, BaseType v_y, int id);
 
         friend class Objects;
 
     public:
-        Object(double x, double y, double m, double r, double v_x = 0.0, double v_y = 0.0);
+        Object(BaseType x, BaseType y, BaseType m, BaseType r, BaseType v_x = 0.0, BaseType v_y = 0.0);
 
-        double mass() const;
-        double radius() const;
+        BaseType mass() const;
+        BaseType radius() const;
         const XY& pos() const;
         const XY& velocity() const;
         int id() const;
@@ -65,13 +67,13 @@ class Object
 
 namespace utils
 {
-    double distance(const XY &, const XY &);
-    double distance(double x1, double y1,
-                    double x2, double y2);
+    BaseType distance(const XY &, const XY &);
+    BaseType distance(BaseType x1, BaseType y1,
+                               BaseType x2, BaseType y2);
 
     XY unit_vector(const XY &, const XY &);
-    XY unit_vector(double x1, double y1,
-                       double x2, double y2);
+    XY unit_vector(BaseType x1, BaseType y1,
+                   BaseType x2, BaseType y2);
 }
 
 

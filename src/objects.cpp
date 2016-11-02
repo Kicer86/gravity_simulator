@@ -131,13 +131,13 @@ void Objects::setVelocity(std::size_t idx, const XY& vxy)
 }
 
 
-void Objects::setMass(std::size_t idx, double mass)
+void Objects::setMass(std::size_t idx, BaseType mass)
 {
     m_mass[idx] = mass;
 }
 
 
-void Objects::setRadius(std::size_t idx, double radius)
+void Objects::setRadius(std::size_t idx, BaseType radius)
 {
     m_radius[idx] = radius;
 }
