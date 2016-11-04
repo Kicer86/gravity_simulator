@@ -27,13 +27,13 @@
 
 class Objects;
 
-class CpuAccelerator: public MTAcceleratorBase
+class SimpleCpuAccelerator: public MTAcceleratorBase
 {
     public:
-        CpuAccelerator(Objects &);
-        CpuAccelerator(const CpuAccelerator &) = delete;
-        ~CpuAccelerator();
-        CpuAccelerator& operator=(const CpuAccelerator &) = delete;
+        SimpleCpuAccelerator (Objects &);
+        SimpleCpuAccelerator (const SimpleCpuAccelerator &) = delete;
+        ~SimpleCpuAccelerator();
+        SimpleCpuAccelerator& operator=(const SimpleCpuAccelerator &) = delete;
 
     private:
         virtual void forcesFor(std::size_t, std::vector<XY> &) const override;
