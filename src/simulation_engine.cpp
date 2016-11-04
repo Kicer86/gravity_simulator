@@ -24,25 +24,30 @@
 
 #include <omp.h>
 
-#include "accelerators/avx_accelerator.hpp"
-#include "accelerators/simple_cpu_accelerator.hpp"
-#include "accelerators/opencl_accelerator.hpp"
+#include "accelerators/iaccelerator.hpp"
 
 
-SimulationEngine::SimulationEngine():
+SimulationEngine::SimulationEngine(IAccelerator* accelerator):
     m_objects(),
     m_eventObservers(),
-    m_accelerator(nullptr),
+    m_accelerator(accelerator),
     m_dt(60.0),
     m_nextId(1)                        // 0 is reserved for invalid entry
 {
-    m_accelerator = std::make_unique<OpenCLAccelerator>(&m_objects);
+    m_accelerator->setObjects(&m_objects);
 }
 
 
 SimulationEngine::~SimulationEngine()
 {
 
+}
+
+
+void SimulationEngine::setAccelerator(IAccelerator* accelerator)
+{
+    m_accelerator = accelerator;
+    m_accelerator->setObjects(&m_objects);
 }
 
 

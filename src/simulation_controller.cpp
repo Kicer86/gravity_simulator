@@ -96,7 +96,8 @@ void Tick::clear()
 
 
 SimulationController::SimulationController():
-    m_engine(),
+    m_accelerator(),
+    m_engine(&m_accelerator),
     m_stepTimer(),
     m_calculationsThread(),
     m_tickData(),

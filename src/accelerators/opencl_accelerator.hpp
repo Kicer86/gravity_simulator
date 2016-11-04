@@ -29,7 +29,7 @@ class Objects;
 class OpenCLAccelerator: public IAccelerator
 {
     public:
-        OpenCLAccelerator(Objects *);
+        OpenCLAccelerator(Objects * = nullptr);
         OpenCLAccelerator(const OpenCLAccelerator &) = delete;
         ~OpenCLAccelerator();
 
