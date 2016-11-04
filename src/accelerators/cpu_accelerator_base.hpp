@@ -17,8 +17,8 @@
  *
  */
 
-#ifndef MTACCELERATOR_BASE_HPP
-#define MTACCELERATOR_BASE_HPP
+#ifndef CPUACCELERATOR_BASE_HPP
+#define CPUACCELERATOR_BASE_HPP
 
 #include <vector>
 
@@ -26,24 +26,26 @@
 
 class Objects;
 
-class MTAcceleratorBase: public IAccelerator
+class CpuAcceleratorBase: public IAccelerator
 {
     public:
-        MTAcceleratorBase(Objects &);
-        MTAcceleratorBase(const MTAcceleratorBase &) = delete;
-        ~MTAcceleratorBase();
-        MTAcceleratorBase& operator=(const MTAcceleratorBase &) = delete;
+        CpuAcceleratorBase (Objects * = nullptr);
+        CpuAcceleratorBase (const CpuAcceleratorBase &) = delete;
+        ~CpuAcceleratorBase();
+        CpuAcceleratorBase& operator=(const CpuAcceleratorBase &) = delete;
+
+        void setObjects(Objects *) final;
 
         virtual std::vector<XY> forces() final;
         std::vector<XY> velocities(const std::vector<XY>& forces, double dt) const;
         virtual std::vector< std::pair<int, int> > collisions() const final;
 
     protected:
-        Objects& m_objects;
+        Objects* m_objects;
 
         XY force(std::size_t, std::size_t) const;
 
         virtual void forcesFor(std::size_t, std::vector<XY> &) const = 0;
 };
 
-#endif // MTACCELERATOR_BASE_HPP
+#endif // CPUACCELERATOR_BASE_HPP

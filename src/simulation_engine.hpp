@@ -46,11 +46,13 @@ struct ISimulationEvents
 class SimulationEngine
 {
     public:
-        SimulationEngine();
+        SimulationEngine(IAccelerator * = nullptr);
         SimulationEngine(const SimulationEngine &) = delete;
         ~SimulationEngine();
 
         SimulationEngine& operator=(const SimulationEngine &) = delete;
+
+        void setAccelerator(IAccelerator *);
 
         void addEventsObserver(ISimulationEvents *);
 
@@ -64,7 +66,7 @@ class SimulationEngine
     private:
         Objects m_objects;
         std::vector<ISimulationEvents *> m_eventObservers;
-        std::unique_ptr<IAccelerator> m_accelerator;
+        IAccelerator* m_accelerator;
         double m_dt;
         int m_nextId;
 

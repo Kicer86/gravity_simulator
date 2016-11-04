@@ -29,18 +29,20 @@ class Objects;
 class OpenCLAccelerator: public IAccelerator
 {
     public:
-        OpenCLAccelerator(Objects &);
+        OpenCLAccelerator(Objects * = nullptr);
         OpenCLAccelerator(const OpenCLAccelerator &) = delete;
         ~OpenCLAccelerator();
 
         OpenCLAccelerator& operator=(const OpenCLAccelerator &) = delete;
+
+        virtual void setObjects(Objects *) override;
 
         virtual std::vector<XY> forces() override;
         virtual std::vector<XY> velocities(const std::vector<XY>& forces, double dt) const override;
         virtual std::vector<std::pair<int, int>> collisions() const override;
 
     private:
-        Objects& m_objects;
+        Objects* m_objects;
         boost::compute::program m_program;
         boost::compute::context m_context;
         boost::compute::device  m_device;

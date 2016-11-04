@@ -22,16 +22,16 @@
 
 #include <vector>
 
-#include "mt_accelerator_base.hpp"
+#include "cpu_accelerator_base.hpp"
 
 #include "../object.hpp"
 
 class Objects;
 
-class AVXAccelerator: public MTAcceleratorBase
+class AVXAccelerator: public CpuAcceleratorBase
 {
     public:
-        AVXAccelerator(Objects &);
+        AVXAccelerator(Objects * = nullptr);
         AVXAccelerator(const AVXAccelerator &) = delete;
         ~AVXAccelerator();
 

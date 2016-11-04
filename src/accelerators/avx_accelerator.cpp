@@ -62,7 +62,7 @@ namespace utils
 
 
 
-AVXAccelerator::AVXAccelerator(Objects& objects): MTAcceleratorBase(objects)
+AVXAccelerator::AVXAccelerator(Objects* objects): CpuAcceleratorBase(objects)
 {
 
 }
@@ -76,7 +76,7 @@ AVXAccelerator::~AVXAccelerator()
 
 void AVXAccelerator::forcesFor(std::size_t i, std::vector<XY>& forces) const
 {
-    const std::size_t objs = m_objects.size();
+    const std::size_t objs = m_objects->size();
 
     // AVX can be used for 8 element aligned packs.
     const std::size_t first_simd_idx = (i + 8) & (-8);
@@ -97,17 +97,17 @@ void AVXAccelerator::forcesFor(std::size_t i, std::vector<XY>& forces) const
     {
         const float G = 6.6732e-11;
 
-        const float xi    = m_objects.getX()[i];
+        const float xi    = m_objects->getX()[i];
         const __m256 x0   = {xi, xi, xi, xi, xi, xi, xi, xi};
-        const __m256 x1234 = _mm256_load_ps( &m_objects.getX()[j] );
+        const __m256 x1234 = _mm256_load_ps( &m_objects->getX()[j] );
 
-        const float yi    = m_objects.getY()[i];
+        const float yi    = m_objects->getY()[i];
         const __m256 y0   = {yi, yi, yi, yi, yi, yi, yi, yi};
-        const __m256 y1234 = _mm256_load_ps( &m_objects.getY()[j] );
+        const __m256 y1234 = _mm256_load_ps( &m_objects->getY()[j] );
 
-        const float mi    = m_objects.getMass()[i];
+        const float mi    = m_objects->getMass()[i];
         const __m256 m0   = {mi, mi, mi, mi, mi, mi, mi, mi};
-        const __m256 m1234 = _mm256_load_ps( &m_objects.getMass()[j] );
+        const __m256 m1234 = _mm256_load_ps( &m_objects->getMass()[j] );
 
         const __m256 dist = utils::distance(x0, y0, x1234, y1234);
         const __m256 dist2 = _mm256_mul_ps(dist, dist);

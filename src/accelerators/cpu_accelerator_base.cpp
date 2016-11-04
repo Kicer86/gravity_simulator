@@ -17,28 +17,34 @@
  *
  */
 
-#include "mt_accelerator_base.hpp"
+#include "cpu_accelerator_base.hpp"
 
 #include <omp.h>
 
 #include "../objects.hpp"
 
 
-MTAcceleratorBase::MTAcceleratorBase(Objects& objects): m_objects(objects)
+CpuAcceleratorBase::CpuAcceleratorBase (Objects* objects): m_objects(objects)
 {
 
 }
 
 
-MTAcceleratorBase::~MTAcceleratorBase()
+CpuAcceleratorBase::~CpuAcceleratorBase()
 {
 
 }
 
 
-std::vector<XY> MTAcceleratorBase::forces()
+void CpuAcceleratorBase::setObjects(Objects* objects)
 {
-    const std::size_t objs = m_objects.size();
+    m_objects = objects;
+}
+
+
+std::vector<XY> CpuAcceleratorBase::forces()
+{
+    const std::size_t objs = m_objects->size();
 
     std::vector<XY> forces(objs);
 
@@ -65,16 +71,16 @@ std::vector<XY> MTAcceleratorBase::forces()
 }
 
 
-XY MTAcceleratorBase::force(std::size_t i, std::size_t j) const
+XY CpuAcceleratorBase::force(std::size_t i, std::size_t j) const
 {
     const BaseType G = 6.6732e-11;
 
-    const BaseType x1 = m_objects.getX()[i];
-    const BaseType y1 = m_objects.getY()[i];
-    const BaseType x2 = m_objects.getX()[j];
-    const BaseType y2 = m_objects.getY()[j];
-    const BaseType m1 = m_objects.getMass()[i];
-    const BaseType m2 = m_objects.getMass()[j];
+    const BaseType x1 = m_objects->getX()[i];
+    const BaseType y1 = m_objects->getY()[i];
+    const BaseType x2 = m_objects->getX()[j];
+    const BaseType y2 = m_objects->getY()[j];
+    const BaseType m1 = m_objects->getMass()[i];
+    const BaseType m2 = m_objects->getMass()[j];
 
     const BaseType dist = utils::distance(x1, y1, x2, y2);
     const BaseType dist2 = dist * dist;
@@ -87,15 +93,16 @@ XY MTAcceleratorBase::force(std::size_t i, std::size_t j) const
 }
 
 
-std::vector<XY> MTAcceleratorBase::velocities(const std::vector<XY>& forces, double dt) const
+std::vector<XY> CpuAcceleratorBase::velocities(const std::vector<XY>& forces, double dt) const
 {
+    const std::size_t objs = m_objects->size();
     std::vector<XY> result;
-    result.reserve(m_objects.size());
+    result.reserve(objs);
 
-    for(std::size_t i = 0; i < m_objects.size(); i++)
+    for(std::size_t i = 0; i < objs; i++)
     {
         const XY& dF = forces[i];
-        const Object& o = m_objects[i];
+        const Object& o = (*m_objects)[i];
 
         // F=am ⇒ a = F/m
         const XY a = dF / o.mass();
@@ -110,9 +117,9 @@ std::vector<XY> MTAcceleratorBase::velocities(const std::vector<XY>& forces, dou
 }
 
 
-std::vector< std::pair< int, int > > MTAcceleratorBase::collisions() const
+std::vector< std::pair< int, int > > CpuAcceleratorBase::collisions() const
 {
-    const std::size_t objs = m_objects.size();
+    const std::size_t objs = m_objects->size();
 
     const int threads = omp_get_max_threads();
     std::vector< std::vector< std::pair<int, int> > > toColide(threads);
@@ -122,12 +129,12 @@ std::vector< std::pair< int, int > > MTAcceleratorBase::collisions() const
     for(std::size_t i = 0; i < objs - 1; i++)
         for(std::size_t j = i + 1; j < objs; j++)
         {
-            const BaseType x1 = m_objects.getX()[i];
-            const BaseType y1 = m_objects.getY()[i];
-            const BaseType x2 = m_objects.getX()[j];
-            const BaseType y2 = m_objects.getY()[j];
-            const BaseType r1 = m_objects.getRadius()[i];
-            const BaseType r2 = m_objects.getRadius()[j];
+            const BaseType x1 = m_objects->getX()[i];
+            const BaseType y1 = m_objects->getY()[i];
+            const BaseType x2 = m_objects->getX()[j];
+            const BaseType y2 = m_objects->getY()[j];
+            const BaseType r1 = m_objects->getRadius()[i];
+            const BaseType r2 = m_objects->getRadius()[j];
 
             const BaseType dist = utils::distance(x1, y1, x2, y2);
 

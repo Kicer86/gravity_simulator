@@ -17,26 +17,26 @@
  *
  */
 
-#include "cpu_accelerator.hpp"
+#include "simple_cpu_accelerator.hpp"
 
 #include "../objects.hpp"
 
 
-CpuAccelerator::CpuAccelerator(Objects& objects): MTAcceleratorBase(objects)
+SimpleCpuAccelerator::SimpleCpuAccelerator (Objects* objects): CpuAcceleratorBase(objects)
 {
 
 }
 
 
-CpuAccelerator::~CpuAccelerator()
+SimpleCpuAccelerator::~SimpleCpuAccelerator()
 {
 
 }
 
 
-void CpuAccelerator::forcesFor(std::size_t i, std::vector<XY>& forces) const
+void SimpleCpuAccelerator::forcesFor(std::size_t i, std::vector<XY>& forces) const
 {
-    const std::size_t count = m_objects.size();
+    const std::size_t count = m_objects->size();
 
     for(std::size_t j = i + 1; j < count; j++)
     {
