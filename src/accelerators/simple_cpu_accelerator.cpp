@@ -17,7 +17,7 @@
  *
  */
 
-#include "cpu_accelerator.hpp"
+#include "simple_cpu_accelerator.hpp"
 
 #include "../objects.hpp"
 

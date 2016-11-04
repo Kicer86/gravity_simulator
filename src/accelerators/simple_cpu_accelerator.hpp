@@ -17,8 +17,8 @@
  *
  */
 
-#ifndef CPUACCELERATOR_HPP
-#define CPUACCELERATOR_HPP
+#ifndef SIMPLECPUACCELERATOR_HPP
+#define SIMPLECPUACCELERATOR_HPP
 
 #include <vector>
 
@@ -39,4 +39,4 @@ class SimpleCpuAccelerator: public MTAcceleratorBase
         virtual void forcesFor(std::size_t, std::vector<XY> &) const override;
 };
 
-#endif // CPUACCELERATOR_HPP
+#endif // SIMPLECPUACCELERATOR_HPP
