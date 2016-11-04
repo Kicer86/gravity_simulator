@@ -13,10 +13,10 @@ option(ENABLE_AVX    "Allows to disable AVX extensions even if detected" ON)
 # CPU accelerator (OpenMP friendly)
 
 list(APPEND ACC_SRC
+    cpu_accelerator_base.cpp
+    cpu_accelerator_base.hpp
     simple_cpu_accelerator.cpp
     simple_cpu_accelerator.hpp
-    mt_accelerator_base.cpp
-    mt_accelerator_base.hpp
 )
 
 #detect OpenMP

@@ -17,8 +17,8 @@
  *
  */
 
-#ifndef MTACCELERATOR_BASE_HPP
-#define MTACCELERATOR_BASE_HPP
+#ifndef CPUACCELERATOR_BASE_HPP
+#define CPUACCELERATOR_BASE_HPP
 
 #include <vector>
 
@@ -46,4 +46,4 @@ class CpuAcceleratorBase: public IAccelerator
         virtual void forcesFor(std::size_t, std::vector<XY> &) const = 0;
 };
 
-#endif // MTACCELERATOR_BASE_HPP
+#endif // CPUACCELERATOR_BASE_HPP

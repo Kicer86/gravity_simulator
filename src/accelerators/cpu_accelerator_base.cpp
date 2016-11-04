@@ -17,7 +17,7 @@
  *
  */
 
-#include "mt_accelerator_base.hpp"
+#include "cpu_accelerator_base.hpp"
 
 #include <omp.h>
 
