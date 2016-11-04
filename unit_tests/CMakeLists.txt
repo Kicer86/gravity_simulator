@@ -9,6 +9,10 @@ find_package(GTest REQUIRED)
 
 set(SRC
         accelerators_tests.cpp
+
+        ${PROJECT_SOURCE_DIR}/src/accelerators/avx_accelerator.cpp
+        ${PROJECT_SOURCE_DIR}/src/accelerators/opencl_accelerator.cpp
+        ${PROJECT_SOURCE_DIR}/src/accelerators/simple_cpu_accelerator.cpp
     )
 
 add_executable(accelerators_tests ${SRC})
