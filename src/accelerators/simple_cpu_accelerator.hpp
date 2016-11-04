@@ -27,7 +27,7 @@
 
 class Objects;
 
-class SimpleCpuAccelerator: public MTAcceleratorBase
+class SimpleCpuAccelerator: public CpuAcceleratorBase
 {
     public:
         SimpleCpuAccelerator (Objects &);

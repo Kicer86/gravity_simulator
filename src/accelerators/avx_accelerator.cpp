@@ -62,7 +62,7 @@ namespace utils
 
 
 
-AVXAccelerator::AVXAccelerator(Objects& objects): MTAcceleratorBase(objects)
+AVXAccelerator::AVXAccelerator(Objects& objects): CpuAcceleratorBase (objects)
 {
 
 }

@@ -28,7 +28,7 @@
 
 class Objects;
 
-class AVXAccelerator: public MTAcceleratorBase
+class AVXAccelerator: public CpuAcceleratorBase
 {
     public:
         AVXAccelerator(Objects &);

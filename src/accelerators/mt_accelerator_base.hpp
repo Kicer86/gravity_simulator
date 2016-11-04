@@ -26,13 +26,13 @@
 
 class Objects;
 
-class MTAcceleratorBase: public IAccelerator
+class CpuAcceleratorBase: public IAccelerator
 {
     public:
-        MTAcceleratorBase(Objects &);
-        MTAcceleratorBase(const MTAcceleratorBase &) = delete;
-        ~MTAcceleratorBase();
-        MTAcceleratorBase& operator=(const MTAcceleratorBase &) = delete;
+        CpuAcceleratorBase (Objects &);
+        CpuAcceleratorBase (const CpuAcceleratorBase &) = delete;
+        ~CpuAcceleratorBase();
+        CpuAcceleratorBase& operator=(const CpuAcceleratorBase &) = delete;
 
         virtual std::vector<XY> forces() final;
         std::vector<XY> velocities(const std::vector<XY>& forces, double dt) const;

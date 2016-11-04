@@ -22,7 +22,7 @@
 #include "../objects.hpp"
 
 
-SimpleCpuAccelerator::SimpleCpuAccelerator (Objects& objects): MTAcceleratorBase(objects)
+SimpleCpuAccelerator::SimpleCpuAccelerator (Objects& objects): CpuAcceleratorBase (objects)
 {
 
 }
