@@ -17,26 +17,26 @@
  *
  */
 
-#include "mt_accelerator_base.hpp"
+#include "cpu_accelerator_base.hpp"
 
 #include <omp.h>
 
 #include "../objects.hpp"
 
 
-MTAcceleratorBase::MTAcceleratorBase(Objects& objects): m_objects(objects)
+CpuAcceleratorBase::CpuAcceleratorBase (Objects& objects): m_objects(objects)
 {
 
 }
 
 
-MTAcceleratorBase::~MTAcceleratorBase()
+CpuAcceleratorBase::~CpuAcceleratorBase()
 {
 
 }
 
 
-std::vector<XY> MTAcceleratorBase::forces()
+std::vector<XY> CpuAcceleratorBase::forces()
 {
     const std::size_t objs = m_objects.size();
 
@@ -65,7 +65,7 @@ std::vector<XY> MTAcceleratorBase::forces()
 }
 
 
-XY MTAcceleratorBase::force(std::size_t i, std::size_t j) const
+XY CpuAcceleratorBase::force(std::size_t i, std::size_t j) const
 {
     const BaseType G = 6.6732e-11;
 
@@ -87,7 +87,7 @@ XY MTAcceleratorBase::force(std::size_t i, std::size_t j) const
 }
 
 
-std::vector<XY> MTAcceleratorBase::velocities(const std::vector<XY>& forces, double dt) const
+std::vector<XY> CpuAcceleratorBase::velocities(const std::vector<XY>& forces, double dt) const
 {
     std::vector<XY> result;
     result.reserve(m_objects.size());
@@ -110,7 +110,7 @@ std::vector<XY> MTAcceleratorBase::velocities(const std::vector<XY>& forces, dou
 }
 
 
-std::vector< std::pair< int, int > > MTAcceleratorBase::collisions() const
+std::vector< std::pair< int, int > > CpuAcceleratorBase::collisions() const
 {
     const std::size_t objs = m_objects.size();
 

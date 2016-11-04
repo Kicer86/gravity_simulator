@@ -17,32 +17,26 @@
  *
  */
 
-#include "cpu_accelerator.hpp"
+#ifndef SIMPLECPUACCELERATOR_HPP
+#define SIMPLECPUACCELERATOR_HPP
 
-#include "../objects.hpp"
+#include <vector>
 
+#include "cpu_accelerator_base.hpp"
+#include "../object.hpp"
 
-CpuAccelerator::CpuAccelerator(Objects& objects): MTAcceleratorBase(objects)
+class Objects;
+
+class SimpleCpuAccelerator: public CpuAcceleratorBase
 {
+    public:
+        SimpleCpuAccelerator (Objects &);
+        SimpleCpuAccelerator (const SimpleCpuAccelerator &) = delete;
+        ~SimpleCpuAccelerator();
+        SimpleCpuAccelerator& operator=(const SimpleCpuAccelerator &) = delete;
 
-}
+    private:
+        virtual void forcesFor(std::size_t, std::vector<XY> &) const override;
+};
 
-
-CpuAccelerator::~CpuAccelerator()
-{
-
-}
-
-
-void CpuAccelerator::forcesFor(std::size_t i, std::vector<XY>& forces) const
-{
-    const std::size_t count = m_objects.size();
-
-    for(std::size_t j = i + 1; j < count; j++)
-    {
-        const XY force_vector = force(i, j);
-
-        forces[i] += force_vector;
-        forces[j] += -force_vector;
-    }
-}
+#endif // SIMPLECPUACCELERATOR_HPP

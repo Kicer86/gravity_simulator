@@ -25,7 +25,7 @@
 #include <omp.h>
 
 #include "accelerators/avx_accelerator.hpp"
-#include "accelerators/cpu_accelerator.hpp"
+#include "accelerators/simple_cpu_accelerator.hpp"
 #include "accelerators/opencl_accelerator.hpp"
 
 
