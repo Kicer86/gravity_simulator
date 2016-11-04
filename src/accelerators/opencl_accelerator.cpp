@@ -38,7 +38,7 @@
 // https://anteru.net/blog/2012/11/03/2009/
 
 
-OpenCLAccelerator::OpenCLAccelerator(Objects& objects):
+OpenCLAccelerator::OpenCLAccelerator(Objects* objects):
     m_objects(objects),
     m_program(),
     m_context(),
@@ -127,9 +127,15 @@ OpenCLAccelerator::~OpenCLAccelerator()
 }
 
 
+void OpenCLAccelerator::setObjects(Objects* objects)
+{
+    m_objects = objects;
+}
+
+
 std::vector<XY> OpenCLAccelerator::forces()
 {
-    const int count = m_objects.size();
+    const int count = m_objects->size();
     std::vector<float> host_forceX(count);
     std::vector<float> host_forceY(count);
 
@@ -141,9 +147,9 @@ std::vector<XY> OpenCLAccelerator::forces()
     boost::compute::buffer forceX(m_context, count * sizeof(float));
     boost::compute::buffer forceY(m_context, count * sizeof(float));
 
-    auto objXFuture = queue.enqueue_write_buffer_async(objX, 0, count * sizeof(float), m_objects.getX().data());
-    auto objYFuture = queue.enqueue_write_buffer_async(objY, 0, count * sizeof(float), m_objects.getY().data());
-    auto massFuture = queue.enqueue_write_buffer_async(mass, 0, count * sizeof(float), m_objects.getMass().data());
+    auto objXFuture = queue.enqueue_write_buffer_async(objX, 0, count * sizeof(float), m_objects->getX().data());
+    auto objYFuture = queue.enqueue_write_buffer_async(objY, 0, count * sizeof(float), m_objects->getY().data());
+    auto massFuture = queue.enqueue_write_buffer_async(mass, 0, count * sizeof(float), m_objects->getMass().data());
     auto forceXFuture = queue.enqueue_write_buffer_async(forceX, 0, count * sizeof(float), host_forceX.data());
     auto forceYFuture = queue.enqueue_write_buffer_async(forceY, 0, count * sizeof(float), host_forceY.data());
 
@@ -181,12 +187,12 @@ std::vector<XY> OpenCLAccelerator::forces()
 std::vector<XY> OpenCLAccelerator::velocities(const std::vector<XY>& forces, double dt) const
 {
     std::vector<XY> result;
-    result.reserve(m_objects.size());
+    result.reserve(m_objects->size());
 
-    for(std::size_t i = 0; i < m_objects.size(); i++)
+    for(std::size_t i = 0; i < m_objects->size(); i++)
     {
         const XY& dF = forces[i];
-        const Object& o = m_objects[i];
+        const Object& o = (*m_objects)[i];
 
         // F=am ⇒ a = F/m
         const XY a = dF / o.mass();
@@ -203,7 +209,7 @@ std::vector<XY> OpenCLAccelerator::velocities(const std::vector<XY>& forces, dou
 
 std::vector<std::pair<int, int>> OpenCLAccelerator::collisions() const
 {
-    const std::size_t objs = m_objects.size();
+    const std::size_t objs = m_objects->size();
 
     const int threads = omp_get_max_threads();
     std::vector< std::vector< std::pair<int, int> > > toColide(threads);
@@ -213,12 +219,12 @@ std::vector<std::pair<int, int>> OpenCLAccelerator::collisions() const
     for(std::size_t i = 0; i < objs - 1; i++)
         for(std::size_t j = i + 1; j < objs; j++)
         {
-            const float x1 = m_objects.getX()[i];
-            const float y1 = m_objects.getY()[i];
-            const float x2 = m_objects.getX()[j];
-            const float y2 = m_objects.getY()[j];
-            const float r1 = m_objects.getRadius()[i];
-            const float r2 = m_objects.getRadius()[j];
+            const float x1 = m_objects->getX()[i];
+            const float y1 = m_objects->getY()[i];
+            const float x2 = m_objects->getX()[j];
+            const float y2 = m_objects->getY()[j];
+            const float r1 = m_objects->getRadius()[i];
+            const float r2 = m_objects->getRadius()[j];
 
             const float dist = utils::distance(x1, y1, x2, y2);
 

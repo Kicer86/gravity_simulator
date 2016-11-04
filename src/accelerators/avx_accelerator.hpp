@@ -31,7 +31,7 @@ class Objects;
 class AVXAccelerator: public CpuAcceleratorBase
 {
     public:
-        AVXAccelerator(Objects &);
+        AVXAccelerator(Objects * = nullptr);
         AVXAccelerator(const AVXAccelerator &) = delete;
         ~AVXAccelerator();
 

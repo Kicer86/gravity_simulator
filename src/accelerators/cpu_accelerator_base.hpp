@@ -29,17 +29,19 @@ class Objects;
 class CpuAcceleratorBase: public IAccelerator
 {
     public:
-        CpuAcceleratorBase (Objects &);
+        CpuAcceleratorBase (Objects * = nullptr);
         CpuAcceleratorBase (const CpuAcceleratorBase &) = delete;
         ~CpuAcceleratorBase();
         CpuAcceleratorBase& operator=(const CpuAcceleratorBase &) = delete;
+
+        void setObjects(Objects *) final;
 
         virtual std::vector<XY> forces() final;
         std::vector<XY> velocities(const std::vector<XY>& forces, double dt) const;
         virtual std::vector< std::pair<int, int> > collisions() const final;
 
     protected:
-        Objects& m_objects;
+        Objects* m_objects;
 
         XY force(std::size_t, std::size_t) const;
 

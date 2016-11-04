@@ -30,7 +30,7 @@ class Objects;
 class SimpleCpuAccelerator: public CpuAcceleratorBase
 {
     public:
-        SimpleCpuAccelerator (Objects &);
+        SimpleCpuAccelerator (Objects * = nullptr);
         SimpleCpuAccelerator (const SimpleCpuAccelerator &) = delete;
         ~SimpleCpuAccelerator();
         SimpleCpuAccelerator& operator=(const SimpleCpuAccelerator &) = delete;

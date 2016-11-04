@@ -22,7 +22,7 @@
 #include "../objects.hpp"
 
 
-SimpleCpuAccelerator::SimpleCpuAccelerator (Objects& objects): CpuAcceleratorBase (objects)
+SimpleCpuAccelerator::SimpleCpuAccelerator (Objects* objects): CpuAcceleratorBase(objects)
 {
 
 }
@@ -36,7 +36,7 @@ SimpleCpuAccelerator::~SimpleCpuAccelerator()
 
 void SimpleCpuAccelerator::forcesFor(std::size_t i, std::vector<XY>& forces) const
 {
-    const std::size_t count = m_objects.size();
+    const std::size_t count = m_objects->size();
 
     for(std::size_t j = i + 1; j < count; j++)
     {
