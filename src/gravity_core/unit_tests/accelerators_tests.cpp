@@ -71,9 +71,9 @@ TEST(AcceleratorsCalculationsTest, Scenario_32SatellitesAroundBigOne)
 
     std::array<IAccelerator *, 3> accelerators = { &simple_cpu_accelerator, &avx_accelerator, &opencl_accelerator };
 
-    // verify forces correctness
     for(IAccelerator* accelerator: accelerators)
     {
+        // prepare objects
         Objects objects;
 
         objects.insert( Object(0, 0, 5.9736e24, 6371e3), 0);
@@ -81,7 +81,10 @@ TEST(AcceleratorsCalculationsTest, Scenario_32SatellitesAroundBigOne)
         for(int i = 1; i < 32; i++)
             objects.insert( Object(384400e3 * i/10, 0, 7.347673e22,  1737.1e3, 0, 1.022e3 * (i%2? 1: -1)), i );
 
+        // setup accelerator
         accelerator->setObjects(&objects);
+
+        // verify forces correctness
         const std::vector<XY> forces = accelerator->forces();
 
         for(std::size_t i = 0; i < forces.size(); i++)
@@ -90,5 +93,13 @@ TEST(AcceleratorsCalculationsTest, Scenario_32SatellitesAroundBigOne)
             EXPECT_DOUBLE_EQ( forces[i].y, forces_expected[i].y );
         }
 
+        // verify velocities for Δt = 0
+        const std::vector<XY> velocities = accelerator->velocities(forces, 0);
+
+        for(std::size_t i = 0; i < velocities.size(); i++)
+        {
+            EXPECT_DOUBLE_EQ( velocities[i].x, 0 );
+            EXPECT_DOUBLE_EQ( velocities[i].y, 0 );
+        }
     }
 }
