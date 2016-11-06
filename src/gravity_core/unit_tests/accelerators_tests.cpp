@@ -69,6 +69,42 @@ TEST(AcceleratorsCalculationsTest, Scenario_32SatellitesAroundBigOne)
         {-4.1369798775797501e+20, 0}
     };
 
+    std::vector<XY> velocities1_expected =
+    {
+        {0.0053530721925199032, 0},
+        {-0.26442655920982361, 0},
+        {-0.065416432917118073, 0},
+        {-0.02878103218972683, 0},
+        {-0.016039855778217316, 0},
+        {-0.010181829333305359, 0},
+        {-0.0070222076028585434, 0},
+        {-0.005131550133228302, 0},
+        {-0.0039146468043327332, 0},
+        {-0.0030880849808454514, 0},
+        {-0.0025030984543263912, 0},
+        {-0.0020755995064973831, 0},
+        {-0.0017552104545757174, 0},
+        {-0.0015103094046935439, 0},
+        {-0.0013202870031818748, 0},
+        {-0.0011712947161868215, 0},
+        {-0.0010538131464272738, 0},
+        {-0.00096119183581322432, 0},
+        {-0.00088876468362286687, 0},
+        {-0.00083330151392146945, 0},
+        {-0.00079267506953328848, 0},
+        {-0.0007656922098249197, 0},
+        {-0.00075205130269750953, 0},
+        {-0.00075245898915454745, 0},
+        {-0.00076896796235814691, 0},
+        {-0.00080573000013828278, 0},
+        {-0.00087064935360103846, 0},
+        {-0.00097927649039775133, 0},
+        {-0.0011652533430606127, 0},
+        {-0.0015149025712162256, 0},
+        {-0.0023273697588592768, 0},
+        {-0.0056303269229829311, 0}
+    };
+
     std::array<IAccelerator *, 3> accelerators = { &simple_cpu_accelerator, &avx_accelerator, &opencl_accelerator };
 
     for(IAccelerator* accelerator: accelerators)
@@ -94,12 +130,21 @@ TEST(AcceleratorsCalculationsTest, Scenario_32SatellitesAroundBigOne)
         }
 
         // verify velocities for Δt = 0
-        const std::vector<XY> velocities = accelerator->velocities(forces, 0);
+        const std::vector<XY> velocities0 = accelerator->velocities(forces, 0);
 
-        for(std::size_t i = 0; i < velocities.size(); i++)
+        for(std::size_t i = 0; i < velocities0.size(); i++)
         {
-            EXPECT_DOUBLE_EQ( velocities[i].x, 0 );
-            EXPECT_DOUBLE_EQ( velocities[i].y, 0 );
+            EXPECT_DOUBLE_EQ( velocities0[i].x, 0 );
+            EXPECT_DOUBLE_EQ( velocities0[i].y, 0 );
+        }
+
+        // verify velocities for Δt = 1
+        const std::vector<XY> velocities1 = accelerator->velocities(forces, 1);
+
+        for(std::size_t i = 0; i < velocities1.size(); i++)
+        {
+            EXPECT_DOUBLE_EQ( velocities1[i].x, velocities1_expected[i].x );
+            EXPECT_DOUBLE_EQ( velocities1[i].y, velocities1_expected[i].y );
         }
     }
 }
