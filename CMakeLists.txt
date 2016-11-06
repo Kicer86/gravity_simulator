@@ -3,8 +3,9 @@ project(gravity_simulator)
 
 cmake_minimum_required(VERSION 3.0)
 
+include(FeatureSummary)
+
 add_subdirectory(src)
-add_subdirectory(unit_tests)
 
 
 if(UNIX)

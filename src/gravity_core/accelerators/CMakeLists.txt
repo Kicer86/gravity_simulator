@@ -115,3 +115,6 @@ add_library(accelerators OBJECT ${ACC_SRC})
 # 'Export' flags to parent scope
 set(ACC_COMPILATOR_FLAGS ${ACC_COMPILATOR_FLAGS} PARENT_SCOPE)
 set(ACC_LINKER_FLAGS ${ACC_LINKER_FLAGS} PARENT_SCOPE)
+
+# unit tests
+#add_subdirectory(unit_tests)
