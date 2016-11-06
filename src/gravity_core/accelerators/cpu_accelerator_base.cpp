@@ -19,6 +19,7 @@
 
 #include "cpu_accelerator_base.hpp"
 
+#include <cassert>
 #include <omp.h>
 
 #include "../objects.hpp"
@@ -44,6 +45,8 @@ void CpuAcceleratorBase::setObjects(Objects* objects)
 
 std::vector<XY> CpuAcceleratorBase::forces()
 {
+    assert(m_objects != nullptr);
+
     const std::size_t objs = m_objects->size();
 
     std::vector<XY> forces(objs);
@@ -95,6 +98,8 @@ XY CpuAcceleratorBase::force(std::size_t i, std::size_t j) const
 
 std::vector<XY> CpuAcceleratorBase::velocities(const std::vector<XY>& forces, double dt) const
 {
+    assert(m_objects != nullptr);
+
     const std::size_t objs = m_objects->size();
     std::vector<XY> result;
     result.reserve(objs);
@@ -119,6 +124,8 @@ std::vector<XY> CpuAcceleratorBase::velocities(const std::vector<XY>& forces, do
 
 std::vector< std::pair< int, int > > CpuAcceleratorBase::collisions() const
 {
+    assert(m_objects != nullptr);
+
     const std::size_t objs = m_objects->size();
 
     const int threads = omp_get_max_threads();
