@@ -23,3 +23,6 @@ target_link_libraries(gravity_core
                       PRIVATE
                         ${ACC_LINKER_FLAGS}
 )
+
+# unit tests
+add_subdirectory(unit_tests)

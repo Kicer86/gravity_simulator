@@ -1,10 +1,10 @@
 
 #include <gmock/gmock.h>
 
-#include "simulation_engine.hpp"
-#include "accelerators/simple_cpu_accelerator.hpp"
-#include "accelerators/avx_accelerator.hpp"
-#include "accelerators/opencl_accelerator.hpp"
+#include "../simulation_engine.hpp"
+#include "../accelerators/simple_cpu_accelerator.hpp"
+#include "../accelerators/avx_accelerator.hpp"
+#include "../accelerators/opencl_accelerator.hpp"
 
 
 /*
