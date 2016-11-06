@@ -90,8 +90,8 @@ add_feature_info(OpenCL_accelerator OPENCL_ENABLED  "speeds up calculations.")
 
 if(OPENMP_FOUND AND ENABLE_OPENMP)
 
-    set_source_files_properties(cpu_accelerator.cpp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-    set_source_files_properties(mt_accelerator_base.cpp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+    set_source_files_properties(cpu_accelerator_base.cpp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+    set_source_files_properties(simple_cpu_accelerator.cpp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
     set_source_files_properties(opencl_accelerator.cpp PROPERTIES COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
 
     list(APPEND ACC_LINKER_FLAGS ${OpenMP_CXX_FLAGS})
