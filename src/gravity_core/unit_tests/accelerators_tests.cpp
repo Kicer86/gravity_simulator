@@ -71,6 +71,7 @@ TEST(AcceleratorsCalculationsTest, Scenario_32SatellitesAroundBigOne)
 
     std::array<IAccelerator *, 3> accelerators = { &simple_cpu_accelerator, &avx_accelerator, &opencl_accelerator };
 
+    // verify forces correctness
     for(IAccelerator* accelerator: accelerators)
     {
         Objects objects;
