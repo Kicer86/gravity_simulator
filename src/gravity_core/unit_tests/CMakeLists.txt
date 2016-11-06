@@ -9,9 +9,7 @@ find_package(GTest REQUIRED)
 
 set(SRC
         accelerators_tests.cpp
-
-        $<TARGET_OBJECTS:accelerators>
-    )
+)
 
 add_executable(accelerators_tests ${SRC})
 
@@ -21,6 +19,7 @@ target_link_libraries(accelerators_tests
                             ${GMOCK_LIBRARY}
                             ${CMAKE_THREAD_LIBS_INIT}
                             ${ACC_LINKER_FLAGS}
+                            gravity_core
 )
 
 target_include_directories(accelerators_tests
