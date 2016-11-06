@@ -105,7 +105,7 @@ TEST(AcceleratorsCalculationsTest, Scenario_32SatellitesAroundBigOne)
         {-0.0056303269229829311, 0}
     };
 
-    std::array<IAccelerator *, 3> accelerators = { &simple_cpu_accelerator, &avx_accelerator, &opencl_accelerator };
+    std::array<IAccelerator *, 3> accelerators = { &simple_cpu_accelerator, &avx_accelerator };
 
     for(IAccelerator* accelerator: accelerators)
     {
