@@ -61,7 +61,7 @@ add_feature_info(AVX_accelerator AVX_FOUND "speeds up calculations.")
 #detect OpenCL (OpenMP friendly)
 
 find_package(OpenCL)
-find_package(Boost)
+find_package(Boost 1.60)
 
 set(OPENCL_ENABLED 0)
 
