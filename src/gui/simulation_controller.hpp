@@ -30,8 +30,6 @@
 #include "simulation_engine.hpp"
 
 #include "accelerators/avx_accelerator.hpp"
-#include "accelerators/simple_cpu_accelerator.hpp"
-#include "accelerators/opencl_accelerator.hpp"
 
 class ObjectsScene;
 
