@@ -25,4 +25,6 @@ target_link_libraries(gravity_core
 )
 
 # unit tests
-add_subdirectory(unit_tests)
+if(BUILD_TESTS)
+    add_subdirectory(unit_tests)
+endif()

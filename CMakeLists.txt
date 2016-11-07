@@ -5,6 +5,9 @@ cmake_minimum_required(VERSION 3.0)
 
 include(FeatureSummary)
 
+option(BUILD_TESTS "Build unit tests" OFF)
+add_feature_info("Build tests" BUILD_TESTS "Enables build of tests. Feature controled by BUILD_TESTS variable.")
+
 add_subdirectory(src)
 
 
@@ -27,3 +30,6 @@ if(UNIX)
     endif()
 
 endif()
+
+
+feature_summary(WHAT ALL)
