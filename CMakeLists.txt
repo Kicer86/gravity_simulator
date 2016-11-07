@@ -8,6 +8,10 @@ include(FeatureSummary)
 option(BUILD_TESTS "Build unit tests" OFF)
 add_feature_info("Build tests" BUILD_TESTS "Enables build of tests. Feature controled by BUILD_TESTS variable.")
 
+if(BUILD_TESTS)
+    enable_testing()
+endif()
+
 add_subdirectory(src)
 
 
@@ -33,3 +37,11 @@ endif()
 
 
 feature_summary(WHAT ALL)
+
+#unit tests
+if(BUILD_TESTS)
+    add_custom_target(RunUnitTests ALL
+                      COMMAND ctest
+                      DEPENDS accelerators_tests
+                     )
+endif()
