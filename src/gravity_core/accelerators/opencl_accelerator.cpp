@@ -87,6 +87,9 @@ OpenCLAccelerator::OpenCLAccelerator(Objects* objects):
             const int i = get_global_id(0);
             const float G = 6.6732e-11;
 
+            forceX[i] = 0;
+            forceY[i] = 0;
+
             for(int j = 0; j < count; j++)
             {
                 if (i == j)
@@ -144,14 +147,12 @@ std::vector<XY> OpenCLAccelerator::forces()
     boost::compute::buffer objX(m_context, count * sizeof(float), boost::compute::buffer::read_only);
     boost::compute::buffer objY(m_context, count * sizeof(float), boost::compute::buffer::read_only);
     boost::compute::buffer mass(m_context, count * sizeof(float), boost::compute::buffer::read_only);
-    boost::compute::buffer forceX(m_context, count * sizeof(float) , boost::compute::buffer::write_only);
+    boost::compute::buffer forceX(m_context, count * sizeof(float), boost::compute::buffer::write_only);
     boost::compute::buffer forceY(m_context, count * sizeof(float), boost::compute::buffer::write_only);
 
     auto objXFuture = queue.enqueue_write_buffer_async(objX, 0, count * sizeof(float), m_objects->getX().data());
     auto objYFuture = queue.enqueue_write_buffer_async(objY, 0, count * sizeof(float), m_objects->getY().data());
     auto massFuture = queue.enqueue_write_buffer_async(mass, 0, count * sizeof(float), m_objects->getMass().data());
-    auto forceXFuture = queue.enqueue_write_buffer_async(forceX, 0, count * sizeof(float), host_forceX.data());
-    auto forceYFuture = queue.enqueue_write_buffer_async(forceY, 0, count * sizeof(float), host_forceY.data());
 
     boost::compute::kernel kernel(m_program, "forces");
 
@@ -165,8 +166,6 @@ std::vector<XY> OpenCLAccelerator::forces()
     objXFuture.wait();
     objYFuture.wait();
     massFuture.wait();
-    forceXFuture.wait();
-    forceYFuture.wait();
 
     queue.enqueue_1d_range_kernel(kernel, 0, count, 0);
 
