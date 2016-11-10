@@ -87,31 +87,34 @@ OpenCLAccelerator::OpenCLAccelerator(Objects* objects):
             const int i = get_global_id(0);
             const float G = 6.6732e-11;
 
-            forceX[i] = 0;
-            forceY[i] = 0;
-
-            for(int j = 0; j < count; j++)
+            if (i < count)
             {
-                if (i == j)
-                    continue;
+                forceX[i] = 0;
+                forceY[i] = 0;
 
-                const float x1 = objX[i];
-                const float y1 = objY[i];
-                const float x2 = objX[j];
-                const float y2 = objY[j];
-                const float m1 = mass[i];
-                const float m2 = mass[j];
+                for(int j = 0; j < count; j++)
+                {
+                    if (i == j)
+                        continue;
 
-                const float dist = point_distance(x1, y1, x2, y2);
-                const float dist2 = dist * dist;
-                const float Fg = (G * m1) * (m2 / dist2);
+                    const float x1 = objX[i];
+                    const float y1 = objY[i];
+                    const float x2 = objX[j];
+                    const float y2 = objY[j];
+                    const float m1 = mass[i];
+                    const float m2 = mass[j];
 
-                struct XY force_vector = unit_vector(x1, y1, x2, y2);
-                force_vector.x *= Fg;
-                force_vector.y *= Fg;
+                    const float dist = point_distance(x1, y1, x2, y2);
+                    const float dist2 = dist * dist;
+                    const float Fg = (G * m1) * (m2 / dist2);
 
-                forceX[i] += force_vector.x;
-                forceY[i] += force_vector.y;
+                    struct XY force_vector = unit_vector(x1, y1, x2, y2);
+                    force_vector.x *= Fg;
+                    force_vector.y *= Fg;
+
+                    forceX[i] += force_vector.x;
+                    forceY[i] += force_vector.y;
+                }
             }
         }
     );
@@ -167,7 +170,12 @@ std::vector<XY> OpenCLAccelerator::forces()
     objYFuture.wait();
     massFuture.wait();
 
-    queue.enqueue_1d_range_kernel(kernel, 0, count, 0);
+    const std::size_t global_size = count % 64 == 0? count: (count + 64) & (-64);
+
+    queue.enqueue_nd_range_kernel(kernel,
+                                  boost::compute::extents<1>(0),
+                                  boost::compute::extents<1>(global_size),
+                                  boost::compute::extents<1>(64));
 
     auto forceXReadFuture = queue.enqueue_read_buffer_async(forceX, 0, count * sizeof(float), host_forceX.data());
     auto forceYReadFuture = queue.enqueue_read_buffer_async(forceY, 0, count * sizeof(float), host_forceY.data());
