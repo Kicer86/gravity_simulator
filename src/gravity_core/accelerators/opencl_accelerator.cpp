@@ -141,11 +141,11 @@ std::vector<XY> OpenCLAccelerator::forces()
 
     boost::compute::command_queue queue(m_context, m_device);
 
-    boost::compute::buffer objX(m_context, count * sizeof(float));
-    boost::compute::buffer objY(m_context, count * sizeof(float));
-    boost::compute::buffer mass(m_context, count * sizeof(float));
-    boost::compute::buffer forceX(m_context, count * sizeof(float));
-    boost::compute::buffer forceY(m_context, count * sizeof(float));
+    boost::compute::buffer objX(m_context, count * sizeof(float), boost::compute::buffer::read_only);
+    boost::compute::buffer objY(m_context, count * sizeof(float), boost::compute::buffer::read_only);
+    boost::compute::buffer mass(m_context, count * sizeof(float), boost::compute::buffer::read_only);
+    boost::compute::buffer forceX(m_context, count * sizeof(float) , boost::compute::buffer::write_only);
+    boost::compute::buffer forceY(m_context, count * sizeof(float), boost::compute::buffer::write_only);
 
     auto objXFuture = queue.enqueue_write_buffer_async(objX, 0, count * sizeof(float), m_objects->getX().data());
     auto objYFuture = queue.enqueue_write_buffer_async(objY, 0, count * sizeof(float), m_objects->getY().data());
