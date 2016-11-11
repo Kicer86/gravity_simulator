@@ -72,6 +72,8 @@ if(OpenCL_FOUND AND Boost_FOUND)
                             ${Boost_INCLUDE_DIRS}
     )
 
+    include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
     find_program(XXD xxd)
 
     if(NOT XXD)
