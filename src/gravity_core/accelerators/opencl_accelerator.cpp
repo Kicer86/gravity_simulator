@@ -170,12 +170,14 @@ std::vector<XY> OpenCLAccelerator::forces()
     objYFuture.wait();
     massFuture.wait();
 
-    const std::size_t global_size = count % 64 == 0? count: (count + 64) & (-64);
+    const int group_size = 1 << 6;
+
+    const std::size_t global_size = count % group_size == 0? count: (count + group_size) & (-group_size);
 
     queue.enqueue_nd_range_kernel(kernel,
                                   boost::compute::extents<1>(0),
                                   boost::compute::extents<1>(global_size),
-                                  boost::compute::extents<1>(64));
+                                  boost::compute::extents<1>(group_size));
 
     auto forceXReadFuture = queue.enqueue_read_buffer_async(forceX, 0, count * sizeof(float), host_forceX.data());
     auto forceYReadFuture = queue.enqueue_read_buffer_async(forceY, 0, count * sizeof(float), host_forceY.data());
