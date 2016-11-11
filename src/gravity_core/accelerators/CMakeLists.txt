@@ -72,9 +72,28 @@ if(OpenCL_FOUND AND Boost_FOUND)
                             ${Boost_INCLUDE_DIRS}
     )
 
+    find_program(XXD xxd)
+
+    if(NOT XXD)
+        message(FATAL_ERROR "Could not find 'xxd' tool")
+    endif()
+
+    add_custom_command(OUTPUT forces_kernel.hpp
+                       COMMAND ${XXD} -i forces_kernel.cl > ${CMAKE_CURRENT_BINARY_DIR}/forces_kernel.hpp
+                       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                       DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/forces_kernel.cl
+    )
+
+    add_custom_target(forces_kernel
+                      DEPENDS forces_kernel.hpp
+    )
+
+    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/forces_kernel.hpp PROPERTIES GENERATED TRUE)
+
     list(APPEND ACC_SRC
         opencl_accelerator.cpp
         opencl_accelerator.hpp
+        ${CMAKE_CURRENT_BINARY_DIR}/forces_kernel.hpp
     )
 
     list(APPEND ACC_LINKER_FLAGS ${OpenCL_LIBRARIES})
