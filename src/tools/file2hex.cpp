@@ -8,6 +8,32 @@
 
 #include <boost/program_options/errors.hpp>
 
+int generateHex(const boost::program_options::variables_map& options)
+{
+    const std::string input_file_path = options["input"].as<std::string>();
+    const std::string output_file_path = options["output"].as<std::string>();
+
+    std::fstream input_file(input_file_path, std::ios::in | std::ios::binary);
+
+    if (input_file.fail())
+    {
+        std::cerr << "Could not open file " << input_file_path << " for reading" << std::endl;
+        return 1;
+    }
+
+    std::fstream output_file(output_file_path, std::ios::out | std::ios::trunc);
+
+    if (output_file.fail())
+    {
+        std::cerr << "Could not open file " << input_file_path << " for writing" << std::endl;
+        return 1;
+    }
+
+
+
+    return 0;
+}
+
 int main(int argc, char** argv)
 {
     boost::program_options::options_description description("Options");
@@ -40,23 +66,5 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    const std::string input_file_path = vm["input"].as<std::string>();
-    const std::string output_file_path = vm["output"].as<std::string>();
-
-    std::fstream input_file(input_file_path, std::ios::in);
-
-    if (input_file.fail())
-    {
-        std::cerr << "Could not open file " << input_file_path << " for reading" << std::endl;
-        return 1;
-    }
-
-    std::fstream output_file(output_file_path, std::ios::out | std::ios::trunc);
-
-    if (output_file.fail())
-    {
-        std::cerr << "Could not open file " << input_file_path << " for writing" << std::endl;
-        return 1;
-    }
-
+    return generateHex(vm);
 }
