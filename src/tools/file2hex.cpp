@@ -2,11 +2,14 @@
 #include <iostream>
 #include <fstream>
 
+#include <boost/algorithm/string/replace.hpp>
+
+#include <boost/filesystem.hpp>
+
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 #include <boost/program_options/parsers.hpp>
 
-#include <boost/program_options/errors.hpp>
 
 int generateHex(const boost::program_options::variables_map& options)
 {
@@ -29,7 +32,36 @@ int generateHex(const boost::program_options::variables_map& options)
         return 1;
     }
 
+    boost::filesystem::path input_path(input_file_path);
+    std::string input_file_name = input_path.filename().string();
+    boost::algorithm::replace_all(input_file_name, ".", "_");
 
+    output_file << std::endl;
+    output_file << "const char* " << input_file_name << " =" << std::endl;
+    output_file << "{ " << std::endl;
+
+    int c = 0;
+    for(;;)
+    {
+        const std::char_traits<char>::int_type in = input_file.get();
+        if (in == std::char_traits<char>::eof() )
+            break;
+
+        if (c == 0)
+            output_file << '\t';
+
+        output_file << in << ", ";
+
+        c++;
+        if (c == 32)
+        {
+            output_file << std::endl;
+            c = 0;
+        }
+    }
+
+    output_file << std::endl;
+    output_file << "};" << std::endl;
 
     return 0;
 }
