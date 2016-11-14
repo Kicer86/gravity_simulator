@@ -59,7 +59,7 @@ int generateHex(const boost::program_options::variables_map& options)
             c = 0;
         }
     }
-
+    output_file << '0';
     output_file << std::endl;
     output_file << "};" << std::endl;
 
