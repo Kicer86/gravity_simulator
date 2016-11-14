@@ -17,11 +17,11 @@
  *
  */
 
+#define BOOST_COMPUTE_DEBUG_KERNEL_COMPILATION
+
 #include "opencl_accelerator.hpp"
 
 #include "omp.h"
-
-#define BOOST_COMPUTE_DEBUG_KERNEL_COMPILATION
 
 #include <boost/compute/core.hpp>
 #include <boost/compute/algorithm/copy.hpp>
@@ -45,11 +45,9 @@ OpenCLAccelerator::OpenCLAccelerator(Objects* objects):
     m_context(),
     m_device()
 {
-    const char* kernel_source = reinterpret_cast<const char *>( forces_kernel_cl );
-
     m_device = boost::compute::system::default_device();
     m_context = boost::compute::context(m_device);
-    m_program = boost::compute::program::create_with_source(kernel_source, m_context);
+    m_program = boost::compute::program::create_with_source(forces_kernel_cl, m_context);
 
     m_program.build();
 }
@@ -70,16 +68,14 @@ void OpenCLAccelerator::setObjects(Objects* objects)
 std::vector<XY> OpenCLAccelerator::forces()
 {
     const int count = m_objects->size();
-    std::vector<float> host_forceX(count);
-    std::vector<float> host_forceY(count);
+    std::vector<XY> host_force(count);
 
     boost::compute::command_queue queue(m_context, m_device);
 
     boost::compute::buffer objX(m_context, count * sizeof(float), boost::compute::buffer::read_only);
     boost::compute::buffer objY(m_context, count * sizeof(float), boost::compute::buffer::read_only);
     boost::compute::buffer mass(m_context, count * sizeof(float), boost::compute::buffer::read_only);
-    boost::compute::buffer forceX(m_context, count * sizeof(float), boost::compute::buffer::write_only);
-    boost::compute::buffer forceY(m_context, count * sizeof(float), boost::compute::buffer::write_only);
+    boost::compute::buffer force(m_context, count * sizeof(XY), boost::compute::buffer::write_only);
 
     auto objXFuture = queue.enqueue_write_buffer_async(objX, 0, count * sizeof(float), m_objects->getX().data());
     auto objYFuture = queue.enqueue_write_buffer_async(objY, 0, count * sizeof(float), m_objects->getY().data());
@@ -90,9 +86,8 @@ std::vector<XY> OpenCLAccelerator::forces()
     kernel.set_arg(0, objX);
     kernel.set_arg(1, objY);
     kernel.set_arg(2, mass);
-    kernel.set_arg(3, forceX);
-    kernel.set_arg(4, forceY);
-    kernel.set_arg(5, count);
+    kernel.set_arg(3, force);
+    kernel.set_arg(4, count);
 
     objXFuture.wait();
     objYFuture.wait();
@@ -107,17 +102,11 @@ std::vector<XY> OpenCLAccelerator::forces()
                                   boost::compute::extents<1>(global_size),
                                   boost::compute::extents<1>(group_size));
 
-    auto forceXReadFuture = queue.enqueue_read_buffer_async(forceX, 0, count * sizeof(float), host_forceX.data());
-    auto forceYReadFuture = queue.enqueue_read_buffer_async(forceY, 0, count * sizeof(float), host_forceY.data());
+    auto forceReadFuture = queue.enqueue_read_buffer_async(force, 0, count * sizeof(XY), host_force.data());
 
-    forceXReadFuture.wait();
-    forceYReadFuture.wait();
+    forceReadFuture.wait();
 
-    std::vector<XY> result(count);
-    for(int i = 0; i < count; i++)
-        result[i] = XY(host_forceX[i], host_forceY[i]);
-
-    return result;
+    return host_force;
 }
 
 

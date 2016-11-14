@@ -32,8 +32,7 @@ struct XY unit_vector(float x1, float y1, float x2, float y2)
 __kernel void forces(__global const float* objX,
                         __global const float* objY,
                         __global const float* mass,
-                        __global float* forceX,
-                        __global float* forceY,
+                        __global struct XY* force,
                         const int count
                     )
 {
@@ -42,8 +41,8 @@ __kernel void forces(__global const float* objX,
 
     if (i < count)
     {
-        forceX[i] = 0;
-        forceY[i] = 0;
+        force[i].x = 0;
+        force[i].y = 0;
 
         for(int j = 0; j < count; j++)
         {
@@ -65,8 +64,8 @@ __kernel void forces(__global const float* objX,
             force_vector.x *= Fg;
             force_vector.y *= Fg;
 
-            forceX[i] += force_vector.x;
-            forceY[i] += force_vector.y;
+            force[i].x += force_vector.x;
+            force[i].y += force_vector.y;
         }
     }
 }
