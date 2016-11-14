@@ -30,10 +30,10 @@ struct XY unit_vector(float x1, float y1, float x2, float y2)
 
 
 __kernel void forces(__global const float* objX,
-                        __global const float* objY,
-                        __global const float* mass,
-                        __global struct XY* force,
-                        const int count
+                     __global const float* objY,
+                     __global const float* mass,
+                     __global struct XY* force,
+                     const int count
                     )
 {
     const int i = get_global_id(0);
