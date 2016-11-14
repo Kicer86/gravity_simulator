@@ -37,7 +37,7 @@ int generateHex(const boost::program_options::variables_map& options)
     boost::algorithm::replace_all(input_file_name, ".", "_");
 
     output_file << std::endl;
-    output_file << "const char* " << input_file_name << " =" << std::endl;
+    output_file << "const char " << input_file_name << "[] =" << std::endl;
     output_file << "{ " << std::endl;
 
     int c = 0;
