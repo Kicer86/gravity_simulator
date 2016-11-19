@@ -16,7 +16,7 @@ int generateHex(const boost::program_options::variables_map& options)
     const std::string input_file_path = options["input"].as<std::string>();
     const std::string output_file_path = options["output"].as<std::string>();
 
-    std::fstream input_file(input_file_path, std::ios::in | std::ios::binary);
+    std::fstream input_file(input_file_path, std::ios_base::in | std::ios_base::binary);
 
     if (input_file.fail())
     {
@@ -24,7 +24,7 @@ int generateHex(const boost::program_options::variables_map& options)
         return 1;
     }
 
-    std::fstream output_file(output_file_path, std::ios::out | std::ios::trunc);
+    std::fstream output_file(output_file_path, std::ios_base::out | std::ios_nase::trunc);
 
     if (output_file.fail())
     {
