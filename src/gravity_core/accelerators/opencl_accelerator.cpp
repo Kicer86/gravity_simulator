@@ -95,7 +95,7 @@ std::vector<XY> OpenCLAccelerator::forces()
     objYFuture.wait();
     massFuture.wait();
 
-    const int group_size = 1 << 6;
+    const int group_size = 1 << 5;
 
     const std::size_t global_size = count % group_size == 0? count: (count + group_size) & (-group_size);
 
