@@ -24,7 +24,7 @@ int generateHex(const boost::program_options::variables_map& options)
         return 1;
     }
 
-    std::fstream output_file(output_file_path, std::ios_base::out | std::ios_nase::trunc);
+    std::fstream output_file(output_file_path, std::ios_base::out | std::ios_base::trunc);
 
     if (output_file.fail())
     {
