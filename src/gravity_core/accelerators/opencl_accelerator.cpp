@@ -50,6 +50,8 @@ OpenCLAccelerator::OpenCLAccelerator(Objects* objects):
     m_program = boost::compute::program::create_with_source(forces_kernel_cl, m_context);
 
     m_program.build();
+
+    std::cout << "OpenCL device: " << m_device.name() << std::endl;
 }
 
 
