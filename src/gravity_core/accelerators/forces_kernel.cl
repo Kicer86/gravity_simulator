@@ -1,26 +1,10 @@
 
-struct XY
+
+float2 unit_vector(float2 p1, float2 p2)
 {
-    float x;
-    float y;
-};
+    float2 v = p2 - p1;
 
-
-float point_distance(float x1, float y1, float x2, float y2)
-{
-    const float dist = sqrt( (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) );
-
-    return dist;
-}
-
-
-struct XY unit_vector(float x1, float y1, float x2, float y2)
-{
-    struct XY v;
-    v.x = x2 - x1;
-    v.y = y2 - y1;
-
-    const float dist = point_distance(x1, y1, x2, y2);
+    const float dist = length(v);
 
     v.x /= dist;
     v.y /= dist;
@@ -32,7 +16,7 @@ struct XY unit_vector(float x1, float y1, float x2, float y2)
 kernel void forces(global const float* objX,
                    global const float* objY,
                    global const float* mass,
-                   global struct XY* force,
+                   global float2* force,
                    const int count
                   )
 {
@@ -41,31 +25,27 @@ kernel void forces(global const float* objX,
 
     if (i < count)
     {
-        force[i].x = 0;
-        force[i].y = 0;
+        force[i] = (float2)(0, 0);
 
         for(int j = 0; j < count; j++)
         {
             if (i == j)
                 continue;
 
-            const float x1 = objX[i];
-            const float y1 = objY[i];
-            const float x2 = objX[j];
-            const float y2 = objY[j];
+            const float2 p1 = (float2)( objX[i], objY[i] );
+            const float2 p2 = (float2)( objX[j], objY[j] );
             const float m1 = mass[i];
             const float m2 = mass[j];
 
-            const float dist = point_distance(x1, y1, x2, y2);
+            const float dist = length(p2 - p1);
             const float dist2 = dist * dist;
             const float Fg = (G * m1) * (m2 / dist2);
 
-            struct XY force_vector = unit_vector(x1, y1, x2, y2);
-            force_vector.x *= Fg;
-            force_vector.y *= Fg;
+            float2 force_vector = unit_vector(p1, p2);
+            force_vector *= Fg;
 
-            force[i].x += force_vector.x;
-            force[i].y += force_vector.y;
+            force[i] += force_vector;
         }
+
     }
 }
