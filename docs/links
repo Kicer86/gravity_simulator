@@ -4,7 +4,7 @@ http://stackoverflow.com/questions/21840673/gcc-generates-sse-instructions-inste
 https://software.intel.com/en-us/articles/introduction-to-intel-advanced-vector-extensions
 https://pl.wikipedia.org/wiki/Advanced_Vector_Extensions
 http://www.codeproject.com/Articles/874396/Crunching-Numbers-with-AVX-and-AVX
-https://software.intel.com/en-us/node/514144     - list of c functions for avx manipulation
+https://software.intel.com/sites/landingpage/IntrinsicsGuide/                        - list of c functions for AVX (and similar technologies)
 
 General about optimizations:
 http://www.walkingrandomly.com/?p=3378
