@@ -33,7 +33,7 @@
 #define STR(x) XSTR(x)
 
 std::string source1 = " \
-  kernel void ocl_kernel1(global const float *objX, global const float *objY, global const float *mass, global float *forceX, global float *forceY, const int count) { \
+  kernel void ocl_kernel1(global const float * restrict objX, global const float * restrict objY, global const float * restrict mass, global float * restrict forceX, global float * restrict forceY, const int count) { \
   const int gid = get_global_id(0); \
   const float G = 6.6732e-11; \
   if (gid < count) { \
@@ -60,7 +60,7 @@ std::string source1 = " \
 }";
 
 std::string source2 = " \
-  kernel void ocl_kernel2(global const float *objX, global const float *objY, global const float *mass, global float *forceX, global float *forceY, const int count) { \
+  kernel void ocl_kernel2(global const float * restrict objX, global const float * restrict objY, global const float * restrict mass, global float * restrict forceX, global float * restrict forceY, const int count) { \
   const float G = 6.6732e-11; \
   if (get_global_id(0) < count) { \
     const int count_local = ((count + LOCAL_MEM_SIZE - 1) / LOCAL_MEM_SIZE) * LOCAL_MEM_SIZE; \

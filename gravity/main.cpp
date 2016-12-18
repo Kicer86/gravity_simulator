@@ -7,8 +7,8 @@
 
 #include <cstdlib>
 
-void cpu_forces(const float *objX, const float *objY, const float *mass,
-                float *forcex, float *forcey, const int count) {
+void cpu_forces(const float * __restrict__ objX, const float * __restrict__ objY, const float * __restrict__ mass,
+                float * __restrict__ forcex, float * __restrict__ forcey, const int count) {
   const float G = 6.6732e-11;
   for (int i = 0; i < count; ++i) {
     float fx = 0, fy = 0;
