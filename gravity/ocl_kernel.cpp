@@ -16,9 +16,10 @@
  * The newer your GPU the bigger value you can try.
  * 16kB is guaranteed total amount on all Nvidia HW.
  * Each thread in a group needs upto 16B. 1024 means
- * that 4 group can run in parallel on any HW.
+ * that at least 4 group can run in parallel on any HW,
+ * provided there is enough resources of other types.
  */
-#define SHARED_MEM_SIZE_PER_GROUP 1024
+#define SHARED_MEM_SIZE_PER_GROUP (1024)
 
 /*
  * Tuning parameter.
@@ -123,8 +124,8 @@ OpenCL::OpenCL() {
   sources.push_back(source2);
 
   std::ostringstream str;
-  str << "-DLOCAL_MEM_SIZE=128";
-  //  str << (SHARED_MEM_SIZE_PER_GROUP / sizeof(float) / 4);
+  str << "-DLOCAL_MEM_SIZE=";
+  str << (SHARED_MEM_SIZE_PER_GROUP / sizeof(float) / 4);
 
   program = cl::Program(context, sources);
   if (program.build({default_device}, " -DLOCAL_MEM_SIZE=128") != CL_SUCCESS) {
