@@ -19,7 +19,7 @@
  * that at least 4 group can run in parallel on any HW,
  * provided there is enough resources of other types.
  */
-#define SHARED_MEM_SIZE_PER_GROUP (1024)
+#define SHARED_MEM_SIZE_PER_GROUP (2 * 1024)
 
 /*
  * Tuning parameter.
@@ -128,7 +128,7 @@ OpenCL::OpenCL() {
   str << (SHARED_MEM_SIZE_PER_GROUP / sizeof(float) / 4);
 
   program = cl::Program(context, sources);
-  if (program.build({default_device}, " -DLOCAL_MEM_SIZE=128") != CL_SUCCESS) {
+  if (program.build({default_device}, str.str().c_str()) != CL_SUCCESS) {
     std::cout << "Error building: "
               << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(default_device)
               << std::endl;
