@@ -53,8 +53,9 @@ void assert(bool v, const char * msg) {
 
 int main(int argc, char **argv) {
 
-  if(argc != 2) {
+  if(argc != 2 || !isdigit(argv[1][0])) {
     std::cout << argv[0] << " <problem-size>" << std::endl;
+    return 1;
   }
 
   /*

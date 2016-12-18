@@ -160,7 +160,7 @@ void OpenCL::exec(const std::string &progname, const float *objX,
   kernel.setArg(4, fy);
   kernel.setArg(5, count);
 
-  queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(count),
+  queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(std::max<int>(count, GROUP_SIZE)),
                              cl::NDRange(GROUP_SIZE));
 
   queue.enqueueReadBuffer(fx, CL_TRUE, 0, siz, forcex);
