@@ -50,7 +50,7 @@ std::string source1 = " \
       const float dy = yj - yi; \
       const float len2 = dx * dx + dy * dy; \
       if(len2 == 0) continue; \
-      const float Fg = G * mi * mj / len2; \
+      const float Fg = (G * mi) * (mj / len2); \
       const float len = sqrt(len2); \
       fx += dx * Fg / len; \
       fy += dy * Fg / len; \
@@ -63,7 +63,6 @@ std::string source1 = " \
 std::string source2 = " \
   kernel void ocl_kernel2(global const float * restrict objX, global const float * restrict objY, global const float * restrict mass, global float * restrict forceX, global float * restrict forceY, const int count) { \
   const float G = 6.6732e-11; \
-  if (get_global_id(0) < count) { \
     const int count_local = ((count + LOCAL_MEM_SIZE - 1) / LOCAL_MEM_SIZE) * LOCAL_MEM_SIZE; \
     local float sx[LOCAL_MEM_SIZE]; \
     local float sy[LOCAL_MEM_SIZE]; \
@@ -73,8 +72,7 @@ std::string source2 = " \
     const float mi = mass[get_global_id(0)]; \
     float fx = 0, fy = 0; \
     for (int c = 0; c < count_local; c += LOCAL_MEM_SIZE) { \
-      int n = count - c; \
-      n = n > LOCAL_MEM_SIZE ? LOCAL_MEM_SIZE : n; \
+      const int n = min(count - c, LOCAL_MEM_SIZE); \
       for(int k = get_local_id(0); k < n; k += get_local_size(0)) { \
         sx[k] = objX[c + k]; \
         sy[k] = objY[c + k]; \
@@ -87,15 +85,17 @@ std::string source2 = " \
         const float mk = sm[k]; \
         const float dx = xk - xi; \
         const float dy = yk - yi; \
-        const float len2 = dx * dx + dy * dy; \
-        if(len2 == 0) continue; \
-        const float Fg = G * mi * mk / len2; \
+        float len2 = dx * dx + dy * dy; \
+        const int notzero = (len2 != 0); \
+        len2 += (len2 == 0); \
+        const float Fg = (G * mi) * (mk / len2); \
         const float len = sqrt(len2); \
-        fx += dx * Fg / len; \
-        fy += dy * Fg / len; \
+        fx += dx * Fg / len * notzero; \
+        fy += dy * Fg / len * notzero; \
       } \
       barrier(CLK_LOCAL_MEM_FENCE); \
     } \
+  if (get_global_id(0) < count) { \
     forceX[get_global_id(0)] = fx; \
     forceY[get_global_id(0)] = fy; \
   } \
@@ -128,7 +128,9 @@ OpenCL::OpenCL() {
   str << (SHARED_MEM_SIZE_PER_GROUP / sizeof(float) / 4);
 
   program = cl::Program(context, sources);
-  if (program.build({default_device}, str.str().c_str()) != CL_SUCCESS) {
+  try {
+    program.build({default_device}, str.str().c_str());
+  } catch (...) {
     std::cout << "Error building: "
               << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(default_device)
               << std::endl;
@@ -141,33 +143,39 @@ OpenCL::OpenCL() {
 void OpenCL::exec(const std::string &progname, const float *objX,
                   const float *objY, const float *mass, float *forcex,
                   float *forcey, const int count) {
+  try {
+    const size_t siz = sizeof(float) * count;
+    cl::Buffer x(context, CL_MEM_READ_ONLY, siz);
+    cl::Buffer y(context, CL_MEM_READ_ONLY, siz);
+    cl::Buffer m(context, CL_MEM_READ_ONLY, siz);
+    cl::Buffer fx(context, CL_MEM_WRITE_ONLY, siz);
+    cl::Buffer fy(context, CL_MEM_WRITE_ONLY, siz);
 
-  const size_t siz = sizeof(float) * count;
-  cl::Buffer x(context, CL_MEM_READ_ONLY, siz);
-  cl::Buffer y(context, CL_MEM_READ_ONLY, siz);
-  cl::Buffer m(context, CL_MEM_READ_ONLY, siz);
-  cl::Buffer fx(context, CL_MEM_WRITE_ONLY, siz);
-  cl::Buffer fy(context, CL_MEM_WRITE_ONLY, siz);
+    queue.enqueueWriteBuffer(x, CL_TRUE, 0, siz, objX);
+    queue.enqueueWriteBuffer(y, CL_TRUE, 0, siz, objY);
+    queue.enqueueWriteBuffer(m, CL_TRUE, 0, siz, mass);
 
-  queue.enqueueWriteBuffer(x, CL_TRUE, 0, siz, objX);
-  queue.enqueueWriteBuffer(y, CL_TRUE, 0, siz, objY);
-  queue.enqueueWriteBuffer(m, CL_TRUE, 0, siz, mass);
+    cl::Kernel kernel(program, progname.c_str());
+    kernel.setArg(0, x);
+    kernel.setArg(1, y);
+    kernel.setArg(2, m);
+    kernel.setArg(3, fx);
+    kernel.setArg(4, fy);
+    kernel.setArg(5, count);
 
-  cl::Kernel kernel(program, progname.c_str());
-  kernel.setArg(0, x);
-  kernel.setArg(1, y);
-  kernel.setArg(2, m);
-  kernel.setArg(3, fx);
-  kernel.setArg(4, fy);
-  kernel.setArg(5, count);
+    int local = GROUP_SIZE;
+    int global = ((count + local - 1) / local) * local;
+    queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(global),
+                               cl::NDRange(local));
 
-  queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(std::max<int>(count, GROUP_SIZE)),
-                             cl::NDRange(GROUP_SIZE));
+    queue.enqueueReadBuffer(fx, CL_TRUE, 0, siz, forcex);
+    queue.enqueueReadBuffer(fy, CL_TRUE, 0, siz, forcey);
 
-  queue.enqueueReadBuffer(fx, CL_TRUE, 0, siz, forcex);
-  queue.enqueueReadBuffer(fy, CL_TRUE, 0, siz, forcey);
-
-  queue.finish();
+    queue.finish();
+  } catch (const cl::Error &e) {
+    std::cout << e.what() << ": " << e.err() << std::endl;
+    abort();
+  }
 }
 
 void OpenCL::exec1(const float *objX, const float *objY, const float *mass,
