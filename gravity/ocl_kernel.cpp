@@ -52,8 +52,8 @@ std::string source1 = " \
       if(len2 == 0) continue; \
       const float Fg = (G * mi) * (mj / len2); \
       const float len = sqrt(len2); \
-      fx += dx * Fg / len; \
-      fy += dy * Fg / len; \
+      fx += dx / len * Fg; \
+      fy += dy / len * Fg; \
     } \
     forceX[gid] = fx; \
     forceY[gid] = fy; \
@@ -101,6 +101,44 @@ std::string source2 = " \
   } \
 }";
 
+std::string source3 = " \
+  kernel void ocl_kernel3(global const float * restrict objX, global const float * restrict objY, global const float * restrict mass, global float * restrict forceX, global float * restrict forceY) { \
+    const float G = 6.6732e-11; \
+    const int lid = get_local_id(0); \
+    const int gid = get_global_id(0); \
+    const gsiz = get_global_size(0); \
+    local float sx[128]; \
+    local float sy[128]; \
+    local float sm[128]; \
+    const float xi = objX[gid]; \
+    const float yi = objY[gid];  \
+    const float mi = mass[gid]; \
+    float fx = 0, fy = 0; \
+    for (int c = lid; c < gsiz; c += 128) { \
+      barrier(CLK_LOCAL_MEM_FENCE); \
+      sx[lid] = objX[c]; \
+      sy[lid] = objY[c]; \
+      sm[lid] = mass[c]; \
+      barrier(CLK_LOCAL_MEM_FENCE); \
+      for(int k = 0; k < 128; ++k) { \
+        const float xk = sx[k]; \
+        const float yk = sy[k]; \
+        const float mk = sm[k]; \
+        const float dx = xk - xi; \
+        const float dy = yk - yi; \
+        float len2 = dx * dx + dy * dy; \
+        const int notzero = (len2 != 0); \
+        len2 += (len2 == 0); \
+        const float Fg = (G * mi) * (mk / len2); \
+        const float len = sqrt(len2); \
+        fx += dx * Fg / len * notzero; \
+        fy += dy * Fg / len * notzero; \
+      } \
+    } \
+    forceX[get_global_id(0)] = fx; \
+    forceY[get_global_id(0)] = fy; \
+}";
+
 OpenCL::OpenCL() {
   std::vector<cl::Platform> all_platforms;
   cl::Platform::get(&all_platforms);
@@ -122,6 +160,7 @@ OpenCL::OpenCL() {
   cl::Program::Sources sources;
   sources.push_back(source1);
   sources.push_back(source2);
+  sources.push_back(source3);
 
   std::ostringstream str;
   str << "-DLOCAL_MEM_SIZE=";
@@ -186,4 +225,52 @@ void OpenCL::exec1(const float *objX, const float *objY, const float *mass,
 void OpenCL::exec2(const float *objX, const float *objY, const float *mass,
                    float *forcex, float *forcey, const int count) {
   exec("ocl_kernel2", objX, objY, mass, forcex, forcey, count);
+}
+
+void OpenCL::exec3(const float *objX, const float *objY, const float *mass,
+                   float *forcex, float *forcey, const int count) {
+  try {
+    const size_t threads_per_group = 128;
+    const size_t total_groups =
+        ((count + threads_per_group - 1) / threads_per_group);
+    const size_t total_elems = total_groups * threads_per_group;
+    const size_t total_size = total_groups * threads_per_group * sizeof(float);
+
+    cl::Buffer x(context, CL_MEM_READ_ONLY, total_size);
+    cl::Buffer y(context, CL_MEM_READ_ONLY, total_size);
+    cl::Buffer m(context, CL_MEM_READ_ONLY, total_size);
+    cl::Buffer fx(context, CL_MEM_WRITE_ONLY, total_size);
+    cl::Buffer fy(context, CL_MEM_WRITE_ONLY, total_size);
+
+    const size_t siz = count * sizeof(float);
+    const size_t rsiz = (total_elems - count) * sizeof(float);
+
+    queue.enqueueWriteBuffer(x, CL_FALSE, 0, siz, objX);
+    queue.enqueueWriteBuffer(y, CL_FALSE, 0, siz, objY);
+    queue.enqueueWriteBuffer(m, CL_FALSE, 0, siz, mass);
+
+    queue.enqueueFillBuffer(x, .0f, siz, rsiz);
+    queue.enqueueFillBuffer(y, .0f, siz, rsiz);
+    queue.enqueueFillBuffer(m, .0f, siz, rsiz);
+
+    cl::Kernel kernel(program, "ocl_kernel3");
+    kernel.setArg(0, x);
+    kernel.setArg(1, y);
+    kernel.setArg(2, m);
+    kernel.setArg(3, fx);
+    kernel.setArg(4, fy);
+
+    queue.enqueueNDRangeKernel(kernel, cl::NullRange,
+                               cl::NDRange(total_groups * threads_per_group),
+                               cl::NDRange(threads_per_group));
+
+    queue.enqueueReadBuffer(fx, CL_FALSE, 0, siz, forcex);
+    queue.enqueueReadBuffer(fy, CL_FALSE, 0, siz, forcey);
+
+    queue.finish();
+
+  } catch (const cl::Error &e) {
+    std::cout << e.what() << ": " << e.err() << std::endl;
+    abort();
+  }
 }

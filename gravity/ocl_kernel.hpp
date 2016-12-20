@@ -12,6 +12,8 @@ public:
              float *forcex, float *forcey, const int count);
   void exec2(const float *objX, const float *objY, const float *mass,
              float *forcex, float *forcey, const int count);
+  void exec3(const float *objX, const float *objY, const float *mass,
+             float *forcex, float *forcey, const int count);
 
 private:
   void exec(const std::string &progname, const float *objX, const float *objY,

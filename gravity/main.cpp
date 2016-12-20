@@ -7,6 +7,20 @@
 
 #include <cstdlib>
 
+template <typename T> bool cmpf(T, T, int);
+
+template <> bool cmpf<float>(float a, float b, int max_diff) {
+  static_assert(sizeof(float) == sizeof(int), "Invalid size");
+  int ai, bi;
+  memcpy(&ai, &a, sizeof(float));
+  memcpy(&bi, &b, sizeof(float));
+  if (ai < 0)
+    ai = 0x80000000 - ai;
+  if (bi < 0)
+    bi = 0x80000000 - bi;
+  return (abs(ai - bi) <= max_diff);
+}
+
 void cpu_forces(const float *__restrict__ objX, const float *__restrict__ objY,
                 const float *__restrict__ mass, float *__restrict__ forcex,
                 float *__restrict__ forcey, const int count) {
@@ -28,6 +42,9 @@ void cpu_forces(const float *__restrict__ objX, const float *__restrict__ objY,
       float dy = yj - yi;
 
       float len2 = dx * dx + dy * dy;
+      if (len2 == 0)
+        continue;
+
       const float Fg = (G * mi) * (mj / len2);
       float len = sqrt(len2);
 
@@ -39,22 +56,8 @@ void cpu_forces(const float *__restrict__ objX, const float *__restrict__ objY,
   }
 }
 
-template <typename T> bool cmpf(T, T, int);
-
-template <> bool cmpf<float>(float a, float b, int max_diff) {
-  static_assert(sizeof(float) == sizeof(int), "Invalid size");
-  int ai, bi;
-  memcpy(&ai, &a, sizeof(float));
-  memcpy(&bi, &b, sizeof(float));
-  if (ai < 0)
-    ai = 0x80000000 - ai;
-  if (bi < 0)
-    bi = 0x80000000 - bi;
-  return (abs(ai - bi) <= max_diff);
-}
-
 template <typename T1, typename T2>
-bool compare(const T1 &t1, const T2 &t2, int max_diff = 1000) {
+bool compare(const T1 &t1, const T2 &t2, int max_diff = 4) {
   int i = 0;
   return std::equal(t1.begin(), t1.end(), t2.begin(), [&](float f1, float f2) {
     ++i;
@@ -70,7 +73,7 @@ bool compare(const T1 &t1, const T2 &t2, int max_diff = 1000) {
 void assert(bool v, const char *msg) {
   if (!v) {
     std::cout << "Assertion failed: " << msg << std::endl;
-    abort();
+    //    abort();
   }
 }
 
@@ -96,12 +99,10 @@ int main(int argc, char **argv) {
   std::vector<float> f2x(siz);
   std::vector<float> f2y(siz);
 
-  std::generate(x.begin(), x.end(),
-                []() { return (float)rand() / (float)RAND_MAX; });
-  std::generate(y.begin(), y.end(),
-                []() { return (float)rand() / (float)RAND_MAX; });
-  std::generate(m.begin(), m.end(),
-                []() { return (float)rand() / (float)RAND_MAX; });
+  auto gen = []() { return (float)rand() / (float)RAND_MAX; };
+  std::generate(x.begin(), x.end(), gen);
+  std::generate(y.begin(), y.end(), gen);
+  std::generate(m.begin(), m.end(), gen);
 
   {
     Timer t;
@@ -130,5 +131,17 @@ int main(int argc, char **argv) {
     assert(compare(f1x, f2x), "results differ too much");
     assert(compare(f1y, f2y), "results differ too much");
   }
+  {
+    OpenCL opencl;
+    std::fill(f2x.begin(), f2x.end(), 0);
+    std::fill(f2y.begin(), f2y.end(), 0);
+    {
+      Timer t;
+      opencl.exec3(&x[0], &y[0], &m[0], &f2x[0], &f2y[0], siz);
+    }
+    assert(compare(f1x, f2x), "results differ too much");
+    assert(compare(f1y, f2y), "results differ too much");
+  }
+
   return 0;
 }
