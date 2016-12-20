@@ -147,7 +147,7 @@ void SimulationController::setScene(ObjectsScene* scene)
 
 void SimulationController::beginSimulation()
 {
-#if 0
+#if 1
     srand(3);
 
     for (int i = 0; i < 2000; i++)
