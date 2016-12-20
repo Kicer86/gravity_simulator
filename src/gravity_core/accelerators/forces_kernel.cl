@@ -27,14 +27,15 @@ kernel void forces(global const float* objX,
     {
         force[i] = (float2)(0, 0);
 
+        const float2 p1 = (float2)( objX[i], objY[i] );
+        const float m1 = mass[i];
+
         for(int j = 0; j < count; j++)
         {
             if (i == j)
                 continue;
 
-            const float2 p1 = (float2)( objX[i], objY[i] );
             const float2 p2 = (float2)( objX[j], objY[j] );
-            const float m1 = mass[i];
             const float m2 = mass[j];
 
             const float dist = length(p2 - p1);
