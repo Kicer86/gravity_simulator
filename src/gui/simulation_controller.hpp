@@ -29,7 +29,7 @@
 
 #include "simulation_engine.hpp"
 
-#include "accelerators/avx_accelerator.hpp"
+#include "accelerators/opencl_accelerator.hpp"
 
 class ObjectsScene;
 
@@ -71,7 +71,7 @@ class SimulationController: public QObject, ISimulationEvents
         int fps() const;
 
     private:
-        AVXAccelerator m_accelerator;
+        OpenCLAccelerator m_accelerator;
         SimulationEngine m_engine;
         QTimer m_stepTimer;
         QThread m_calculationsThread;
