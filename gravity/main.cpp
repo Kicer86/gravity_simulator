@@ -6,6 +6,7 @@
 #include <iterator>
 
 #include <cstdlib>
+#include <cmath>
 
 template <typename T> bool cmpf(T, T, int);
 
@@ -115,7 +116,7 @@ int main(int argc, char **argv) {
     std::fill(f2y.begin(), f2y.end(), 0);
     {
       Timer t;
-      opencl.exec1(&x[0], &y[0], &m[0], &f2x[0], &f2y[0], siz);
+      opencl.exec2(&x[0], &y[0], &m[0], &f2x[0], &f2y[0], siz);
     }
     assert(compare(f1x, f2x), "results differ too much");
     assert(compare(f1y, f2y), "results differ too much");
@@ -126,7 +127,7 @@ int main(int argc, char **argv) {
     std::fill(f2y.begin(), f2y.end(), 0);
     {
       Timer t;
-      opencl.exec2(&x[0], &y[0], &m[0], &f2x[0], &f2y[0], siz);
+      opencl.exec1(&x[0], &y[0], &m[0], &f2x[0], &f2y[0], siz);
     }
     assert(compare(f1x, f2x), "results differ too much");
     assert(compare(f1y, f2y), "results differ too much");
