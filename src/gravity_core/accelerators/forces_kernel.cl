@@ -20,32 +20,53 @@ kernel void forces(global const float* objX,
                    const int count
                   )
 {
-    const int i = get_global_id(0);
     const float G = 6.6732e-11;
+    const int count_local = ((count + LOCAL_MEM_SIZE - 1) / LOCAL_MEM_SIZE) * LOCAL_MEM_SIZE;
 
-    if (i < count)
+    local float sx[LOCAL_MEM_SIZE];
+    local float sy[LOCAL_MEM_SIZE];
+    local float sm[LOCAL_MEM_SIZE];
+
+    const float xi = objX[get_global_id(0)];
+    const float yi = objY[get_global_id(0)];
+    const float mi = mass[get_global_id(0)];
+
+    float fx = 0, fy = 0;
+
+    for (int c = 0; c < count_local; c += LOCAL_MEM_SIZE)
     {
-        force[i] = (float2)(0, 0);
+      const int n = min(count - c, LOCAL_MEM_SIZE);
 
-        for(int j = 0; j < count; j++)
-        {
-            if (i == j)
-                continue;
+      for(int k = get_local_id(0); k < n; k += get_local_size(0))
+      {
+        sx[k] = objX[c + k];
+        sy[k] = objY[c + k];
+        sm[k] = mass[c + k];
+      }
 
-            const float2 p1 = (float2)( objX[i], objY[i] );
-            const float2 p2 = (float2)( objX[j], objY[j] );
-            const float m1 = mass[i];
-            const float m2 = mass[j];
+      barrier(CLK_LOCAL_MEM_FENCE);
 
-            const float dist = length(p2 - p1);
-            const float dist2 = dist * dist;
-            const float Fg = (G * m1) * (m2 / dist2);
+      for(int k = 0; k < n; ++k)
+      {
+        const float xk = sx[k];
+        const float yk = sy[k];
+        const float mk = sm[k];
+        const float dx = xk - xi;
+        const float dy = yk - yi;
+        float len2 = dx * dx + dy * dy;
+        const int notzero = (len2 != 0);
+        len2 += (len2 == 0);
+        const float Fg = (G * mi) * (mk / len2);
+        const float len = sqrt(len2);
+        fx += dx * Fg / len * notzero;
+        fy += dy * Fg / len * notzero;
+      }
 
-            float2 force_vector = unit_vector(p1, p2);
-            force_vector *= Fg;
-
-            force[i] += force_vector;
-        }
-
+      barrier(CLK_LOCAL_MEM_FENCE);
     }
+
+  if (get_global_id(0) < count)
+  {
+    force[get_global_id(0)] = (float2)(fx, fy);
+  }
 }
