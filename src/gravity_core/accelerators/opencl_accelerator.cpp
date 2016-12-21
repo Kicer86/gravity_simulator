@@ -35,6 +35,10 @@
 #include "../objects.hpp"
 #include "forces_kernel.hpp"
 
+
+#define SHARED_MEM_SIZE_PER_GROUP (2 * 1024)
+#define GROUP_SIZE 128
+
 // tutorials:
 // https://anteru.net/blog/2012/11/03/2009/
 
@@ -49,7 +53,9 @@ OpenCLAccelerator::OpenCLAccelerator(Objects* objects):
     m_context = boost::compute::context(m_device);
     m_program = boost::compute::program::create_with_source(forces_kernel_cl, m_context);
 
-    m_program.build();
+    const std::string program_args = "-DLOCAL_MEM_SIZE=" + std::to_string(SHARED_MEM_SIZE_PER_GROUP / sizeof(float) / 4);
+
+    m_program.build(program_args);
 
     std::cout << "OpenCL device: " << m_device.name() << std::endl;
 }
@@ -95,7 +101,7 @@ std::vector<XY> OpenCLAccelerator::forces()
     objYFuture.wait();
     massFuture.wait();
 
-    const int group_size = 1 << 5;
+    const int group_size = GROUP_SIZE;
 
     const std::size_t global_size = count % group_size == 0? count: (count + group_size) & (-group_size);
 
