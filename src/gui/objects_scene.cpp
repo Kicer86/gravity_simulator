@@ -24,9 +24,9 @@
 #include <QColor>
 #include <QGraphicsItem>
 #include <QPen>
+#include <QGraphicsSceneMouseEvent>
 
-
-ObjectsScene::ObjectsScene(): m_objects()
+ObjectsScene::ObjectsScene(): m_objects(), track_id(0)
 {
     const BaseType grid = 400e6;
     QPen pen;
@@ -52,6 +52,8 @@ void ObjectsScene::addObject(int id, const Object& obj)
 
     QGraphicsItem* item = createItem(radius);
     item->setPos(position);
+    item->setData(ObjectData::Id, id);
+    item->setData(ObjectData::Radius, radius);
 
     m_objects.insert( std::make_pair(id, item) );
 }
@@ -74,6 +76,8 @@ void ObjectsScene::updateRadius(int id, BaseType r)
     assert(obj != m_objects.end());
 
     QGraphicsItem* item = createItem(r);
+    item->setData(ObjectData::Id, id);
+    item->setData(ObjectData::Radius, r);
 
     const QPointF pos = obj->second->pos();
     item->setPos(pos);
@@ -84,11 +88,25 @@ void ObjectsScene::updateRadius(int id, BaseType r)
     obj->second = item;
 }
 
+void ObjectsScene::updateMass(int id, BaseType m)
+{
+    auto obj = m_objects.find(id);
+    assert(obj != m_objects.end());
+
+    obj->second->setData(ObjectData::Mass, m);
+}
+
 
 void ObjectsScene::removeObject(int id)
 {
     auto obj = m_objects.find(id);
     assert(obj != m_objects.end());
+
+    if (id == track_id)
+    {
+        track_id = 0;
+        emit objectDataUpdated(nullptr);
+    }
 
     removeItem(obj->second);
 
@@ -106,4 +124,25 @@ QGraphicsItem* ObjectsScene::createItem(BaseType radius)
     QGraphicsItem* item = addEllipse(rect, pen, QBrush(Qt::SolidPattern));
 
     return item;
+}
+
+void ObjectsScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    const QGraphicsItem *item = itemAt(event->scenePos(), QTransform());
+    if (item != nullptr)
+        track_id = item->data(ObjectData::Id).toInt();
+    else
+        track_id = 0;
+
+    emit objectDataUpdated(item);
+}
+
+void ObjectsScene::updateTrackInfo(void)
+{
+    if (track_id)
+    {
+        auto obj = m_objects.find(track_id);
+        assert(obj != m_objects.end());
+        emit objectDataUpdated(obj->second);
+    }
 }

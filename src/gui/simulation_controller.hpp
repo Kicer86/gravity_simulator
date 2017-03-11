@@ -57,7 +57,7 @@ Q_DECLARE_METATYPE(Tick)
 
 class SimulationController: public QObject, ISimulationEvents
 {
-        Q_OBJECT
+	Q_OBJECT
 
     public:
         SimulationController();

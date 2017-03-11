@@ -215,7 +215,7 @@ void SimulationController::beginSimulation()
 #endif
 
 
-// for performance checks
+    // for performance checks
 #if 0
     for(int i = 0; i < 150; i++)
         m_engine.step();
@@ -274,7 +274,13 @@ void SimulationController::updateScene(const Tick& data)
         m_scene->removeObject(obj.id());
 
     for(const Object& obj: data.updated)
-        m_scene->updatePosition(obj.id(), obj.pos());
+    {
+        const auto id = obj.id();
+        m_scene->updatePosition(id, obj.pos());
+        m_scene->updateMass(id, obj.mass());
+    }
+
+    m_scene->updateTrackInfo();
 
     emit objectCountUpdated(data.updated.size());
 }
