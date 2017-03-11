@@ -35,7 +35,7 @@ MainWindow::MainWindow():
 
     connect(&m_controller, &SimulationController::fpsUpdated, ui->simulationInfo, &SimulationInfoWidget::updateFps);
     connect(&m_controller, &SimulationController::objectCountUpdated, ui->simulationInfo, &SimulationInfoWidget::updateObjectCount);
-
+    connect(&m_scene, &ObjectsScene::objectDataUpdated, ui->simulationInfo, &SimulationInfoWidget::updateObjectData);
     m_controller.beginSimulation();
 }
 

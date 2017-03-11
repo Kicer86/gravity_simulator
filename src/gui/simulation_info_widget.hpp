@@ -21,6 +21,9 @@
 #define SIMULATIONINFOWIDGET_HPP
 
 #include <QWidget>
+#include <QGraphicsItem>
+#include <QGroupBox>
+#include "types.hpp"
 
 class QLabel;
 
@@ -35,10 +38,15 @@ class SimulationInfoWidget: public QWidget
 
         void updateFps(int);
         void updateObjectCount(int);
+		void updateObjectData(const QGraphicsItem *);
 
     private:
         QLabel* m_fpsValue;
         QLabel* m_objCountValue;
+        QLabel* m_objIDValue;
+        QLabel* m_objPosValue;
+        QLabel* m_objMassValue;
+        QLabel* m_objRadiusValue;
 };
 
 #endif // SIMULATIONINFOWIDGET_H

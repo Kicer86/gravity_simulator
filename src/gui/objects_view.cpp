@@ -23,6 +23,7 @@
 #include <QDebug>
 #include <QWheelEvent>
 #include <QScrollBar>
+#include <QGraphicsItem>
 
 #include "simulation_controller.hpp"
 
@@ -42,6 +43,7 @@ ObjectsView::~ObjectsView()
 void ObjectsView::mousePressEvent(QMouseEvent* event)
 {
     m_prevPoint = event->pos();
+    QGraphicsView::mousePressEvent(event);
 }
 
 

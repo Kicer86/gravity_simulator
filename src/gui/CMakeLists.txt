@@ -17,6 +17,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 qt5_wrap_cpp(moc_wrapped
              main_window.hpp
+             objects_scene.hpp
              simulation_controller.hpp
 )
 

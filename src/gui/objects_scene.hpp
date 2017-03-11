@@ -28,6 +28,8 @@
 
 class ObjectsScene: public QGraphicsScene
 {
+	Q_OBJECT
+
     public:
         ObjectsScene();
         ObjectsScene(const ObjectsScene &) = delete;
@@ -37,10 +39,16 @@ class ObjectsScene: public QGraphicsScene
         void addObject(int id, const Object &);
         void updatePosition(int id, const XY &);
         void updateRadius(int id, BaseType r);
+        void updateMass(int id, BaseType m);
+        void updateTrackInfo(void);
         void removeObject(int id);
-
+    signals:
+        void objectDataUpdated(const QGraphicsItem *);
+    protected:
+        virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
     private:
         std::unordered_map<int, QGraphicsItem *> m_objects;
+        int track_id;
 
         QGraphicsItem* createItem(BaseType);
 };

@@ -19,6 +19,7 @@
 
 
 #include "simulation_info_widget.hpp"
+#include "types.hpp"
 
 #include <QGridLayout>
 #include <QLabel>
@@ -33,13 +34,30 @@ SimulationInfoWidget::SimulationInfoWidget(QWidget* p):
 
     QLabel* fpsLabel = new QLabel(tr("fps:"), this);
     QLabel* objCountLabel = new QLabel(tr("objects:"), this);
+    QLabel* idLabel = new QLabel(tr("object id:"), this);
+    QLabel* posLabel = new QLabel(tr("position:"), this);
+    QLabel* radiusLabel = new QLabel(tr("radius:"), this);
+    QLabel* massLabel = new QLabel(tr("mass:"), this);
+
     m_fpsValue = new QLabel(this);
     m_objCountValue = new QLabel(this);
+    m_objIDValue = new QLabel(this);
+    m_objPosValue = new QLabel(this);
+    m_objRadiusValue = new QLabel(this);
+    m_objMassValue = new QLabel(this);
 
     mainLayout->addWidget(fpsLabel, 0, 0);
     mainLayout->addWidget(m_fpsValue, 0, 1);
     mainLayout->addWidget(objCountLabel, 1, 0);
     mainLayout->addWidget(m_objCountValue, 1, 1);
+    mainLayout->addWidget(idLabel, 2, 0);
+    mainLayout->addWidget(m_objIDValue, 2, 1);
+    mainLayout->addWidget(posLabel, 3, 0);
+    mainLayout->addWidget(m_objPosValue, 3, 1);
+    mainLayout->addWidget(radiusLabel, 4, 0);
+    mainLayout->addWidget(m_objRadiusValue, 4, 1);
+    mainLayout->addWidget(massLabel, 5, 0);
+    mainLayout->addWidget(m_objMassValue, 5, 1);
 }
 
 
@@ -58,5 +76,29 @@ void SimulationInfoWidget::updateFps(int fps)
 void SimulationInfoWidget::updateObjectCount(int count)
 {
     m_objCountValue->setText(QString::number(count));
+}
+
+void SimulationInfoWidget::updateObjectData(const QGraphicsItem *item)
+{
+    if (item == nullptr)
+    {
+        m_objIDValue->setText(QString(""));
+        m_objPosValue->setText(QString(""));
+        m_objRadiusValue->setText(QString(""));
+        m_objMassValue->setText(QString(""));
+    }
+    else
+    {
+        const int id = item->data(DATA_OBJECT_ID).toInt();
+        const QPointF pos = item->pos();
+        const BaseType mass = item->data(DATA_OBJECT_MASS).value<BaseType>();
+        const BaseType radius = item->data(DATA_OBJECT_RADIUS).value<BaseType>();
+
+        m_objIDValue->setText(QString::number(id));
+        m_objPosValue->setText(QString("%1, %2").arg(pos.x(), 0, 'g', 2)
+                           .arg(pos.y(), 0, 'g', 2));
+        m_objRadiusValue->setText(QString::number(radius, 'g', 3));
+        m_objMassValue->setText(QString::number(mass, 'g', 3));
+    }
 }
 
