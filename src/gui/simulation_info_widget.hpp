@@ -23,6 +23,7 @@
 #include <QWidget>
 #include <QGraphicsItem>
 #include <QGroupBox>
+
 #include "types.hpp"
 
 class QLabel;

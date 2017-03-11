@@ -4,6 +4,15 @@
 
 typedef float BaseType;
 
-enum { DATA_OBJECT_ID, DATA_OBJECT_MASS, DATA_OBJECT_RADIUS, DATA_OBJECT_SPEED };
+namespace ObjectData
+{
+    enum
+    {
+        Id,
+        Mass,
+        Radius,
+        Speed,
+    };
+}
 
 #endif

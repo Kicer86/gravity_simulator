@@ -89,10 +89,10 @@ void SimulationInfoWidget::updateObjectData(const QGraphicsItem *item)
     }
     else
     {
-        const int id = item->data(DATA_OBJECT_ID).toInt();
+        const int id = item->data(ObjectData::Id).toInt();
         const QPointF pos = item->pos();
-        const BaseType mass = item->data(DATA_OBJECT_MASS).value<BaseType>();
-        const BaseType radius = item->data(DATA_OBJECT_RADIUS).value<BaseType>();
+        const BaseType mass = item->data(ObjectData::Mass).value<BaseType>();
+        const BaseType radius = item->data(ObjectData::Radius).value<BaseType>();
 
         m_objIDValue->setText(QString::number(id));
         m_objPosValue->setText(QString("%1, %2").arg(pos.x(), 0, 'g', 2)
