@@ -50,6 +50,11 @@ struct vector2d
     vector2d(): x(0.0), y(0.0){ }
     vector2d(const XY& xy): x(xy.x), y(xy.y) {}
 
+    operator XY() const
+    {
+        return XY(x.raw_value(), y.raw_value());
+    }
+
     vector2d operator-(const vector2d& other) const
     {
         vector2d result = *this;
@@ -107,6 +112,9 @@ struct vector2d
         return result;
     }
 };
+
+
+typedef vector2d<newton_t> force_vector_t;
 
 
 class Object
