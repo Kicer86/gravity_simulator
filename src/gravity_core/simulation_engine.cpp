@@ -100,7 +100,7 @@ double SimulationEngine::step()
     std::vector<XY> v(objs);
     std::vector<XY> pos(objs);
 
-    const std::vector<XY> forces = m_accelerator->forces();
+    const std::vector<force_vector_t> forces = m_accelerator->forces();
 
     do
     {
