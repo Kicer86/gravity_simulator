@@ -115,12 +115,13 @@ struct vector2d
 
 
 typedef vector2d<newton_t> force_vector_t;
+typedef vector2d<velocity_t> velocity_vector_t;
 
 
 class Object
 {
         XY m_pos;
-        XY m_v;
+        velocity_vector_t m_v;
         BaseType m_mass;
         BaseType m_radius;
 
@@ -136,7 +137,7 @@ class Object
         BaseType mass() const;
         BaseType radius() const;
         const XY& pos() const;
-        const XY& velocity() const;
+        const velocity_vector_t& velocity() const;
         int id() const;
 };
 

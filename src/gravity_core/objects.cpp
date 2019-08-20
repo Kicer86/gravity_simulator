@@ -71,8 +71,8 @@ std::size_t Objects::insert(const Object& obj, std::size_t id)
 
     m_x.push_back(obj.pos().x);
     m_y.push_back(obj.pos().y);
-    m_vx.push_back(obj.velocity().x);
-    m_vy.push_back(obj.velocity().y);
+    m_vx.push_back(obj.velocity().x.raw_value());
+    m_vy.push_back(obj.velocity().y.raw_value());
     m_mass.push_back(obj.mass());
     m_radius.push_back(obj.radius());
     m_id.push_back(id);
