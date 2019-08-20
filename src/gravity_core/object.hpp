@@ -72,10 +72,27 @@ struct vector2d
         return *this;
     }
 
+    template<typename Scalar>
+    vector2d& operator*=(Scalar v)
+    {
+        x *= v;
+        y *= v;
+
+        return *this;
+    }
+
     vector2d operator*(BaseType v) const
     {
         vector2d result(x, y);
         result *= v;
+
+        return result;
+    }
+
+    template<typename Scalar>
+    auto operator*(const Scalar& v) const
+    {
+        vector2d<decltype(x * v)> result(x * v, y * v);
 
         return result;
     }
@@ -111,18 +128,27 @@ struct vector2d
 
         return result;
     }
+
+    template<typename Scalar>
+    auto operator/(const Scalar& v) const
+    {
+        vector2d<decltype(x/v)> result(x / v, y / v);
+
+        return result;
+    }
 };
 
 
 typedef vector2d<newton_t> force_vector_t;
-typedef vector2d<velocity_t> velocity_vector_t;
+typedef vector2d<velocity_type> velocity_vector_t;
+typedef vector2d<acceleration_type> acceleration_vector_t;
 
 
 class Object
 {
         XY m_pos;
         velocity_vector_t m_v;
-        BaseType m_mass;
+        mass_type m_mass;
         BaseType m_radius;
 
         int m_id;                  // object id used for object identification
@@ -134,7 +160,7 @@ class Object
     public:
         Object(BaseType x, BaseType y, BaseType m, BaseType r, BaseType v_x = 0.0, BaseType v_y = 0.0);
 
-        BaseType mass() const;
+        mass_type mass() const;
         BaseType radius() const;
         const XY& pos() const;
         const velocity_vector_t& velocity() const;

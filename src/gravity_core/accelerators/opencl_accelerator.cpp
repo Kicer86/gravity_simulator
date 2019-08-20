@@ -118,7 +118,7 @@ std::vector<force_vector_t> OpenCLAccelerator::forces()
 }
 
 
-std::vector<XY> OpenCLAccelerator::velocities(const std::vector<force_vector_t>& forces, double dt) const
+std::vector<XY> OpenCLAccelerator::velocities(const std::vector<force_vector_t>& forces, time_type dt) const
 {
     std::vector<XY> result;
     result.reserve(m_objects->size());
@@ -129,10 +129,10 @@ std::vector<XY> OpenCLAccelerator::velocities(const std::vector<force_vector_t>&
         const Object& o = (*m_objects)[i];
 
         // F=am ⇒ a = F/m
-        const XY a = dF / o.mass();
+        const acceleration_vector_t a = dF / o.mass();
 
         // ΔV = aΔt
-        const XY dv = a * dt;
+        const velocity_vector_t dv = a * dt;
 
         result.push_back(dv);
     }

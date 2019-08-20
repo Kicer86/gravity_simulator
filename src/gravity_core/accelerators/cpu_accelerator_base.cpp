@@ -96,7 +96,7 @@ XY CpuAcceleratorBase::force(std::size_t i, std::size_t j) const
 }
 
 
-std::vector<XY> CpuAcceleratorBase::velocities(const std::vector<force_vector_t>& forces, double dt) const
+std::vector<XY> CpuAcceleratorBase::velocities(const std::vector<force_vector_t>& forces, time_type dt) const
 {
     assert(m_objects != nullptr);
 
@@ -106,14 +106,14 @@ std::vector<XY> CpuAcceleratorBase::velocities(const std::vector<force_vector_t>
 
     for(std::size_t i = 0; i < objs; i++)
     {
-        const XY& dF = forces[i];
+        const force_vector_t& dF = forces[i];
         const Object& o = (*m_objects)[i];
 
         // F=am ⇒ a = F/m
-        const XY a = dF / o.mass();
+        const acceleration_vector_t a = dF / o.mass();
 
         // ΔV = aΔt
-        const XY dv = a * dt;
+        const velocity_vector_t dv = a * dt;
 
         result.push_back(dv);
     }

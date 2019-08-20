@@ -38,7 +38,7 @@ class OpenCLAccelerator: public IAccelerator
         virtual void setObjects(Objects *) override;
 
         virtual std::vector<force_vector_t> forces() override;
-        virtual std::vector<XY> velocities(const std::vector<force_vector_t>& forces, double dt) const override;
+        virtual std::vector<XY> velocities(const std::vector<force_vector_t>& forces, time_type dt) const override;
         virtual std::vector<std::pair<int, int>> collisions() const override;
 
     private:

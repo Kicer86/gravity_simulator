@@ -39,7 +39,7 @@ class ObjectsScene: public QGraphicsScene
         void addObject(int id, const Object &);
         void updatePosition(int id, const XY &);
         void updateRadius(int id, BaseType r);
-        void updateMass(int id, BaseType m);
+        void updateMass(int id, mass_type m);
         void updateTrackInfo(void);
         void removeObject(int id);
     signals:

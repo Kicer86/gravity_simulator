@@ -73,7 +73,7 @@ std::size_t Objects::insert(const Object& obj, std::size_t id)
     m_y.push_back(obj.pos().y);
     m_vx.push_back(obj.velocity().x.raw_value());
     m_vy.push_back(obj.velocity().y.raw_value());
-    m_mass.push_back(obj.mass());
+    m_mass.push_back(obj.mass().raw_value());
     m_radius.push_back(obj.radius());
     m_id.push_back(id);
 
@@ -131,9 +131,9 @@ void Objects::setVelocity(std::size_t idx, const XY& vxy)
 }
 
 
-void Objects::setMass(std::size_t idx, BaseType mass)
+void Objects::setMass(std::size_t idx, mass_type mass)
 {
-    m_mass[idx] = mass;
+    m_mass[idx] = mass.raw_value();
 }
 
 

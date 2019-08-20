@@ -118,7 +118,7 @@ Object::Object(BaseType x, BaseType y, BaseType m, BaseType r, BaseType v_x, Bas
 }
 
 
-BaseType Object::mass() const
+mass_type Object::mass() const
 {
     return m_mass;
 }
