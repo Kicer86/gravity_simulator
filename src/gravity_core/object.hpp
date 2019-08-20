@@ -38,7 +38,74 @@ struct XY
     XY operator+(const XY& other) const;
     XY operator-() const;
     XY operator/(BaseType v) const;
+};
 
+
+template<typename Unit>
+struct vector2d
+{
+    Unit x, y;
+
+    vector2d(Unit _x, Unit _y): x(_x), y(_y) { }
+    vector2d(): x(0.0), y(0.0){ }
+    vector2d(const XY& xy): x(xy.x), y(xy.y) {}
+
+    vector2d operator-(const vector2d& other) const
+    {
+        vector2d result = *this;
+        result.x -= other.x;
+        result.y -= other.y;
+
+        return result;
+    }
+
+    vector2d& operator*=(BaseType v)
+    {
+        x *= v;
+        y *= v;
+
+        return *this;
+    }
+
+    vector2d operator*(BaseType v) const
+    {
+        vector2d result(x, y);
+        result *= v;
+
+        return result;
+    }
+
+    vector2d& operator+=(const vector2d& other)
+    {
+        x += other.x;
+        y += other.y;
+
+        return *this;
+    }
+
+    vector2d operator+(const vector2d& other) const
+    {
+        vector2d result(x, y);
+        result += other;
+
+        return result;
+    }
+
+    vector2d operator-() const
+    {
+        vector2d result(-x, -y);
+
+        return result;
+    }
+
+    vector2d operator/(BaseType v) const
+    {
+        XY result = *this;
+        result.x /= v;
+        result.y /= v;
+
+        return result;
+    }
 };
 
 
