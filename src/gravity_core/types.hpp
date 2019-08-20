@@ -6,7 +6,11 @@
 
 typedef float BaseType;
 
+// units
 typedef SI::newton_t<BaseType> newton_t;
+
+// quantities
+typedef SI::velocity_t<BaseType, std::ratio<1>> velocity_t;
 
 namespace ObjectData
 {
