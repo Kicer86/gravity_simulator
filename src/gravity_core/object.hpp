@@ -38,15 +38,117 @@ struct XY
     XY operator+(const XY& other) const;
     XY operator-() const;
     XY operator/(BaseType v) const;
-
 };
+
+
+template<typename Unit>
+struct vector2d
+{
+    Unit x, y;
+
+    vector2d(Unit _x, Unit _y): x(_x), y(_y) { }
+    vector2d(): x(0.0), y(0.0){ }
+    vector2d(const XY& xy): x(xy.x), y(xy.y) {}
+
+    operator XY() const
+    {
+        return XY(x.raw_value(), y.raw_value());
+    }
+
+    vector2d operator-(const vector2d& other) const
+    {
+        vector2d result = *this;
+        result.x -= other.x;
+        result.y -= other.y;
+
+        return result;
+    }
+
+    vector2d& operator*=(BaseType v)
+    {
+        x *= v;
+        y *= v;
+
+        return *this;
+    }
+
+    template<typename Scalar>
+    vector2d& operator*=(Scalar v)
+    {
+        x *= v;
+        y *= v;
+
+        return *this;
+    }
+
+    vector2d operator*(BaseType v) const
+    {
+        vector2d result(x, y);
+        result *= v;
+
+        return result;
+    }
+
+    template<typename Scalar>
+    auto operator*(const Scalar& v) const
+    {
+        vector2d<decltype(x * v)> result(x * v, y * v);
+
+        return result;
+    }
+
+    vector2d& operator+=(const vector2d& other)
+    {
+        x += other.x;
+        y += other.y;
+
+        return *this;
+    }
+
+    vector2d operator+(const vector2d& other) const
+    {
+        vector2d result(x, y);
+        result += other;
+
+        return result;
+    }
+
+    vector2d operator-() const
+    {
+        vector2d result(-x, -y);
+
+        return result;
+    }
+
+    vector2d operator/(BaseType v) const
+    {
+        XY result = *this;
+        result.x /= v;
+        result.y /= v;
+
+        return result;
+    }
+
+    template<typename Scalar>
+    auto operator/(const Scalar& v) const
+    {
+        vector2d<decltype(x/v)> result(x / v, y / v);
+
+        return result;
+    }
+};
+
+
+typedef vector2d<newton_t> force_vector_t;
+typedef vector2d<velocity_type> velocity_vector_t;
+typedef vector2d<acceleration_type> acceleration_vector_t;
 
 
 class Object
 {
         XY m_pos;
-        XY m_v;
-        BaseType m_mass;
+        velocity_vector_t m_v;
+        mass_type m_mass;
         BaseType m_radius;
 
         int m_id;                  // object id used for object identification
@@ -58,10 +160,10 @@ class Object
     public:
         Object(BaseType x, BaseType y, BaseType m, BaseType r, BaseType v_x = 0.0, BaseType v_y = 0.0);
 
-        BaseType mass() const;
+        mass_type mass() const;
         BaseType radius() const;
         const XY& pos() const;
-        const XY& velocity() const;
+        const velocity_vector_t& velocity() const;
         int id() const;
 };
 

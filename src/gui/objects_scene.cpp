@@ -88,12 +88,12 @@ void ObjectsScene::updateRadius(int id, BaseType r)
     obj->second = item;
 }
 
-void ObjectsScene::updateMass(int id, BaseType m)
+void ObjectsScene::updateMass(int id, mass_type m)
 {
     auto obj = m_objects.find(id);
     assert(obj != m_objects.end());
 
-    obj->second->setData(ObjectData::Mass, m);
+    obj->second->setData(ObjectData::Mass, m.raw_value());
 }
 
 

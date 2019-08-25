@@ -100,7 +100,7 @@ double SimulationEngine::step()
     std::vector<XY> v(objs);
     std::vector<XY> pos(objs);
 
-    const std::vector<XY> forces = m_accelerator->forces();
+    const std::vector<force_vector_t> forces = m_accelerator->forces();
 
     do
     {
@@ -173,8 +173,8 @@ std::size_t SimulationEngine::collide(std::size_t i, std::size_t j)
     Object l = m_objects[lighter];
 
     // correct velocity by summing momentums
-    const BaseType masses = h.mass() + l.mass();
-    const XY momentums = h.velocity() * h.mass() + l.velocity() * l.mass();
+    const mass_type masses = h.mass() + l.mass();
+    const vector2d<momentum_type> momentums = h.velocity() * h.mass() + l.velocity() * l.mass();
     const XY newVelocity = momentums / masses;
 
     m_objects.setVelocity(heavier, newVelocity);

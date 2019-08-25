@@ -43,20 +43,20 @@ void CpuAcceleratorBase::setObjects(Objects* objects)
 }
 
 
-std::vector<XY> CpuAcceleratorBase::forces()
+std::vector<force_vector_t> CpuAcceleratorBase::forces()
 {
     assert(m_objects != nullptr);
 
     const std::size_t objs = m_objects->size();
 
-    std::vector<XY> forces(objs);
+    std::vector<force_vector_t> forces(objs);
 
     // prepare private tables for threads for results, so we don't get races when accessing 'forces'
     const int threads = omp_get_max_threads();
-    std::vector< std::vector<XY> > private_forces(threads);    // for each thread vector of its calculations
+    std::vector< std::vector<force_vector_t> > private_forces(threads);    // for each thread vector of its calculations
 
     for(int t = 0; t < threads; t++)
-        private_forces[t] = std::vector<XY>(objs);             // initialize vector of results for each vector
+        private_forces[t] = std::vector<force_vector_t>(objs);             // initialize vector of results for each vector
 
     #pragma omp parallel for schedule(static, 1)
     for(std::size_t i = 0; i < objs - 1; i++)
@@ -96,7 +96,7 @@ XY CpuAcceleratorBase::force(std::size_t i, std::size_t j) const
 }
 
 
-std::vector<XY> CpuAcceleratorBase::velocities(const std::vector<XY>& forces, double dt) const
+std::vector<XY> CpuAcceleratorBase::velocities(const std::vector<force_vector_t>& forces, time_type dt) const
 {
     assert(m_objects != nullptr);
 
@@ -106,14 +106,14 @@ std::vector<XY> CpuAcceleratorBase::velocities(const std::vector<XY>& forces, do
 
     for(std::size_t i = 0; i < objs; i++)
     {
-        const XY& dF = forces[i];
+        const force_vector_t& dF = forces[i];
         const Object& o = (*m_objects)[i];
 
         // F=am ⇒ a = F/m
-        const XY a = dF / o.mass();
+        const acceleration_vector_t a = dF / o.mass();
 
         // ΔV = aΔt
-        const XY dv = a * dt;
+        const velocity_vector_t dv = a * dt;
 
         result.push_back(dv);
     }

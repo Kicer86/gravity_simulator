@@ -36,8 +36,8 @@ class CpuAcceleratorBase: public IAccelerator
 
         void setObjects(Objects *) final;
 
-        virtual std::vector<XY> forces() final;
-        std::vector<XY> velocities(const std::vector<XY>& forces, double dt) const;
+        virtual std::vector<force_vector_t> forces() final;
+        std::vector<XY> velocities(const std::vector<force_vector_t>& forces, time_type dt) const override;
         virtual std::vector< std::pair<int, int> > collisions() const final;
 
     protected:
@@ -45,7 +45,7 @@ class CpuAcceleratorBase: public IAccelerator
 
         XY force(std::size_t, std::size_t) const;
 
-        virtual void forcesFor(std::size_t, std::vector<XY> &) const = 0;
+        virtual void forcesFor(std::size_t, std::vector<force_vector_t> &) const = 0;
 };
 
 #endif // CPUACCELERATOR_BASE_HPP

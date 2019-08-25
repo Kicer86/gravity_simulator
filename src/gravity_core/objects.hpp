@@ -101,7 +101,7 @@ class Objects
         // hight level access
         void setPos(std::size_t idx, const XY &);
         void setVelocity(std::size_t idx, const XY &);
-        void setMass(std::size_t idx, BaseType);
+        void setMass(std::size_t idx, mass_type);
         void setRadius(std::size_t idx, BaseType);
 
         XY getPos(std::size_t idx) const;

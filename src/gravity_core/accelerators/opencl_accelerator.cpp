@@ -73,17 +73,17 @@ void OpenCLAccelerator::setObjects(Objects* objects)
 }
 
 
-std::vector<XY> OpenCLAccelerator::forces()
+std::vector<force_vector_t> OpenCLAccelerator::forces()
 {
     const int count = m_objects->size();
-    std::vector<XY> host_force(count);
+    std::vector<force_vector_t> host_force(count);
 
     boost::compute::command_queue queue(m_context, m_device);
 
     boost::compute::buffer objX(m_context, count * sizeof(float), boost::compute::buffer::read_only);
     boost::compute::buffer objY(m_context, count * sizeof(float), boost::compute::buffer::read_only);
     boost::compute::buffer mass(m_context, count * sizeof(float), boost::compute::buffer::read_only);
-    boost::compute::buffer force(m_context, count * sizeof(XY), boost::compute::buffer::write_only);
+    boost::compute::buffer force(m_context, count * sizeof(force_vector_t), boost::compute::buffer::write_only);
 
     auto objXFuture = queue.enqueue_write_buffer_async(objX, 0, count * sizeof(float), m_objects->getX().data());
     auto objYFuture = queue.enqueue_write_buffer_async(objY, 0, count * sizeof(float), m_objects->getY().data());
@@ -118,21 +118,21 @@ std::vector<XY> OpenCLAccelerator::forces()
 }
 
 
-std::vector<XY> OpenCLAccelerator::velocities(const std::vector<XY>& forces, double dt) const
+std::vector<XY> OpenCLAccelerator::velocities(const std::vector<force_vector_t>& forces, time_type dt) const
 {
     std::vector<XY> result;
     result.reserve(m_objects->size());
 
     for(std::size_t i = 0; i < m_objects->size(); i++)
     {
-        const XY& dF = forces[i];
+        const force_vector_t& dF = forces[i];
         const Object& o = (*m_objects)[i];
 
         // F=am ⇒ a = F/m
-        const XY a = dF / o.mass();
+        const acceleration_vector_t a = dF / o.mass();
 
         // ΔV = aΔt
-        const XY dv = a * dt;
+        const velocity_vector_t dv = a * dt;
 
         result.push_back(dv);
     }

@@ -118,7 +118,7 @@ Object::Object(BaseType x, BaseType y, BaseType m, BaseType r, BaseType v_x, Bas
 }
 
 
-BaseType Object::mass() const
+mass_type Object::mass() const
 {
     return m_mass;
 }
@@ -136,7 +136,7 @@ const XY& Object::pos() const
 }
 
 
-const XY& Object::velocity() const
+const velocity_vector_t& Object::velocity() const
 {
     return m_v;
 }

@@ -34,13 +34,13 @@ SimpleCpuAccelerator::~SimpleCpuAccelerator()
 }
 
 
-void SimpleCpuAccelerator::forcesFor(std::size_t i, std::vector<XY>& forces) const
+void SimpleCpuAccelerator::forcesFor(std::size_t i, std::vector<force_vector_t>& forces) const
 {
     const std::size_t count = m_objects->size();
 
     for(std::size_t j = i + 1; j < count; j++)
     {
-        const XY force_vector = force(i, j);
+        const force_vector_t force_vector = force(i, j);
 
         forces[i] += force_vector;
         forces[j] += -force_vector;
