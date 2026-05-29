@@ -20,19 +20,30 @@
 
 #include "simulation_controller.hpp"
 
-#include <cassert>
+#include <algorithm>
+#include <cmath>
 
 #include "objects_scene.hpp"
+#include "simulation_preset.hpp"
 
-bool equal(BaseType l, BaseType r)
+namespace
 {
-    return std::abs(l - r) < 0.00001;
-}
+    constexpr BaseType MIN_VISIBLE_RADIUS_RATIO = 240.0;
 
-BaseType fRand(BaseType fMin, BaseType fMax)
-{
-    BaseType f = static_cast<BaseType>(rand()) / RAND_MAX;
-    return fMin + f * (fMax - fMin);
+
+    BaseType minimumVisibleObjectRadius(const SimulationPreset& preset)
+    {
+        BaseType maxExtent = 400e6;
+
+        for (const Object& object: preset.objects)
+        {
+            const XY& pos = object.pos();
+            maxExtent = std::max(maxExtent, static_cast<BaseType>(std::abs(pos.x)));
+            maxExtent = std::max(maxExtent, static_cast<BaseType>(std::abs(pos.y)));
+        }
+
+        return maxExtent / MIN_VISIBLE_RADIUS_RATIO;
+    }
 }
 
 
@@ -145,75 +156,12 @@ void SimulationController::setScene(ObjectsScene* scene)
 }
 
 
-void SimulationController::beginSimulation()
+void SimulationController::beginSimulation(const SimulationPreset& preset)
 {
-#if 0
-    srand(3);
+    m_scene->setMinimumVisualRadius(minimumVisibleObjectRadius(preset));
 
-    for (int i = 0; i < 2000; i++)
-    {
-        const BaseType x = fRand(-5000e6, 5000e6);
-        const BaseType y = fRand(-5000e6, 5000e6);
-
-        const BaseType v_x = fRand(-5e2, 5e2);
-        const BaseType v_y = fRand(-5e2, 5e2);
-
-        m_engine.addObject( Object(x, y, 7.347673e24, 1737.1e3, v_x, v_y) );
-        //int id2 = m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
-        //int id3 = m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
-        //int id4 = m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
-    }
-#elif 0
-    m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
-    m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 500, 1.022e3) );
-    m_engine.addObject( Object(-384400e3, 0, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
-    m_engine.addObject( Object(-184400e3, 184400e3, 7.347673e22, 1737.1e3, 0.0, -1.022e3) );
-#elif 1
-    m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
-
-    for(int i = 1; i < 32; i++)
-        m_engine.addObject( Object(384400e3 * i/10, 0, 7.347673e22,  1737.1e3, 0, 1.022e3 * (i%2? 1: -1)) );
-#elif 0
-    m_engine.addObject( Object(0, 0, 5.9736e24, 6371e3) );
-    m_engine.addObject( Object(384400e3, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
-#endif
-
-#if 0
-    SimulationEngine engine1(false);
-    SimulationEngine engine2(true);
-
-    engine1.addObject( Object(0, 0, 5.9736e24, 6371e3) );
-
-    for(int i = 1; i < 8; i++)
-        engine1.addObject( Object(384400e3 * i/10, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
-
-    engine2.addObject( Object(0, 0, 5.9736e24, 6371e3) );
-
-    for(int i = 1; i < 8; i++)
-        engine2.addObject( Object(384400e3 * i/10, 0, 7.347673e22,  1737.1e3, 0, 1.022e3) );
-
-    for(int i = 0; ;i++)
-    {
-        engine1.step();
-        engine2.step();
-
-        const Objects& obj1 = engine1.objects();
-        const Objects& obj2 = engine2.objects();
-
-        assert( obj1.size() == obj2.size() );
-        for(std::size_t j = 0; j < obj1.size(); j++)
-        {
-            assert( obj1.getId()[j] == obj2.getId()[j] );
-            assert( equal(obj1.getX()[j], obj2.getX()[j]) );
-            assert( equal(obj1.getY()[j], obj2.getY()[j]) );
-            assert( equal(obj1.getVX()[j], obj2.getVX()[j]) );
-            assert( equal(obj1.getVY()[j], obj2.getVY()[j]) );
-            assert( equal(obj1.getMass()[j], obj2.getMass()[j]) );
-            assert( equal(obj1.getRadius()[j], obj2.getRadius()[j]) );
-        }
-    }
-#endif
-
+    for (const Object& object: preset.objects)
+        m_engine.addObject(object);
 
     // for performance checks
 #if 0

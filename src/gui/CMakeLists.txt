@@ -27,6 +27,10 @@ add_executable(gravity_simulator
                objects_scene.hpp
                objects_view.cpp
                objects_view.hpp
+               simulation_preset_dialog.cpp
+               simulation_preset_dialog.hpp
+               simulation_preset.cpp
+               simulation_preset.hpp
                simulation_controller.cpp
                simulation_controller.hpp
                simulation_info_widget.cpp

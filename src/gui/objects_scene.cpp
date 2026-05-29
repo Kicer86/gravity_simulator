@@ -19,6 +19,7 @@
 
 #include "objects_scene.hpp"
 
+#include <algorithm>
 #include <cassert>
 
 #include <QColor>
@@ -26,7 +27,7 @@
 #include <QPen>
 #include <QGraphicsSceneMouseEvent>
 
-ObjectsScene::ObjectsScene(): m_objects(), track_id(0)
+ObjectsScene::ObjectsScene(): m_objects(), track_id(0), m_minimumVisualRadius(0.0)
 {
     const BaseType grid = 400e6;
     QPen pen;
@@ -114,12 +115,19 @@ void ObjectsScene::removeObject(int id)
 }
 
 
+void ObjectsScene::setMinimumVisualRadius(BaseType radius)
+{
+    m_minimumVisualRadius = radius;
+}
+
+
 QGraphicsItem* ObjectsScene::createItem(BaseType radius)
 {
-    const QSizeF size(2 * radius, 2 * radius);
-    const QRectF rect(QPointF(-radius, -radius), size);
+    const BaseType visualRadius = std::max(radius, m_minimumVisualRadius);
+    const QSizeF size(2 * visualRadius, 2 * visualRadius);
+    const QRectF rect(QPointF(-visualRadius, -visualRadius), size);
     QPen pen(Qt::red);
-    pen.setWidthF(10e6);
+    pen.setWidthF(std::max(10e6, visualRadius / 5.0));
 
     QGraphicsItem* item = addEllipse(rect, pen, QBrush(Qt::SolidPattern));
 

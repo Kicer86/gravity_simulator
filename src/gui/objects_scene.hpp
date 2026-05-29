@@ -42,6 +42,7 @@ class ObjectsScene: public QGraphicsScene
         void updateMass(int id, mass_type m);
         void updateTrackInfo(void);
         void removeObject(int id);
+        void setMinimumVisualRadius(BaseType);
     signals:
         void objectDataUpdated(const QGraphicsItem *);
     protected:
@@ -49,6 +50,7 @@ class ObjectsScene: public QGraphicsScene
     private:
         std::unordered_map<int, QGraphicsItem *> m_objects;
         int track_id;
+        BaseType m_minimumVisualRadius;
 
         QGraphicsItem* createItem(BaseType);
 };
