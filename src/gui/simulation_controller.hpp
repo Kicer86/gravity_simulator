@@ -32,6 +32,7 @@
 #include "accelerators/avx_accelerator.hpp"
 
 class ObjectsScene;
+struct SimulationPreset;
 
 struct Tick
 {
@@ -67,7 +68,7 @@ class SimulationController: public QObject, ISimulationEvents
 
         void setScene(ObjectsScene *);
 
-        void beginSimulation();
+        void beginSimulation(const SimulationPreset &);
         int fps() const;
 
     private:
