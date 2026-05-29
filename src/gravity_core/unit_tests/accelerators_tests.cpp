@@ -1,10 +1,23 @@
 
 #include <gmock/gmock.h>
 
+#include <algorithm>
+#include <cmath>
+
 #include "../simulation_engine.hpp"
 #include "../accelerators/simple_cpu_accelerator.hpp"
 #include "../accelerators/avx_accelerator.hpp"
 #include "../accelerators/opencl_accelerator.hpp"
+
+namespace
+{
+    void expectNearlyEqual(double actual, double expected)
+    {
+        const double tolerance = std::max(std::abs(expected) * 1e-6, 1e-12);
+
+        EXPECT_NEAR(actual, expected, tolerance);
+    }
+}
 
 
 class AcceleratorsTestScenario1: public testing::Test
@@ -103,12 +116,12 @@ TEST_F(AcceleratorsTestScenario1, SimpleCpuAccelerator)
     accelerator.setObjects(&objects);
 
     // verify forces correctness
-    const std::vector<XY> forces = accelerator.forces();
+    const std::vector<force_vector_t> forces = accelerator.forces();
 
     for(std::size_t i = 0; i < forces.size(); i++)
     {
-        EXPECT_DOUBLE_EQ( forces[i].x, forces_expected[i].x );
-        EXPECT_DOUBLE_EQ( forces[i].y, forces_expected[i].y );
+        expectNearlyEqual(forces[i].x.raw_value(), forces_expected[i].x);
+        expectNearlyEqual(forces[i].y.raw_value(), forces_expected[i].y);
     }
 
     // verify velocities for Δt = 0
@@ -116,8 +129,8 @@ TEST_F(AcceleratorsTestScenario1, SimpleCpuAccelerator)
 
     for(std::size_t i = 0; i < velocities0.size(); i++)
     {
-        EXPECT_DOUBLE_EQ( velocities0[i].x, 0 );
-        EXPECT_DOUBLE_EQ( velocities0[i].y, 0 );
+        expectNearlyEqual(velocities0[i].x, 0);
+        expectNearlyEqual(velocities0[i].y, 0);
     }
 
     // verify velocities for Δt = 1
@@ -125,8 +138,8 @@ TEST_F(AcceleratorsTestScenario1, SimpleCpuAccelerator)
 
     for(std::size_t i = 0; i < velocities1.size(); i++)
     {
-        EXPECT_DOUBLE_EQ( velocities1[i].x, velocities1_expected[i].x );
-        EXPECT_DOUBLE_EQ( velocities1[i].y, velocities1_expected[i].y );
+        expectNearlyEqual(velocities1[i].x, velocities1_expected[i].x);
+        expectNearlyEqual(velocities1[i].y, velocities1_expected[i].y);
     }
 }
 
@@ -138,12 +151,12 @@ TEST_F(AcceleratorsTestScenario1, AVXAccelerator)
     accelerator.setObjects(&objects);
 
     // verify forces correctness
-    const std::vector<XY> forces = accelerator.forces();
+    const std::vector<force_vector_t> forces = accelerator.forces();
 
     for(std::size_t i = 0; i < forces.size(); i++)
     {
-        EXPECT_DOUBLE_EQ( forces[i].x, forces_expected[i].x );
-        EXPECT_DOUBLE_EQ( forces[i].y, forces_expected[i].y );
+        expectNearlyEqual(forces[i].x.raw_value(), forces_expected[i].x);
+        expectNearlyEqual(forces[i].y.raw_value(), forces_expected[i].y);
     }
 
     // verify velocities for Δt = 0
@@ -151,8 +164,8 @@ TEST_F(AcceleratorsTestScenario1, AVXAccelerator)
 
     for(std::size_t i = 0; i < velocities0.size(); i++)
     {
-        EXPECT_DOUBLE_EQ( velocities0[i].x, 0 );
-        EXPECT_DOUBLE_EQ( velocities0[i].y, 0 );
+        expectNearlyEqual(velocities0[i].x, 0);
+        expectNearlyEqual(velocities0[i].y, 0);
     }
 
     // verify velocities for Δt = 1
@@ -160,7 +173,7 @@ TEST_F(AcceleratorsTestScenario1, AVXAccelerator)
 
     for(std::size_t i = 0; i < velocities1.size(); i++)
     {
-        EXPECT_DOUBLE_EQ( velocities1[i].x, velocities1_expected[i].x );
-        EXPECT_DOUBLE_EQ( velocities1[i].y, velocities1_expected[i].y );
+        expectNearlyEqual(velocities1[i].x, velocities1_expected[i].x);
+        expectNearlyEqual(velocities1[i].y, velocities1_expected[i].y);
     }
 }

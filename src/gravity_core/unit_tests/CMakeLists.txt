@@ -1,10 +1,10 @@
 
-find_package(OpenLibrary 2.2 REQUIRED)
+find_package(OpenLibrary 2.2 QUIET)
 
-include(${OPENLIBRARY_USE_FILE})
+if(OpenLibrary_FOUND)
+    include(${OPENLIBRARY_USE_FILE})
+endif()
 
-find_package(Threads REQUIRED)
-find_package(GMock REQUIRED)
 find_package(GTest REQUIRED)
 
 set(SRC
@@ -15,22 +15,19 @@ add_executable(accelerators_tests ${SRC})
 
 target_link_libraries(accelerators_tests
                         PRIVATE
-                            ${GMOCK_MAIN_LIBRARY}
-                            ${GMOCK_LIBRARY}
-                            ${CMAKE_THREAD_LIBS_INIT}
+                            GTest::gmock_main
                             ${ACC_LINKER_FLAGS}
                             gravity_core
 )
 
 target_include_directories(accelerators_tests
-                            SYSTEM PRIVATE
-                                ${GMOCK_INCLUDE_DIRS}
-                                ${GTEST_INCLUDE_DIRS}
                             PRIVATE
                                 ${CMAKE_SOURCE_DIR}/src
 )
 
 
-enableCodeCoverage(accelerators_tests)
+if(COMMAND enableCodeCoverage)
+    enableCodeCoverage(accelerators_tests)
+endif()
 
 add_test(accelerators accelerators_tests)

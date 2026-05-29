@@ -20,6 +20,10 @@
 #ifndef OPENCLACCELERATOR_HPP
 #define OPENCLACCELERATOR_HPP
 
+#ifndef BOOST_COMPUTE_MAX_CL_VERSION
+#define BOOST_COMPUTE_MAX_CL_VERSION 102
+#endif
+
 #include <boost/compute/core.hpp>
 
 #include "iaccelerator.hpp"
