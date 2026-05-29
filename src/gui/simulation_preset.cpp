@@ -19,12 +19,17 @@
 
 #include "simulation_preset.hpp"
 
+#include <cmath>
 #include <cstdint>
 #include <limits>
 
 
 namespace
 {
+    constexpr BaseType GRAVITATIONAL_CONSTANT = 6.67430e-11;
+    constexpr BaseType PI = 3.14159265358979323846;
+
+
     BaseType randomBetween(std::uint32_t& seed, BaseType min, BaseType max)
     {
         seed = seed * 1664525u + 1013904223u;
@@ -32,6 +37,12 @@ namespace
         const BaseType normalized = static_cast<BaseType>(seed) / static_cast<BaseType>(std::numeric_limits<std::uint32_t>::max());
 
         return min + normalized * (max - min);
+    }
+
+
+    BaseType circularVelocity(BaseType centralMass, BaseType radius)
+    {
+        return std::sqrt(GRAVITATIONAL_CONSTANT * centralMass / radius);
     }
 
 
@@ -90,6 +101,62 @@ namespace
             Object(384400e3, 0, 7.347673e22, 1737.1e3, 0, 1.022e3),
         };
     }
+
+
+    std::vector<Object> solarSystem()
+    {
+        return
+        {
+            Object(0, 0, 1.98847e30, 696340e3),
+            Object(57.9e9, 0, 3.3011e23, 2439.7e3, 0, 47.36e3),
+            Object(108.2e9, 0, 4.8675e24, 6051.8e3, 0, 35.02e3),
+            Object(149.6e9, 0, 5.97237e24, 6371e3, 0, 29.78e3),
+            Object(227.9e9, 0, 6.4171e23, 3389.5e3, 0, 24.07e3),
+            Object(778.6e9, 0, 1.8982e27, 69911e3, 0, 13.07e3),
+            Object(1433.5e9, 0, 5.6834e26, 58232e3, 0, 9.68e3),
+            Object(2872.5e9, 0, 8.6810e25, 25362e3, 0, 6.80e3),
+            Object(4495.1e9, 0, 1.02413e26, 24622e3, 0, 5.43e3),
+        };
+    }
+
+
+    std::vector<Object> binaryStars()
+    {
+        return
+        {
+            Object(-40e9, 0, 1.2e30, 540000e3, 0, -28.0e3),
+            Object(40e9, 0, 1.2e30, 540000e3, 0, 28.0e3),
+            Object(0, 220e9, 5.97237e24, 6371e3, -28.0e3, 0),
+            Object(0, -320e9, 6.4171e23, 3389.5e3, 22.0e3, 0),
+            Object(430e9, 0, 1.8982e27, 69911e3, 0, 20.0e3),
+        };
+    }
+
+
+    std::vector<Object> asteroidRing()
+    {
+        std::vector<Object> objects;
+        objects.reserve(97);
+
+        const BaseType centralMass = 1.98847e30;
+        objects.emplace_back(0, 0, centralMass, 696340e3);
+
+        for (int i = 0; i < 96; i++)
+        {
+            const BaseType angle = 2.0 * PI * i / 96.0;
+            const BaseType radius = 120e9 + (i % 12) * 9e9;
+            const BaseType speed = circularVelocity(centralMass, radius);
+
+            const BaseType x = std::cos(angle) * radius;
+            const BaseType y = std::sin(angle) * radius;
+            const BaseType v_x = -std::sin(angle) * speed;
+            const BaseType v_y = std::cos(angle) * speed;
+
+            objects.emplace_back(x, y, 3.0e20, 900e3, v_x, v_y);
+        }
+
+        return objects;
+    }
 }
 
 
@@ -116,6 +183,21 @@ const std::vector<SimulationPreset>& simulationPresets()
             QStringLiteral("Moon cloud"),
             QStringLiteral("Two thousand moon-mass bodies spread through a large square with random velocities."),
             moonCloud(),
+        },
+        {
+            QStringLiteral("Solar system"),
+            QStringLiteral("The Sun and eight planets with approximate average orbital distances and speeds."),
+            solarSystem(),
+        },
+        {
+            QStringLiteral("Binary stars"),
+            QStringLiteral("Two similar stars orbiting their common center with a few larger bodies nearby."),
+            binaryStars(),
+        },
+        {
+            QStringLiteral("Asteroid ring"),
+            QStringLiteral("A star surrounded by a dense ring of small bodies on circular trajectories."),
+            asteroidRing(),
         },
     };
 
