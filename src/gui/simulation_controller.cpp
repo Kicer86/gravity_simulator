@@ -20,8 +20,31 @@
 
 #include "simulation_controller.hpp"
 
+#include <algorithm>
+#include <cmath>
+
 #include "objects_scene.hpp"
 #include "simulation_preset.hpp"
+
+namespace
+{
+    constexpr BaseType MIN_VISIBLE_RADIUS_RATIO = 240.0;
+
+
+    BaseType minimumVisibleObjectRadius(const SimulationPreset& preset)
+    {
+        BaseType maxExtent = 400e6;
+
+        for (const Object& object: preset.objects)
+        {
+            const XY& pos = object.pos();
+            maxExtent = std::max(maxExtent, static_cast<BaseType>(std::abs(pos.x)));
+            maxExtent = std::max(maxExtent, static_cast<BaseType>(std::abs(pos.y)));
+        }
+
+        return maxExtent / MIN_VISIBLE_RADIUS_RATIO;
+    }
+}
 
 
 Tick::Tick():
@@ -135,6 +158,8 @@ void SimulationController::setScene(ObjectsScene* scene)
 
 void SimulationController::beginSimulation(const SimulationPreset& preset)
 {
+    m_scene->setMinimumVisualRadius(minimumVisibleObjectRadius(preset));
+
     for (const Object& object: preset.objects)
         m_engine.addObject(object);
 
