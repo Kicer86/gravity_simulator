@@ -20,6 +20,7 @@
 #include "main_window.hpp"
 
 #include "simulation_preset.hpp"
+#include "simulation_preset_dialog.hpp"
 #include "ui_main_window.h"
 
 
@@ -37,7 +38,13 @@ MainWindow::MainWindow():
     connect(&m_controller, &SimulationController::fpsUpdated, ui->simulationInfo, &SimulationInfoWidget::updateFps);
     connect(&m_controller, &SimulationController::objectCountUpdated, ui->simulationInfo, &SimulationInfoWidget::updateObjectCount);
     connect(&m_scene, &ObjectsScene::objectDataUpdated, ui->simulationInfo, &SimulationInfoWidget::updateObjectData);
-    m_controller.beginSimulation(defaultSimulationPreset());
+    SimulationPresetDialog presetDialog(this);
+    const SimulationPreset& preset = presetDialog.exec() == QDialog::Accepted?
+        presetDialog.selectedPreset():
+        defaultSimulationPreset();
+
+    setWindowTitle(QStringLiteral("Gravity simulator - %1").arg(preset.name));
+    m_controller.beginSimulation(preset);
 }
 
 
